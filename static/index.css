@@ -1,0 +1,242 @@
+#title {
+  color: white;
+}
+
+#promotion {
+  color: white;
+  text-align: center;
+  top: 35%;
+  left: 0;
+  right: 0;
+  width: 25%;
+  z-index: 1000;
+  position: fixed;
+  margin: auto;
+  background-color: rgb(30, 30, 30);
+  padding-bottom: 5px;
+}
+
+.welcomeScreen {
+  z-index: 1000;
+  background-color: rgb(30, 30, 30);
+  color: white;
+  position: fixed;
+  width: 50%;
+  margin:auto;
+  top: 35%;
+  left: 25%;
+  height: 260px;
+  text-align: center;
+}
+
+#welcomeScreen2, #welcomeScreenPC {
+  display: none;
+}
+
+.center {
+  text-align: center;
+}
+
+.square {
+  height: 90px;
+  width: 90px;
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+  position: absolute;
+  top: 0px;
+}
+
+.square0 {
+  left: 0px;
+}
+
+.square1 {
+  left: 90px;
+}
+
+.square2 {
+  left: 180px;
+}
+
+.square3 {
+  left: 270px;
+}
+
+.square4 {
+  left: 360px;
+}
+
+.square5 {
+  left: 450px;
+}
+
+.square6 {
+  left: 540px;
+}
+
+.square7 {
+  left: 630px;
+}
+
+.bg-black {
+  background-color: rgb(90, 156, 96)
+}
+
+.bg-white {
+  background-color: white
+}
+
+body {
+  background-color: rgb(60,60,60);
+}
+
+.chess_row {
+  padding: 0px;
+  margin: 0px;
+  height: 90px;
+  width: 720px;
+  position: relative;
+}
+
+.board {
+  margin: auto;
+  width: 720px;
+  position: relative;
+}
+
+.color_0 {
+  color: rgb(60,60,60)
+}
+
+.color_1 {
+  color: rgb(141, 102, 53);
+}
+
+.bg-color_0 {
+  background-color: rgb(60,60,60);
+}
+
+.bg-color_1 {
+  background-color: rgb(50,50,50);
+}
+
+.bg-black-main {
+  background-color: rgb(30, 30, 30);
+}
+
+#history {
+  width: 100%;
+  height: 305px;
+  background-color: rgb(50, 50, 50);
+  top: 100px;
+  margin-top: 15px;
+  left: 0px;
+  padding-bottom: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+#list {
+  color: white;
+  width: 100%;
+  height: 259px;
+  overflow-y: auto;
+}
+
+#evaluation {
+  margin-top: 15px;
+  background-color: rgb(50,50,50);
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
+}
+
+#evaluation_figure {
+  width: 100%;
+}
+
+#buttons {
+  background-color: rgb(50,50,50);
+  top: 537px;
+  height: 68px;
+  width: 100%;
+  margin-top: 15px;
+}
+
+#button {
+  margin-left: 15px;
+  margin-top: 15px;
+}
+
+#col_left {
+  color: white;
+  background-color: rgb(60, 60, 60);
+  padding-right: 0px
+}
+
+#col_right {
+  color: white;
+  background-color: rgb(60, 60, 60);
+  padding-left: 0px;
+}
+
+#timer {
+  color: black;
+  background-color: white;
+  text-align: center;
+}
+
+#timer2 {
+  color: black;
+  background-color: white;
+  text-align: center;
+}
+
+#timer1_div {
+  height: 100px;
+  width: 100%;
+  background-color: rgb(50,50,50);
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+#timer2_div {
+  height: 100px;
+  width: 100%;
+  background-color: rgb(50,50,50);
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-top: 15px;
+}
+
+.time {
+  background-color: rgb(200,200,200);
+  color: black;
+  height: 150px;
+  width: 150px;
+  vertical-align: middle;
+  text-align: center;
+  margin: auto;
+}
+
+svg {
+  height: 24px;
+  width: 100%;
+}
+
+#rect_left {
+  height: 24px;
+  fill: rgb(141, 102, 53);
+}
+
+#rect_right {
+  height: 24px;
+  fill: black;
+}
+
+#text {
+  height: 24px;
+  font-size: 16px;
+  fill: white;
+}

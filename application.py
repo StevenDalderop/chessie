@@ -9,7 +9,9 @@ socketio = SocketIO(app)
 if __name__ == '__main__':
     socketio.run(app)
 
-engine = chess.engine.SimpleEngine.popen_uci("stockfish-11-win/stockfish-11-win/Windows/stockfish_20011801_x64.exe")
+#engine = chess.engine.SimpleEngine.popen_uci("stockfish-11-win/stockfish-11-win/Windows/stockfish_20011801_x64.exe")
+engine = chess.engine.SimpleEngine.popen_uci("stockfish_12_linux_x64/stockfish_20090216_x64")
+
 engine.configure({"UCI_LimitStrength": True, "UCI_Elo": 2850})
 board = chess.Board()
 

@@ -11,7 +11,8 @@ if __name__ == '__main__':
     socketio.run(app)
 
 # engine = chess.engine.SimpleEngine.popen_uci("stockfish-11-win/stockfish-11-win/Windows/stockfish_20011801_x64.exe")
-engine = chess.engine.SimpleEngine.popen_uci("stockfish-11-linux/stockfish-11-linux/Linux/stockfish_20011801_x64")
+#engine = chess.engine.SimpleEngine.popen_uci("stockfish-11-linux/stockfish-11-linux/Linux/stockfish_20011801_x64")
+engine = chess.engine.SimpleEngine.popen_uci("stockfish_20090216_x64") # stockfish 12
 
 engine.configure({"UCI_LimitStrength": True, "UCI_Elo": 2850})
 board = chess.Board()

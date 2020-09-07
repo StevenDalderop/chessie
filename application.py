@@ -54,8 +54,8 @@ def move(data):
     if (board.is_game_over()):
         emit("announce game over", {"result": board.result()})
 
-    info = engine.analyse(board, chess.engine.Limit(time=0.5))
-    emit("announce score", {"score": info["score"].white().score()})
+    #info = engine.analyse(board, chess.engine.Limit(time=0.5))
+    #emit("announce score", {"score": info["score"].white().score()})
 
 @socketio.on("new game")
 def new_game(data):

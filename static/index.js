@@ -4,10 +4,6 @@ socket.on('connect', function () {
   console.log("connected");
 });
 
-socket.on("announce position", data => {
-  alert(data["position"]);
-});
-
 function Square(props) {
   return React.createElement(
     "button",

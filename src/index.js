@@ -4,8 +4,6 @@ socket.on('connect', function() {
     console.log("connected")
 });
 
-socket.on("announce position", (data) => {alert(data["position"])})
-
 function Square(props) {
   return (
     <button className={"square bg-" + props.square_color + " " + props.class} onClick={() => props.onClick()}>

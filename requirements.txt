@@ -1,3 +1,4 @@
+asyncio==3.4.3
 cffi==1.14.2
 click==7.1.2
 dnspython==1.16.0

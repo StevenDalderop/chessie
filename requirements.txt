@@ -5,7 +5,6 @@ dnspython==1.16.0
 eventlet==0.27.0
 Flask==1.1.2
 Flask-SocketIO==4.3.1
-gevent==20.6.2
 gevent-websocket==0.10.1
 greenlet==0.4.16
 gunicorn==20.0.4
@@ -18,6 +17,7 @@ python-chess==0.31.4
 python-engineio==3.13.2
 python-socketio==4.6.0
 six==1.15.0
+stockfish==3.10.2
 Werkzeug==1.0.1
 zope.event==4.4
 zope.interface==5.1.0

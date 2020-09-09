@@ -3,18 +3,20 @@ from flask_socketio import SocketIO, emit
 import chess
 import chess.engine
 import chess.pgn
-import asyncio
+import sys
+from stockfish import Stockfish
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, debug=False)
 
-# engine = chess.engine.SimpleEngine.popen_uci("stockfish-11-win/stockfish-11-win/Windows/stockfish_20011801_x64.exe")
-#engine = chess.engine.SimpleEngine.popen_uci("stockfish-11-linux/stockfish-11-linux/Linux/stockfish_20011801_x64")
-engine = chess.engine.SimpleEngine.popen_uci("./stockfish_20090216_x64") # stockfish 12
+if sys.platform == "linux":
+    stockfish = Stockfish("./stockfish_20090216_x64") # stockfish 12
+else:
+    stockfish = Stockfish("stockfish-11-win/stockfish-11-win/Windows/stockfish_20011801_x64.exe")
 
-engine.configure({"UCI_LimitStrength": True, "UCI_Elo": 2850})
 board = chess.Board()
 
 @app.route("/")
@@ -27,7 +29,7 @@ def index():
 @socketio.on("announce move human")
 def move(data):
     global board
-    global game
+    global stockfish
 
     promotion = None
     if (data["promotion"]):
@@ -45,25 +47,26 @@ def move(data):
         emit("announce game over", {"result": board.result()})
 
     if (data["vs"] == "pc"):
-        result = engine.play(board, chess.engine.Limit(time=1))
-        pc_move = result.move
-        board.push(pc_move)
+        stockfish.set_fen_position(board.fen())
+        move_string = stockfish.get_best_move_time(1000)
+        move = chess.Move.from_uci(move_string)
+        board.push(move)
         init_board = chess.Board()
         moves_san = init_board.variation_san(board.move_stack)
-        emit("announce move pc", {"fen": board.fen(), "move": pc_move.uci(), "moves_san": moves_san})
+        emit("announce move pc", {"fen": board.fen(), "move": move.uci(), "moves_san": moves_san})
 
     if (board.is_game_over()):
         emit("announce game over", {"result": board.result()})
 
-    info = engine.analyse(board, chess.engine.Limit(time=0.5))
-    emit("announce score", {"score": info["score"].white().score()})
+    # info = engine.analyse(board, chess.engine.Limit(time=0.5))
+    # emit("announce score", {"score": info["score"].white().score()})
 
 @socketio.on("new game")
 def new_game(data):
     global board
     board = chess.Board()
 
-@socketio.on("announce elo")
-def configure(data):
-    global engine
-    engine.configure({"UCI_LimitStrength": True, "UCI_Elo": data["elo"]})
+# @socketio.on("announce elo")
+# def configure(data):
+#     global engine
+#     engine.configure({"UCI_LimitStrength": True, "UCI_Elo": data["elo"]})

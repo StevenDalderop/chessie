@@ -1,9 +1,3 @@
-// Connect to websocket
-var socket = io();
-socket.on('connect', function () {
-  console.log("connected");
-});
-
 function Square(props) {
   return React.createElement(
     "button",
@@ -396,7 +390,13 @@ class Game extends React.Component {
         if (promotion) {
           this.setState({ "promotion": [row, column] });
         } else {
-          socket.emit("announce move human", { "row_start": selected_square[0], "col_start": selected_square[1], "row_end": row, "col_end": column, "promotion": null, "vs": this.state.vs });
+          fetch(`http://127.0.0.1:5000/validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`).then(response => response.json()).then(data => {
+            if (data["validated"] === "true") {
+              console.log("move validated");
+              this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false }));
+              this.startTimer();
+            }
+          });
         }
       }
     } else if (selected_square && !pieces[row][column]) {
@@ -407,7 +407,13 @@ class Game extends React.Component {
       if (promotion) {
         this.setState({ "promotion": [row, column] });
       } else {
-        socket.emit("announce move human", { "row_start": selected_square[0], "col_start": selected_square[1], "row_end": row, "col_end": column, "promotion": null, "vs": this.state.vs });
+        fetch(`http://127.0.0.1:5000/validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`).then(response => response.json()).then(data => {
+          if (data["validated"] === "true") {
+            console.log("move validated");
+            this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false }));
+            this.startTimer();
+          }
+        });
       }
     }
   }
@@ -460,27 +466,27 @@ class Game extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({ "history": [{ "pieces": this.fen_to_history(board) }] });
-
-    socket.on("announce validated move human", data => {
-      console.log("move validated");
-      this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "selected_square": null, "last_move": data["last_move"], "step": state.step + 1, "promotion": false, "san": data["moves_san"] }));
-      this.startTimer();
-    });
-
-    socket.on("announce move pc", data => {
-      console.log("move pc: " + data["move"]);
-      this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "selected_square": null, "last_move": 0, "step": state.step + 1, "san": data["moves_san"] }));
-      this.startTimer();
-    });
-
-    socket.on("announce score", data => {
-      this.setState({ "score": data["score"] });
-    });
-
-    socket.on("announce game over", data => {
-      this.setState({ "result": data["result"] });
-    });
+    // this.setState({"history": [{"pieces": this.fen_to_history(board)}]})
+    //
+    // socket.on("announce validated move human", (data) => {
+    //   console.log("move validated")
+    //   this.setState((state) => ({"history": state.history.concat([{"pieces": this.fen_to_history(data["fen"])}]), "selected_square": null, "last_move": data["last_move"], "step": state.step + 1, "promotion": false, "san": data["moves_san"]}))
+    //   this.startTimer()
+    // })
+    //
+    // socket.on("announce move pc", (data) => {
+    //   console.log("move pc: " + data["move"])
+    //   this.setState((state) => ({"history": state.history.concat([{"pieces": this.fen_to_history(data["fen"])}]), "selected_square": null, "last_move": 0, "step": state.step + 1, "san": data["moves_san"]}))
+    //   this.startTimer()
+    // })
+    //
+    // socket.on("announce score", (data) => {
+    //   this.setState({"score": data["score"]})
+    // })
+    //
+    // socket.on("announce game over", (data) => {
+    //   this.setState({"result": data["result"]})
+    // })
   }
 
   componentWillUnmount() {

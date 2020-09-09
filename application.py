@@ -3,7 +3,6 @@ import chess
 import chess.engine
 import chess.pgn
 import sys
-from stockfish import Stockfish
 
 app = Flask(__name__)
 

@@ -3,6 +3,8 @@ import chess
 import chess.engine
 import chess.pgn
 import sys
+import os
+import stat
 
 app = Flask(__name__)
 

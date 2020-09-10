@@ -20,9 +20,6 @@ function Promotion(props) {
   if (!props["promotion"]) {
     return null;
   } else {
-    let row = props["promotion"][0];
-    let column = props["promotion"][1];
-    let selected_square = props["selected_square"];
     return React.createElement(
       "div",
       { id: "promotion" },
@@ -33,22 +30,22 @@ function Promotion(props) {
       ),
       React.createElement(
         "button",
-        { className: "btn btn-primary mr-1", onClick: () => socket.emit("announce move human", { "row_start": selected_square[0], "col_start": selected_square[1], "row_end": row, "col_end": column, "promotion": 5, "vs": props["vs"] }) },
+        { className: "btn btn-primary mr-1", onClick: () => props.onClick("queen") },
         " Queen "
       ),
       React.createElement(
         "button",
-        { className: "btn btn-primary mr-1", onClick: () => socket.emit("announce move human", { "row_start": selected_square[0], "col_start": selected_square[1], "row_end": row, "col_end": column, "promotion": 2, "vs": props["vs"] }) },
+        { className: "btn btn-primary mr-1", onClick: () => props.onClick("knight") },
         " Knight "
       ),
       React.createElement(
         "button",
-        { className: "btn btn-primary mr-1", onClick: () => socket.emit("announce move human", { "row_start": selected_square[0], "col_start": selected_square[1], "row_end": row, "col_end": column, "promotion": 3, "vs": props["vs"] }) },
+        { className: "btn btn-primary mr-1", onClick: () => props.onClick("bishop") },
         " Bishop "
       ),
       React.createElement(
         "button",
-        { className: "btn btn-primary", onClick: () => socket.emit("announce move human", { "row_start": selected_square[0], "col_start": selected_square[1], "row_end": row, "col_end": column, "promotion": 4, "vs": props["vs"] }) },
+        { className: "btn btn-primary", onClick: () => props.onClick("rook") },
         " Rook "
       )
     );
@@ -380,39 +377,21 @@ class Game extends React.Component {
 
     if (!selected_square && pieces[row][column]) {
       this.setState({ "selected_square": [row, column] });
-    } else if (selected_square && pieces[row][column]) {
-      if (pieces[row][column][1] !== this.state.last_move) {
-        // Same color
-        this.setState({ "selected_square": [row, column] });
-      } else {
-        // Attack piece
-        let move = [String.fromCharCode(selected_square[1] + 97) + String(8 - selected_square[0]) + String.fromCharCode(column + 97) + String(8 - row)];
-        console.log("move human: " + move);
-        let promotion = pieces[selected_square[0]][selected_square[1]][0] === "pawn" && (row === 0 || row === 7);
-        if (promotion) {
-          this.setState({ "promotion": [row, column] });
-        } else {
-          fetch(`${baseURL}validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`).then(response => response.json()).then(data => {
-            if (data["validated"] === "true") {
-              console.log("move validated");
-              this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false }));
-              this.startTimer();
-            }
-          });
-        }
-      }
-    } else if (selected_square && !pieces[row][column]) {
-      // Move piece
+    } else if (selected_square && pieces[row][column] && pieces[row][column][1] !== this.state.last_move) {
+      // Same color
+      this.setState({ "selected_square": [row, column] });
+    } else if (selected_square && pieces[row][column] && pieces[row][column][1] === this.state.last_move || selected_square && !pieces[row][column]) {
+      // Move or attack piece
       let move = [String.fromCharCode(selected_square[1] + 97) + String(8 - selected_square[0]) + String.fromCharCode(column + 97) + String(8 - row)];
       console.log("move human: " + move);
       let promotion = pieces[selected_square[0]][selected_square[1]][0] === "pawn" && (row === 0 || row === 7);
       if (promotion) {
         this.setState({ "promotion": [row, column] });
       } else {
-        fetch(`${baseURL}validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`).then(response => response.json()).then(data => {
+        fetch(`${baseURL}validated_move_info/${selected_square[0]}/${selected_square[1]}/${row}/${column}`).then(response => response.json()).then(data => {
           if (data["validated"] === "true") {
             console.log("move validated");
-            this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false }));
+            this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "result": data["result"], "last_move": data["last_move"], "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false }));
             this.startTimer();
           }
         });
@@ -437,9 +416,22 @@ class Game extends React.Component {
 
   handleClick3(e) {
     e.preventDefault();
-    socket.emit("announce elo", { "elo": this.state.elo });
+    fetch(`${baseURL}configure/${this.state.elo}`);
     document.querySelector("#welcomeScreenPC").style.display = "none";
     document.querySelector("#welcomeScreen2").style.display = "initial";
+  }
+
+  handleClickPromotion(piece) {
+    let row = this.state.promotion[0];
+    let column = this.state.promotion[1];
+    let selected_square = this.state.selected_square;
+    fetch(`${baseURL}validated_move_info/${selected_square[0]}/${selected_square[1]}/${row}/${column}/${piece}`).then(response => response.json()).then(data => {
+      if (data["validated"] === "true") {
+        console.log("move validated");
+        this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "result": data["result"], "last_move": data["last_move"], "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false }));
+        this.startTimer();
+      }
+    });
   }
 
   startTimer() {
@@ -464,7 +456,7 @@ class Game extends React.Component {
       "history": this.state.history.slice(0, 1),
       "san": null,
       "score": 0 });
-    socket.emit("new game", { "new_game": true });
+    fetch(`${baseURL}new_game`);
   }
 
   componentDidMount() {
@@ -485,10 +477,6 @@ class Game extends React.Component {
     // socket.on("announce score", (data) => {
     //   this.setState({"score": data["score"]})
     // })
-    //
-    // socket.on("announce game over", (data) => {
-    //   this.setState({"result": data["result"]})
-    // })
   }
 
   componentWillUnmount() {
@@ -506,7 +494,7 @@ class Game extends React.Component {
       React.createElement(Welcome1, { onClick: option => this.handleClick1(option) }),
       React.createElement(Welcome2, { onClick: time => this.handleClick2(time) }),
       React.createElement(WelcomePC, { onChange: e => this.setState({ "elo": e.target.value }), elo_value: this.state.elo, onSubmit: e => this.handleClick3(e) }),
-      React.createElement(Promotion, { selected_square: this.state.selected_square, promotion: this.state.promotion, vs: this.state.vs }),
+      React.createElement(Promotion, { promotion: this.state.promotion, onClick: piece => this.handleClickPromotion(piece) }),
       React.createElement(Message, { title: "Result", text: this.state.result, onClick: () => {
           document.querySelector("#message").style.display = "none";this.setState({ "result": null });
         } }),

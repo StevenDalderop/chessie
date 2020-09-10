@@ -1,3 +1,5 @@
+const baseURL = window.location.href;
+
 function Square(props) {
   return React.createElement(
     "button",
@@ -390,7 +392,7 @@ class Game extends React.Component {
         if (promotion) {
           this.setState({ "promotion": [row, column] });
         } else {
-          fetch(`http://127.0.0.1:5000/validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`).then(response => response.json()).then(data => {
+          fetch(`${baseURL}validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`).then(response => response.json()).then(data => {
             if (data["validated"] === "true") {
               console.log("move validated");
               this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false }));
@@ -407,7 +409,7 @@ class Game extends React.Component {
       if (promotion) {
         this.setState({ "promotion": [row, column] });
       } else {
-        fetch(`http://127.0.0.1:5000/validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`).then(response => response.json()).then(data => {
+        fetch(`${baseURL}validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`).then(response => response.json()).then(data => {
           if (data["validated"] === "true") {
             console.log("move validated");
             this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false }));

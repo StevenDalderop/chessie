@@ -1,3 +1,5 @@
+const baseURL = window.location.href
+
 function Square(props) {
   return (
     <button className={"square bg-" + props.square_color + " " + props.class} onClick={() => props.onClick()}>
@@ -252,7 +254,7 @@ class Game extends React.Component {
         if (promotion) {
          this.setState({"promotion": [row, column]})
        } else {
-         fetch(`http://127.0.0.1:5000/validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
+         fetch(`${baseURL}validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
            .then(response => response.json())
            .then (data => {
               if (data["validated"] === "true") {
@@ -270,7 +272,7 @@ class Game extends React.Component {
       if (promotion) {
        this.setState({"promotion": [row, column]})
       } else {
-        fetch(`http://127.0.0.1:5000/validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
+        fetch(`${baseURL}validate_move/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
           .then(response => response.json())
           .then (data => {
              if (data["validated"] === "true") {

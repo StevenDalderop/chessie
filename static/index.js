@@ -465,6 +465,7 @@ class Game extends React.Component {
     this.interval = setInterval(() => {
       let seconds = this.state.times[!this.state.last_move ? 1 : 0];
       if (seconds === 0) {
+        this.setState(state => ({ "result": state.last_move ? "1-0" : "0-1" }));
         clearInterval(this.interval);
       } else {
         seconds = seconds - 1;

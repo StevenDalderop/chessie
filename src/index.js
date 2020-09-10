@@ -239,10 +239,8 @@ class Game extends React.Component {
     let pieces = current.pieces
     let selected_square = this.state.selected_square
 
-    if (!selected_square && pieces[row][column]) {
+    if ((!selected_square && pieces[row][column]) || (selected_square && pieces[row][column] && pieces[row][column][1] !== this.state.last_move)) {
       this.setState({"selected_square": [row, column]})
-    } else if (selected_square && pieces[row][column] && pieces[row][column][1] !== this.state.last_move) { // Same color
-        this.setState({"selected_square": [row, column]})
     } else if ((selected_square && pieces[row][column] && pieces[row][column][1] === this.state.last_move) || (selected_square && !pieces[row][column])) { // Move or attack piece
         let move = [String.fromCharCode(selected_square[1] + 97) + String(8 - selected_square[0]) + String.fromCharCode(column + 97) + String(8 - row)]
         console.log("move human: " + move)
@@ -250,19 +248,47 @@ class Game extends React.Component {
         if (promotion) {
          this.setState({"promotion": [row, column]})
        } else {
-         fetch(`${baseURL}validated_move_info/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
-           .then(response => response.json())
-           .then (data => {
-              if (data["validated"] === "true") {
-                console.log("move validated")
-                this.setState((state) => ({"history": state.history.concat([{"pieces": this.fen_to_history(data["fen"])}]), "result": data["result"], "last_move": data["last_move"], "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false}))
-                this.startTimer()
-              }
-           })
+         this.make_moves(selected_square, row, column)
        }
     }
   }
 
+  async make_moves(selected_square, row, column) {
+    let response = await fetch(`${baseURL}validated_move_info/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
+    let data = await response.json()
+
+    if (data["validated"] === "true") {
+       console.log("move validated")
+       this.setState((state) => ({
+         "history": state.history.concat([{"pieces": this.fen_to_history(data["fen"])}]),
+         "result": data["result"],
+         "last_move": data["last_move"],
+         "score": data["score"],
+         "selected_square": null,
+         "san": data["moves_san"],
+         "step": state.step + 1,
+         "promotion": false
+       }))
+       this.startTimer()
+     }
+
+     if (this.state.vs === "pc") {
+       fetch(`${baseURL}get_pc_move`)
+       .then(response => response.json())
+       .then((data) => {
+         this.setState((state) => ({
+           "history": state.history.concat([{"pieces": this.fen_to_history(data["fen"])}]),
+           "result": data["result"],
+           "last_move": data["last_move"],
+           "score": data["score"],
+           "selected_square": null,
+           "san": data["moves_san"],
+           "step": state.step + 1,
+           "promotion": false
+         }))
+       })
+     }
+  }
 
   handleClick1 (option) {
     document.querySelector("#welcomeScreen1").style.display = "none"
@@ -327,23 +353,7 @@ class Game extends React.Component {
   }
 
   componentDidMount() {
-    // this.setState({"history": [{"pieces": this.fen_to_history(board)}]})
-    //
-    // socket.on("announce validated move human", (data) => {
-    //   console.log("move validated")
-    //   this.setState((state) => ({"history": state.history.concat([{"pieces": this.fen_to_history(data["fen"])}]), "selected_square": null, "last_move": data["last_move"], "step": state.step + 1, "promotion": false, "san": data["moves_san"]}))
-    //   this.startTimer()
-    // })
-    //
-    // socket.on("announce move pc", (data) => {
-    //   console.log("move pc: " + data["move"])
-    //   this.setState((state) => ({"history": state.history.concat([{"pieces": this.fen_to_history(data["fen"])}]), "selected_square": null, "last_move": 0, "step": state.step + 1, "san": data["moves_san"]}))
-    //   this.startTimer()
-    // })
-    //
-    // socket.on("announce score", (data) => {
-    //   this.setState({"score": data["score"]})
-    // })
+    this.setState({"history": [{"pieces": this.fen_to_history(board)}]}) // Copy board from server
   }
 
   componentWillUnmount() {

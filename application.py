@@ -83,27 +83,3 @@ def pc_move():
         "score": info["score"].white().score(),
         "result": result
     }
-
-
-# @socketio.on("announce move human")
-# def move(data):
-
-
-#     if (data["vs"] == "pc"):
-#         stockfish.set_fen_position(board.fen())
-#         move_string = stockfish.get_best_move_time(1000)
-#         move = chess.Move.from_uci(move_string)
-#         board.push(move)
-#         init_board = chess.Board()
-#         moves_san = init_board.variation_san(board.move_stack)
-#         emit("announce move pc", {"fen": board.fen(), "move": move.uci(), "moves_san": moves_san})
-#
-#     # info = engine.analyse(board, chess.engine.Limit(time=0.5))
-#     # emit("announce score", {"score": info["score"].white().score()})
-
-
-
-# @socketio.on("announce elo")
-# def configure(data):
-#     global engine
-#     engine.configure({"UCI_LimitStrength": True, "UCI_Elo": data["elo"]})

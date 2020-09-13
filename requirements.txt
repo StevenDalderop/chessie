@@ -13,6 +13,7 @@ pycparser==2.20
 python-chess==0.31.4
 python-engineio==3.13.2
 six==1.15.0
+stockfish==3.10.2
 Werkzeug==1.0.1
 zope.event==4.4
 zope.interface==5.1.0

@@ -4,6 +4,7 @@ import chess.engine
 import sys
 import os
 import stat
+from stockfish import Stockfish
 
 app = Flask(__name__)
 
@@ -12,9 +13,9 @@ if __name__ == '__main__':
 
 if sys.platform == "linux":
     os.chmod("./stockfish_20011801_x64", stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-    engine = chess.engine.SimpleEngine.popen_uci("./stockfish_20011801_x64")
+    stockfish = Stockfish("./stockfish_20011801_x64")
 else:
-    engine = chess.engine.SimpleEngine.popen_uci("./stockfish_20011801_x64.exe")
+    stockfish = Stockfish("./stockfish_20011801_x64.exe")
 
 board = chess.Board()
 
@@ -41,14 +42,16 @@ def validated_move_info(row_start, col_start, row_end, col_end, promotion):
         init_board = chess.Board()
         moves_san = init_board.variation_san(board.move_stack)
         last_move = 0 if board.turn else 1
-        info = engine.analyse(board, chess.engine.Limit(time=0.1))
+        stockfish.set_fen_position(board.fen())
+        info = stockfish.get_evaluation()
+        score = None if info["type"] != "cp" else info["value"]
         result = None if not board.is_game_over() else board.result()
         return {
             "validated": "true",
             "fen": board.fen(),
             "moves_san": moves_san,
             "last_move": last_move,
-            "score": info["score"].white().score(),
+            "score": score,
             "result": result
         }
     else:
@@ -69,17 +72,20 @@ def configure(elo):
 @app.route("/get_pc_move")
 def pc_move():
     global board
-    result = engine.play(board, chess.engine.Limit(time = 0.1))
-    board.push(result.move)
+    stockfish.set_fen_position(board.fen())
+    move = stockfish.get_best_move_time(100)
+    board.push(chess.Move.from_uci(move))
     init_board = chess.Board()
     moves_san = init_board.variation_san(board.move_stack)
     last_move = 0 if board.turn else 1
-    info = engine.analyse(board, chess.engine.Limit(time=0.1))
+    stockfish.set_fen_position(board.fen())
+    info = stockfish.get_evaluation()
+    score = None if info["type"] != "cp" else info["value"]
     result = None if not board.is_game_over() else board.result()
     return {
         "fen": board.fen(),
         "moves_san": moves_san,
         "last_move": last_move,
-        "score": info["score"].white().score(),
+        "score": score,
         "result": result
     }

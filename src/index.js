@@ -1,5 +1,11 @@
 const baseURL = window.location.href
 
+var socket = io()
+socket.on('connect', () => {
+  socket.emit("connected", {"data": "I am connected"})
+})
+
+
 function Square(props) {
   return (
     <button className={"square bg-" + props.square_color + " " + props.class} onClick={() => props.onClick()}>

@@ -1,4 +1,5 @@
 from flask import render_template, Flask
+from flask_socketio import SocketIO
 import chess
 import chess.engine
 import sys
@@ -7,9 +8,10 @@ import stat
 from stockfish import Stockfish
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    socketio.run(app)
 
 if sys.platform == "linux":
     os.chmod("./stockfish_20011801_x64", stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
@@ -89,3 +91,7 @@ def pc_move():
         "score": score,
         "result": result
     }
+
+@socketio.on("connected")
+def handle_message(message):
+    print(message)

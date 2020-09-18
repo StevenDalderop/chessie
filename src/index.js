@@ -1,10 +1,6 @@
 const baseURL = window.location.href
 
 var socket = io()
-socket.on('connect', () => {
-  socket.emit("connected", {"data": "I am connected"})
-})
-
 
 function Square(props) {
   return (
@@ -52,13 +48,16 @@ function Message(props) {
   }
 }
 
-function Welcome1(props) {
+function StartScreen(props) {
   return (
     <div id="welcomeScreen1" className="welcomeScreen">
       <h1> Welcome </h1>
       <div className="row">
         <div className="col">
-          <div className="time" onClick={() => props.onClick("human")}> <h3> vs Human </h3> </div>
+          <div className="time" onClick={() => props.onClick("human")}> <h3> vs Human on same PC </h3> </div>
+        </div>
+        <div className="col">
+          <div className="time" onClick={() => props.onClick("human_other")}> <h3> vs Human on other PC </h3> </div>
         </div>
         <div className="col">
           <div className="time" onClick={() => props.onClick("pc")}> <h3> vs PC </h3> </div>
@@ -68,7 +67,7 @@ function Welcome1(props) {
   )
 }
 
-function Welcome2(props) {
+function WelcomeHuman(props) {
   return (
     <div id="welcomeScreen2" className="welcomeScreen">
       <h1> Welcome </h1>
@@ -86,6 +85,62 @@ function Welcome2(props) {
           <div className="time" onClick={() => props.onClick(600)}> <h3> 10 minutes </h3> </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function WelcomeHumanOther(props) {
+  return (
+    <div id="humanOther" className="welcomeScreen">
+      <h1> Welcome </h1>
+      <div>
+        <form onSubmit={(e) => props.onSubmit(e)}>
+          <label> What is your username? </label> <br></br>
+          <input id="username" type="text" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
+          <button className="btn btn-primary mt-3"> Submit </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function UsersOnline(props) {
+  let users = []
+  let i = 0
+  let u
+  for (u of props["usernames"]) {
+    users.push(<li key={i}> {u} </li>)
+    i++
+  }
+  let games = []
+  let j = 0
+  let g
+  for (g of props["games"]) {
+    games.push(<li key={j} onClick={() => props.onClickGame(g["username"], g["room"], g["time"])}> {g["username"]} ({g["time"]} seconds) </li>)
+    j++
+  }
+  return (
+    <div id="usersOnline" className="welcomeScreen">
+      <h1> Vs human on other PC </h1>
+      <div className="row">
+        <div className="col">
+          <h3> Users online </h3>
+          <div className="align-left">
+            <ul>
+              {users}
+            </ul>
+          </div>
+        </div>
+        <div className="col">
+          <h3> Games available </h3>
+          <div className="align-left">
+            <ul>
+              {games}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <button className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>
     </div>
   )
 }
@@ -146,17 +201,15 @@ class Board extends React.Component {
   }
 }
 
-class Timer extends React.Component {
-  render () {
-    let minutes = Math.floor(this.props.seconds / 60)
-    let seconds = this.props.seconds - minutes * 60
-    if (seconds.toString().length < 2) {
-      seconds = "0" + seconds.toString()
-    }
-    return (
-      <h2> { minutes + ":" + seconds  } </h2>
-    )
+function Timer(props) {
+  let minutes = Math.floor(props.seconds / 60)
+  let seconds = props.seconds - minutes * 60
+  if (seconds.toString().length < 2) {
+    seconds = "0" + seconds.toString()
   }
+  return (
+    <h2> { minutes + ":" + seconds  } </h2>
+  )
 }
 
 class Game extends React.Component {
@@ -182,7 +235,12 @@ class Game extends React.Component {
       "score": 0,
       "elo": 2000,
       "result": null,
-      "san": null
+      "san": null,
+      "username": "Player2",
+      "username2": "Player1",
+      "room": null,
+      "users_online": [],
+      "games_available": []
     }
 
     this.handleNewGame = this.handleNewGame.bind(this)
@@ -262,8 +320,9 @@ class Game extends React.Component {
   async make_moves(selected_square, row, column) {
     let response = await fetch(`${baseURL}validated_move_info/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
     let data = await response.json()
+    let step = this.state.step
 
-    if (data["validated"] === "true") {
+    if (data["validated"] === "true" && this.state.vs !== "human_other") {
        console.log("move validated")
        this.setState((state) => ({
          "history": state.history.concat([{"pieces": this.fen_to_history(data["fen"])}]),
@@ -293,6 +352,8 @@ class Game extends React.Component {
            "promotion": false
          }))
        })
+     } else if (this.state.vs === "human_other" && data["validated"] === "true") {
+       socket.emit("make move", {"fen": data["fen"], "moves_san": data["moves_san"], "step": step + 1, "last_move": data["last_move"] , "score": data["score"], "result": data["result"], "room": this.state.room})
      }
   }
 
@@ -300,6 +361,8 @@ class Game extends React.Component {
     document.querySelector("#welcomeScreen1").style.display = "none"
     if (option === "human") {
       document.querySelector("#welcomeScreen2").style.display = "initial"
+    } else if (option === "human_other") {
+      document.querySelector("#humanOther").style.display = "initial"
     } else {
       document.querySelector("#welcomeScreenPC").style.display = "initial"
     }
@@ -309,6 +372,10 @@ class Game extends React.Component {
   handleClick2 (time) {
     document.querySelector("#welcomeScreen2").style.display = "none"
     this.setState({"times": [time, time]})
+    if (this.state.vs === "human_other") {
+      socket.emit("new game", {"username": this.state.username, "time": time})
+      document.querySelector("#usersOnline").style.display = "initial"
+    }
   }
 
   handleClick3 (e) {
@@ -316,6 +383,25 @@ class Game extends React.Component {
     fetch(`${baseURL}configure/${this.state.elo}`)
     document.querySelector("#welcomeScreenPC").style.display = "none"
     document.querySelector("#welcomeScreen2").style.display = "initial"
+  }
+
+  handleClick4 (e) {
+    e.preventDefault()
+    document.querySelector("#humanOther").style.display = "none"
+    document.querySelector("#usersOnline").style.display = "initial"
+    socket.emit("add user online", {"username": this.state.username})
+  }
+
+  handleClick5 (e) {
+    e.preventDefault()
+    document.querySelector("#welcomeScreen2").style.display = "initial"
+    document.querySelector("#usersOnline").style.display = "none"
+  }
+
+  handleClick6 (username, room, time) {
+    socket.emit("join game", {"username": this.state.username, "username2": username, "room": room, "time": time})
+    this.setState({"times": [time, time]})
+    console.log("join game " + username + " " + room)
   }
 
   handleClickPromotion (piece) {
@@ -361,6 +447,35 @@ class Game extends React.Component {
 
   componentDidMount() {
     this.setState({"history": [{"pieces": this.fen_to_history(board)}]}) // Copy board from server
+
+    socket.on("announce user", data => {
+      this.setState({"users_online": data["users_online"]})
+    })
+
+    socket.on("announce new game", data => {
+      this.setState({"games_available": data["games_available"]})
+    })
+
+    socket.on("announce game starts", data => {
+      document.querySelectorAll(".welcomeScreen").forEach((screen) => {
+        screen.style.display = "None"
+      })
+      this.setState({"username": data["username"], "username2": data["username2"], "room": data["room"]})
+    })
+
+    socket.on("announce move", data => {
+      this.setState((state) => ({
+        "history": state.history.concat([{"pieces": this.fen_to_history(data["fen"])}]),
+        "result": data["result"],
+        "last_move": data["last_move"],
+        "score": data["score"],
+        "selected_square": null,
+        "san": data["moves_san"],
+        "step": data["step"],
+        "promotion": false
+      }))
+      this.startTimer()
+    })
   }
 
   componentWillUnmount() {
@@ -374,11 +489,13 @@ class Game extends React.Component {
   render () {
     return (
       <div>
-        <Welcome1 onClick={(option) => this.handleClick1(option)} />
-        <Welcome2 onClick={(time) => this.handleClick2(time)} />
+        <StartScreen onClick={(option) => this.handleClick1(option)} />
+        <WelcomeHuman onClick={(time) => this.handleClick2(time)} />
+        <WelcomeHumanOther onChange={(e) => this.setState({"username": e.target.value })} username={this.state.username} onSubmit={(e) => this.handleClick4(e)} />
         <WelcomePC onChange={(e) => this.setState({"elo": e.target.value })} elo_value={this.state.elo} onSubmit={(e) => this.handleClick3(e)} />
         <Promotion promotion={this.state.promotion} onClick={(piece) => this.handleClickPromotion(piece)} />
         <Message title="Result" text={this.state.result} onClick={() => {document.querySelector("#message").style.display="none"; this.setState({"result": null})}} />
+        <UsersOnline usernames={this.state.users_online} games={this.state.games_available} onClick={(e) => this.handleClick5(e)} onClickGame={(username, room, time) => this.handleClick6(username, room, time)} />
 
         <div className="row">
           <div className="col" id="col_left">
@@ -388,7 +505,7 @@ class Game extends React.Component {
             </div>
           <div className="col" id="col_right" >
             <div id="timer1_div">
-              <h2> Time </h2>
+              <h2> {this.state.username2} </h2>
               <div id="timer">
                 <Timer seconds={this.state.times[0]} />
               </div>
@@ -413,7 +530,7 @@ class Game extends React.Component {
               <button id="button" onClick={this.handleNewGame} className="btn btn-primary"> New game </button>
             </div>
             <div id="timer2_div">
-              <h2> Time </h2>
+              <h2> {this.state.username} </h2>
               <div id="timer2">
                 <Timer seconds={this.state.times[1]} />
               </div>

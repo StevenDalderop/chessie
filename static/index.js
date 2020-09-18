@@ -1,10 +1,5 @@
 const baseURL = window.location.href;
 var socket = io();
-socket.on('connect', () => {
-  socket.emit("connected", {
-    "data": "I am connected"
-  });
-});
 
 function Square(props) {
   return React.createElement("button", {
@@ -59,7 +54,7 @@ function Message(props) {
   }
 }
 
-function Welcome1(props) {
+function StartScreen(props) {
   return React.createElement("div", {
     id: "welcomeScreen1",
     className: "welcomeScreen"
@@ -70,7 +65,12 @@ function Welcome1(props) {
   }, React.createElement("div", {
     className: "time",
     onClick: () => props.onClick("human")
-  }, " ", React.createElement("h3", null, " vs Human "), " ")), React.createElement("div", {
+  }, " ", React.createElement("h3", null, " vs Human on same PC "), " ")), React.createElement("div", {
+    className: "col"
+  }, React.createElement("div", {
+    className: "time",
+    onClick: () => props.onClick("human_other")
+  }, " ", React.createElement("h3", null, " vs Human on other PC "), " ")), React.createElement("div", {
     className: "col"
   }, React.createElement("div", {
     className: "time",
@@ -78,7 +78,7 @@ function Welcome1(props) {
   }, " ", React.createElement("h3", null, " vs PC "), " "))));
 }
 
-function Welcome2(props) {
+function WelcomeHuman(props) {
   return React.createElement("div", {
     id: "welcomeScreen2",
     className: "welcomeScreen"
@@ -105,6 +105,66 @@ function Welcome2(props) {
     className: "time",
     onClick: () => props.onClick(600)
   }, " ", React.createElement("h3", null, " 10 minutes "), " "))));
+}
+
+function WelcomeHumanOther(props) {
+  return React.createElement("div", {
+    id: "humanOther",
+    className: "welcomeScreen"
+  }, React.createElement("h1", null, " Welcome "), React.createElement("div", null, React.createElement("form", {
+    onSubmit: e => props.onSubmit(e)
+  }, React.createElement("label", null, " What is your username? "), " ", React.createElement("br", null), React.createElement("input", {
+    id: "username",
+    type: "text",
+    placeholder: "username",
+    value: props.username,
+    onChange: props.onChange
+  }), " ", React.createElement("br", null), React.createElement("button", {
+    className: "btn btn-primary mt-3"
+  }, " Submit "))));
+}
+
+function UsersOnline(props) {
+  let users = [];
+  let i = 0;
+  let u;
+
+  for (u of props["usernames"]) {
+    users.push(React.createElement("li", {
+      key: i
+    }, " ", u, " "));
+    i++;
+  }
+
+  let games = [];
+  let j = 0;
+  let g;
+
+  for (g of props["games"]) {
+    games.push(React.createElement("li", {
+      key: j,
+      onClick: () => props.onClickGame(g["username"], g["room"], g["time"])
+    }, " ", g["username"], " (", g["time"], " seconds) "));
+    j++;
+  }
+
+  return React.createElement("div", {
+    id: "usersOnline",
+    className: "welcomeScreen"
+  }, React.createElement("h1", null, " Vs human on other PC "), React.createElement("div", {
+    className: "row"
+  }, React.createElement("div", {
+    className: "col"
+  }, React.createElement("h3", null, " Users online "), React.createElement("div", {
+    className: "align-left"
+  }, React.createElement("ul", null, users))), React.createElement("div", {
+    className: "col"
+  }, React.createElement("h3", null, " Games available "), React.createElement("div", {
+    className: "align-left"
+  }, React.createElement("ul", null, games)))), React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: e => props.onClick(e)
+  }, " Create new game "));
 }
 
 function WelcomePC(props) {
@@ -177,18 +237,15 @@ class Board extends React.Component {
 
 }
 
-class Timer extends React.Component {
-  render() {
-    let minutes = Math.floor(this.props.seconds / 60);
-    let seconds = this.props.seconds - minutes * 60;
+function Timer(props) {
+  let minutes = Math.floor(props.seconds / 60);
+  let seconds = props.seconds - minutes * 60;
 
-    if (seconds.toString().length < 2) {
-      seconds = "0" + seconds.toString();
-    }
-
-    return React.createElement("h2", null, " ", minutes + ":" + seconds, " ");
+  if (seconds.toString().length < 2) {
+    seconds = "0" + seconds.toString();
   }
 
+  return React.createElement("h2", null, " ", minutes + ":" + seconds, " ");
 }
 
 class Game extends React.Component {
@@ -207,7 +264,12 @@ class Game extends React.Component {
       "score": 0,
       "elo": 2000,
       "result": null,
-      "san": null
+      "san": null,
+      "username": "Player2",
+      "username2": "Player1",
+      "room": null,
+      "users_online": [],
+      "games_available": []
     };
     this.handleNewGame = this.handleNewGame.bind(this);
     this.fen_to_history = this.fen_to_history.bind(this);
@@ -298,8 +360,9 @@ class Game extends React.Component {
   async make_moves(selected_square, row, column) {
     let response = await fetch(`${baseURL}validated_move_info/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
     let data = await response.json();
+    let step = this.state.step;
 
-    if (data["validated"] === "true") {
+    if (data["validated"] === "true" && this.state.vs !== "human_other") {
       console.log("move validated");
       this.setState(state => ({
         "history": state.history.concat([{
@@ -331,6 +394,16 @@ class Game extends React.Component {
           "promotion": false
         }));
       });
+    } else if (this.state.vs === "human_other" && data["validated"] === "true") {
+      socket.emit("make move", {
+        "fen": data["fen"],
+        "moves_san": data["moves_san"],
+        "step": step + 1,
+        "last_move": data["last_move"],
+        "score": data["score"],
+        "result": data["result"],
+        "room": this.state.room
+      });
     }
   }
 
@@ -339,6 +412,8 @@ class Game extends React.Component {
 
     if (option === "human") {
       document.querySelector("#welcomeScreen2").style.display = "initial";
+    } else if (option === "human_other") {
+      document.querySelector("#humanOther").style.display = "initial";
     } else {
       document.querySelector("#welcomeScreenPC").style.display = "initial";
     }
@@ -353,6 +428,14 @@ class Game extends React.Component {
     this.setState({
       "times": [time, time]
     });
+
+    if (this.state.vs === "human_other") {
+      socket.emit("new game", {
+        "username": this.state.username,
+        "time": time
+      });
+      document.querySelector("#usersOnline").style.display = "initial";
+    }
   }
 
   handleClick3(e) {
@@ -360,6 +443,34 @@ class Game extends React.Component {
     fetch(`${baseURL}configure/${this.state.elo}`);
     document.querySelector("#welcomeScreenPC").style.display = "none";
     document.querySelector("#welcomeScreen2").style.display = "initial";
+  }
+
+  handleClick4(e) {
+    e.preventDefault();
+    document.querySelector("#humanOther").style.display = "none";
+    document.querySelector("#usersOnline").style.display = "initial";
+    socket.emit("add user online", {
+      "username": this.state.username
+    });
+  }
+
+  handleClick5(e) {
+    e.preventDefault();
+    document.querySelector("#welcomeScreen2").style.display = "initial";
+    document.querySelector("#usersOnline").style.display = "none";
+  }
+
+  handleClick6(username, room, time) {
+    socket.emit("join game", {
+      "username": this.state.username,
+      "username2": username,
+      "room": room,
+      "time": time
+    });
+    this.setState({
+      "times": [time, time]
+    });
+    console.log("join game " + username + " " + room);
   }
 
   handleClickPromotion(piece) {
@@ -426,6 +537,42 @@ class Game extends React.Component {
         "pieces": this.fen_to_history(board)
       }]
     }); // Copy board from server
+
+    socket.on("announce user", data => {
+      this.setState({
+        "users_online": data["users_online"]
+      });
+    });
+    socket.on("announce new game", data => {
+      this.setState({
+        "games_available": data["games_available"]
+      });
+    });
+    socket.on("announce game starts", data => {
+      document.querySelectorAll(".welcomeScreen").forEach(screen => {
+        screen.style.display = "None";
+      });
+      this.setState({
+        "username": data["username"],
+        "username2": data["username2"],
+        "room": data["room"]
+      });
+    });
+    socket.on("announce move", data => {
+      this.setState(state => ({
+        "history": state.history.concat([{
+          "pieces": this.fen_to_history(data["fen"])
+        }]),
+        "result": data["result"],
+        "last_move": data["last_move"],
+        "score": data["score"],
+        "selected_square": null,
+        "san": data["moves_san"],
+        "step": data["step"],
+        "promotion": false
+      }));
+      this.startTimer();
+    });
   }
 
   componentWillUnmount() {
@@ -437,10 +584,16 @@ class Game extends React.Component {
   }
 
   render() {
-    return React.createElement("div", null, React.createElement(Welcome1, {
+    return React.createElement("div", null, React.createElement(StartScreen, {
       onClick: option => this.handleClick1(option)
-    }), React.createElement(Welcome2, {
+    }), React.createElement(WelcomeHuman, {
       onClick: time => this.handleClick2(time)
+    }), React.createElement(WelcomeHumanOther, {
+      onChange: e => this.setState({
+        "username": e.target.value
+      }),
+      username: this.state.username,
+      onSubmit: e => this.handleClick4(e)
     }), React.createElement(WelcomePC, {
       onChange: e => this.setState({
         "elo": e.target.value
@@ -459,6 +612,11 @@ class Game extends React.Component {
           "result": null
         });
       }
+    }), React.createElement(UsersOnline, {
+      usernames: this.state.users_online,
+      games: this.state.games_available,
+      onClick: e => this.handleClick5(e),
+      onClickGame: (username, room, time) => this.handleClick6(username, room, time)
     }), React.createElement("div", {
       className: "row"
     }, React.createElement("div", {
@@ -474,7 +632,7 @@ class Game extends React.Component {
       id: "col_right"
     }, React.createElement("div", {
       id: "timer1_div"
-    }, React.createElement("h2", null, " Time "), React.createElement("div", {
+    }, React.createElement("h2", null, " ", this.state.username2, " "), React.createElement("div", {
       id: "timer"
     }, React.createElement(Timer, {
       seconds: this.state.times[0]
@@ -505,7 +663,7 @@ class Game extends React.Component {
       className: "btn btn-primary"
     }, " New game ")), React.createElement("div", {
       id: "timer2_div"
-    }, React.createElement("h2", null, " Time "), React.createElement("div", {
+    }, React.createElement("h2", null, " ", this.state.username, " "), React.createElement("div", {
       id: "timer2"
     }, React.createElement(Timer, {
       seconds: this.state.times[1]

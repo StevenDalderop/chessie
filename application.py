@@ -1,7 +1,6 @@
 from flask import render_template, Flask
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, join_room, leave_room
 import chess
-import chess.engine
 import sys
 import os
 import stat
@@ -20,6 +19,10 @@ else:
     stockfish = Stockfish("./stockfish_20011801_x64.exe")
 
 board = chess.Board()
+
+users_online = []
+rooms = 0
+games_available = []
 
 @app.route("/")
 def index():
@@ -92,6 +95,41 @@ def pc_move():
         "result": result
     }
 
-@socketio.on("connected")
-def handle_message(message):
-    print(message)
+@socketio.on('connect')
+def test_connect():
+    print('Client connected')
+
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected') # Takes one minute
+
+@socketio.on("add user online")
+def user_online(data):
+    global users_online
+    username = data["username"]
+    users_online.append(username)
+    socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
+
+@socketio.on("new game")
+def new_game(data):
+    global rooms, games_available
+    username = data["username"]
+    room = rooms
+    games_available.append({"room": room, "username": username, "time": data["time"]})
+    join_room(room)
+    rooms += 1
+    socketio.emit("announce new game", {"games_available": games_available}, broadcast=True)
+
+@socketio.on("join game")
+def join_game(data):
+    global board
+    board = chess.Board()
+    join_room(data["room"])
+    username = data["username"]
+    username2 = data["username2"]
+    socketio.emit("announce game starts", {"username": username, "username2": username2, "room": data["room"]}, room=data["room"])
+
+@socketio.on("make move")
+def make_move(data):
+    print("make move")
+    socketio.emit("announce move", {"fen": data["fen"], "moves_san": data["moves_san"], "step": data["step"], "last_move": data["last_move"] , "score": data["score"], "result": data["result"]}, room=data["room"])

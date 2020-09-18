@@ -27,10 +27,11 @@
   left: 25%;
   height: 260px;
   text-align: center;
+  display: None;
 }
 
-#welcomeScreen2, #welcomeScreenPC {
-  display: none;
+.align-left {
+  text-align: left;
 }
 
 .center {

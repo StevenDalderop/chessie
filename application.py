@@ -18,23 +18,27 @@ if sys.platform == "linux":
 else:
     stockfish = Stockfish("./stockfish_20011801_x64.exe")
 
-board = chess.Board()
-
+boards = {}
+game_id_last = 0
 users_online = []
 rooms = 0
 games_available = []
 
 @app.route("/")
 def index():
-    global board
-    board = chess.Board() # Reset board
-    fen = board.fen()
-    return render_template("index.html", board = fen)
+    global boards, game_id_last
+    game_id_last += 1
+    if (game_id_last == 100): # Keep only 100 boards in memory then overwrite first.
+        game_id_last = 0
+    boards[str(game_id_last)] =  chess.Board() # Reset board
+    fen = boards[str(game_id_last)].fen()
+    return render_template("index.html", board = fen, game_id = game_id_last)
 
-@app.route("/validated_move_info/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>", defaults={'promotion': None})
-@app.route("/validated_move_info/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>/<string:promotion>")
-def validated_move_info(row_start, col_start, row_end, col_end, promotion):
-    global board
+@app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>", defaults={'promotion': None})
+@app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>/<string:promotion>")
+def validated_move_info(game_id, row_start, col_start, row_end, col_end, promotion):
+    global boards
+    board = boards[str(game_id)] # Reference not copy
 
     if (promotion):
         pieces = {"queen": chess.QUEEN, "bishop": chess.BISHOP, "knight": chess.KNIGHT, "rook": chess.ROOK}
@@ -64,9 +68,12 @@ def validated_move_info(row_start, col_start, row_end, col_end, promotion):
 
 @app.route("/new_game")
 def new_game():
-    global board
-    board = chess.Board()
-    return {"new_game": "true"}
+    global boards, game_id_last
+    game_id_last += 1
+    if (game_id_last == 100): # Keep only 100 boards in memory then overwrite first.
+        game_id_last = 0
+    boards[str(game_id_last)] = chess.Board()
+    return {"new_game": "true", "game_id": game_id_last}
 
 @app.route("/configure/<int:elo>")
 def configure(elo):
@@ -74,9 +81,10 @@ def configure(elo):
     engine.configure({"UCI_LimitStrength": True, "UCI_Elo": elo})
     return {"configured": "true"}
 
-@app.route("/get_pc_move")
-def pc_move():
-    global board
+@app.route("/get_pc_move/<int:game_id>")
+def pc_move(game_id):
+    global boards
+    board = boards[str(game_id)]
     stockfish.set_fen_position(board.fen())
     move = stockfish.get_best_move_time(100)
     board.push(chess.Move.from_uci(move))
@@ -122,12 +130,12 @@ def new_game(data):
 
 @socketio.on("join game")
 def join_game(data):
-    global board
-    board = chess.Board()
+    global boards
+    boards[str(data["game_id"])] = chess.Board()
     join_room(data["room"])
     username = data["username"]
     username2 = data["username2"]
-    socketio.emit("announce game starts", {"username": username, "username2": username2, "room": data["room"]}, room=data["room"])
+    socketio.emit("announce game starts", {"username": username, "username2": username2, "game_id": data["game_id"], "room": data["room"]}, room=data["room"])
 
 @socketio.on("make move")
 def make_move(data):

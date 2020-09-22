@@ -269,7 +269,8 @@ class Game extends React.Component {
       "username2": "Player1",
       "room": null,
       "users_online": [],
-      "games_available": []
+      "games_available": [],
+      "game_id": null
     };
     this.handleNewGame = this.handleNewGame.bind(this);
     this.fen_to_history = this.fen_to_history.bind(this);
@@ -358,7 +359,7 @@ class Game extends React.Component {
   }
 
   async make_moves(selected_square, row, column) {
-    let response = await fetch(`${baseURL}validated_move_info/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
+    let response = await fetch(`${baseURL}validated_move_info/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
     let data = await response.json();
     let step = this.state.step;
 
@@ -380,7 +381,7 @@ class Game extends React.Component {
     }
 
     if (this.state.vs === "pc") {
-      fetch(`${baseURL}get_pc_move`).then(response => response.json()).then(data => {
+      fetch(`${baseURL}get_pc_move/${this.state.game_id}`).then(response => response.json()).then(data => {
         this.setState(state => ({
           "history": state.history.concat([{
             "pieces": this.fen_to_history(data["fen"])
@@ -463,6 +464,7 @@ class Game extends React.Component {
   handleClick6(username, room, time) {
     socket.emit("join game", {
       "username": this.state.username,
+      "game_id": this.state.game_id,
       "username2": username,
       "room": room,
       "time": time
@@ -477,7 +479,7 @@ class Game extends React.Component {
     let row = this.state.promotion[0];
     let column = this.state.promotion[1];
     let selected_square = this.state.selected_square;
-    fetch(`${baseURL}validated_move_info/${selected_square[0]}/${selected_square[1]}/${row}/${column}/${piece}`).then(response => response.json()).then(data => {
+    fetch(`${baseURL}validated_move_info/${game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}/${piece}`).then(response => response.json()).then(data => {
       if (data["validated"] === "true") {
         console.log("move validated");
         this.setState(state => ({
@@ -518,6 +520,9 @@ class Game extends React.Component {
   }
 
   handleNewGame(e) {
+    document.querySelectorAll(".welcomeScreen").forEach(screen => {
+      screen.style.display = "None";
+    });
     document.querySelector("#welcomeScreen1").style.display = "Initial";
     clearInterval(this.interval);
     this.setState({
@@ -528,14 +533,19 @@ class Game extends React.Component {
       "san": null,
       "score": 0
     });
-    fetch(`${baseURL}new_game`);
+    fetch(`${baseURL}new_game`).then(response => response.json()).then(data => {
+      this.setState({
+        "game_id": data["game_id"]
+      });
+    });
   }
 
   componentDidMount() {
     this.setState({
       "history": [{
         "pieces": this.fen_to_history(board)
-      }]
+      }],
+      "game_id": game_id
     }); // Copy board from server
 
     socket.on("announce user", data => {
@@ -554,6 +564,7 @@ class Game extends React.Component {
       });
       this.setState({
         "username": data["username"],
+        "game_id": data["game_id"],
         "username2": data["username2"],
         "room": data["room"]
       });

@@ -12,7 +12,7 @@ function Square(props) {
 
 function piece_icon(name) {
   if (name) {
-    return (<i className={"fas fa-chess-" + name[0] + " fa-4x color_" + name[1]}></i>)
+    return (<i className={"fas fa-chess-" + name[0] + " fa-3x color_" + name[1]}></i>)
   } else {
     return null
   }
@@ -214,7 +214,7 @@ function Timer(props) {
     seconds = "0" + seconds.toString()
   }
   return (
-    <h2> { minutes + ":" + seconds  } </h2>
+    <h3 className="times"> { minutes + ":" + seconds  } </h3>
   )
 }
 
@@ -520,42 +520,46 @@ class Game extends React.Component {
         <Message title="Result" text={this.state.result} onClick={() => {document.querySelector("#message").style.display="none"; this.setState({"result": null})}} />
         <UsersOnline usernames={this.state.users_online} games={this.state.games_available} onClick={(e) => this.handleClick5(e)} onClickGame={(username, room, time) => this.handleClick6(username, room, time)} />
 
-        <div className="row">
-          <div className="col" id="col_left">
-            </div>
-          <div className="col-auto" >
-            <Board pieces={this.state.history[this.state.step].pieces} onClick={(row, column) => this.handleClick(row, column)} mirrored={this.state.mirrored} />
-            </div>
-          <div className="col" id="col_right" >
-            <div id="timer1_div">
-              <h2> {this.state.username2} </h2>
-              <div id="timer">
-                <Timer seconds={this.state.times[0]} />
+        <div className="container-fluid no-padding">
+          <div className="row">
+            <div className="col">
+              <div className="container_div">
+                <div id="board_container">
+                  <Board pieces={this.state.history[this.state.step].pieces} onClick={(row, column) => this.handleClick(row, column)} mirrored={this.state.mirrored} />
+                </div>
               </div>
             </div>
-            <div id="history">
-              <h2> History </h2>
-              <div id="list">
-                  {this.state.san}
+            <div className="col-auto" id="col_right" >
+              <div id="timer1_div">
+                <h5> {this.state.username2} </h5>
+                <div id="timer">
+                  <Timer seconds={this.state.times[0]} />
+                </div>
               </div>
-            </div>
-            <div id="evaluation">
-              <h2> Stockfish evaluation </h2>
-              <div id="evaluation_figure">
-                <svg>
-                  <rect id="rect_left" width={String(this.score_to_with(this.state.score))+"%"}/>
-                  <rect id="rect_right" x={String(this.score_to_with(this.state.score))+"%"} width={String(100 - this.score_to_with(this.state.score))+"%"}/>
-                  <text id="text" x="15" y="18"> Centipawns: {this.state.score} </text>
-                </svg>
+              <div id="history">
+                <h5> History </h5>
+                <div id="list">
+                    {this.state.san}
+                </div>
               </div>
-            </div>
-            <div id="buttons">
-              <button id="button" onClick={this.handleNewGame} className="btn btn-primary"> New game </button>
-            </div>
-            <div id="timer2_div">
-              <h2> {this.state.username} </h2>
-              <div id="timer2">
-                <Timer seconds={this.state.times[1]} />
+              <div id="evaluation">
+                <h5> Chess engine </h5>
+                <div id="evaluation_figure">
+                  <svg>
+                    <rect id="rect_left" width={String(this.score_to_with(this.state.score))+"%"}/>
+                    <rect id="rect_right" x={String(this.score_to_with(this.state.score))+"%"} width={String(100 - this.score_to_with(this.state.score))+"%"}/>
+                    <text id="text" x="15" y="18"> Centipawns: {this.state.score} </text>
+                  </svg>
+                </div>
+              </div>
+              <div id="buttons">
+                <button id="button" onClick={this.handleNewGame} className="btn btn-primary"> New game </button>
+              </div>
+              <div id="timer2_div">
+                <h5> {this.state.username} </h5>
+                <div id="timer2">
+                  <Timer seconds={this.state.times[1]} />
+                </div>
               </div>
             </div>
           </div>

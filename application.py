@@ -51,9 +51,11 @@ def validated_move_info(game_id, row_start, col_start, row_end, col_end, promoti
         init_board = chess.Board()
         moves_san = init_board.variation_san(board.move_stack)
         last_move = 0 if board.turn else 1
+        print(board.fen())
         stockfish.set_fen_position(board.fen())
         info = stockfish.get_evaluation()
-        score = None if info["type"] != "cp" else info["value"]
+        print(info)
+        score = None if len(info) == 0 else None if info["type"] != "cp" else info["value"]
         result = None if not board.is_game_over() else board.result()
         return {
             "validated": "true",
@@ -93,7 +95,7 @@ def pc_move(game_id):
     last_move = 0 if board.turn else 1
     stockfish.set_fen_position(board.fen())
     info = stockfish.get_evaluation()
-    score = None if info["type"] != "cp" else info["value"]
+    score = None if len(info) == 0 else None if info["type"] != "cp" else info["value"]
     result = None if not board.is_game_over() else board.result()
     return {
         "fen": board.fen(),
@@ -103,13 +105,13 @@ def pc_move(game_id):
         "result": result
     }
 
-@socketio.on('connect')
-def test_connect():
-    print('Client connected')
-
-@socketio.on('disconnect')
-def test_disconnect():
-    print('Client disconnected') # Takes one minute
+# @socketio.on('connect')
+# def test_connect():
+#     print('Client connected')
+#
+# @socketio.on('disconnect')
+# def test_disconnect():
+#     print('Client disconnected') # Takes one minute
 
 @socketio.on("add user online")
 def user_online(data):

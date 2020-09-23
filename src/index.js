@@ -163,12 +163,18 @@ function WelcomePC(props) {
 class Board extends React.Component {
   renderSquare(row, column) {
     let square_color;
-    if ((row + column) % 2 === 0) {
-      square_color = "white" } else {
+    if (this.props.mirrored) {
+      var row_new = 7 - row
+    } else {
+      var row_new = row
+    }
+    if ((row_new + column) % 2 === 0) {
+      square_color = "white"
+    } else {
       square_color = "black"
     }
     return (
-      <Square class={"square" + column} square_color={square_color} piece={this.props.pieces[row][column]} onClick={() => this.props.onClick(row, column)} key={row * 8 + column} />
+      <Square class={"square" + column} square_color={square_color} piece={this.props.pieces[row_new][column]} onClick={() => this.props.onClick(row, column)} key={row * 8 + column} />
     )
   }
 
@@ -241,7 +247,8 @@ class Game extends React.Component {
       "room": null,
       "users_online": [],
       "games_available": [],
-      "game_id": null
+      "game_id": null,
+      "mirrored": false
     }
 
     this.handleNewGame = this.handleNewGame.bind(this)
@@ -303,6 +310,10 @@ class Game extends React.Component {
     let current = history[this.state.step]
     let pieces = current.pieces
     let selected_square = this.state.selected_square
+
+    if (this.state.mirrored) {
+      var row = 7 - row
+    }
 
     if ((!selected_square && pieces[row][column]) || (selected_square && pieces[row][column] && pieces[row][column][1] !== this.state.last_move)) {
       this.setState({"selected_square": [row, column]})
@@ -463,10 +474,16 @@ class Game extends React.Component {
     })
 
     socket.on("announce game starts", data => {
+      console.log("game starts")
+      console.log(data)
       document.querySelectorAll(".welcomeScreen").forEach((screen) => {
         screen.style.display = "None"
       })
-      this.setState({"username": data["username"], "game_id": data["game_id"], "username2": data["username2"], "room": data["room"]})
+      if (data["username"] === this.state.username) {
+        this.setState({"username": data["username"], "game_id": data["game_id"], "username2": data["username2"], "room": data["room"]}) // Play as white
+      } else if (data["username2"] === this.state.username) {
+        this.setState({"username": data["username2"], "game_id": data["game_id"], "username2": data["username"], "room": data["room"], "mirrored": true}) // Play as black
+      }
     })
 
     socket.on("announce move", data => {
@@ -507,7 +524,7 @@ class Game extends React.Component {
           <div className="col" id="col_left">
             </div>
           <div className="col-auto" >
-            <Board pieces={this.state.history[this.state.step].pieces} onClick={(row, column) => this.handleClick(row, column)}/>
+            <Board pieces={this.state.history[this.state.step].pieces} onClick={(row, column) => this.handleClick(row, column)} mirrored={this.state.mirrored} />
             </div>
           <div className="col" id="col_right" >
             <div id="timer1_div">

@@ -39,9 +39,9 @@
   margin:auto;
   top: 35%;
   left: 25%;
-  height: 260px;
   text-align: center;
   display: None;
+  padding-bottom: 15px;
 }
 
 .align-left {
@@ -190,6 +190,12 @@ body {
   height: 100%;
 }
 
+.close_button {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+
 .no-padding {
   padding: 0px;
 }
@@ -255,8 +261,8 @@ body {
 .time {
   background-color: rgb(200,200,200);
   color: black;
-  height: 150px;
-  width: 150px;
+  height: 100px;
+  width: 100px;
   vertical-align: middle;
   text-align: center;
   margin: auto;
@@ -269,7 +275,7 @@ svg {
 
 #rect_left {
   height: 24px;
-  fill: rgb(141, 102, 53);
+  fill: white;
 }
 
 #rect_right {
@@ -280,5 +286,5 @@ svg {
 #text {
   height: 24px;
   font-size: 16px;
-  fill: white;
+  fill: grey;
 }

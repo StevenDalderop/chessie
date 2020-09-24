@@ -94,56 +94,69 @@ function StartScreen(props) {
     "div",
     { id: "welcomeScreen1", className: "welcomeScreen" },
     React.createElement(
-      "h1",
-      null,
-      " Welcome "
-    ),
-    React.createElement(
       "div",
-      { className: "row" },
+      { className: "container_div" },
       React.createElement(
-        "div",
-        { className: "col" },
-        React.createElement(
-          "div",
-          { className: "time", onClick: () => props.onClick("human") },
-          " ",
-          React.createElement(
-            "h3",
-            null,
-            " vs Human on same PC "
-          ),
-          " "
-        )
+        "button",
+        { className: "close_button btn btn-danger", onClick: () => {
+            document.querySelectorAll(".welcomeScreen").forEach(screen => {
+              screen.style.display = "None";
+            });
+          } },
+        " Close "
+      ),
+      React.createElement(
+        "h1",
+        null,
+        " New Game "
       ),
       React.createElement(
         "div",
-        { className: "col" },
+        { className: "row" },
         React.createElement(
           "div",
-          { className: "time", onClick: () => props.onClick("human_other") },
-          " ",
+          { className: "col" },
           React.createElement(
-            "h3",
-            null,
-            " vs Human on other PC "
-          ),
-          " "
-        )
-      ),
-      React.createElement(
-        "div",
-        { className: "col" },
+            "div",
+            { className: "time", onClick: () => props.onClick("human") },
+            " ",
+            React.createElement(
+              "h3",
+              null,
+              " vs Human offline "
+            ),
+            " "
+          )
+        ),
         React.createElement(
           "div",
-          { className: "time", onClick: () => props.onClick("pc") },
-          " ",
+          { className: "col" },
           React.createElement(
-            "h3",
-            null,
-            " vs PC "
-          ),
-          " "
+            "div",
+            { className: "time", onClick: () => props.onClick("human_other") },
+            " ",
+            React.createElement(
+              "h3",
+              null,
+              " vs Human online "
+            ),
+            " "
+          )
+        ),
+        React.createElement(
+          "div",
+          { className: "col" },
+          React.createElement(
+            "div",
+            { className: "time", onClick: () => props.onClick("pc") },
+            " ",
+            React.createElement(
+              "h3",
+              null,
+              " vs PC "
+            ),
+            " "
+          )
         )
       )
     )
@@ -155,71 +168,84 @@ function WelcomeHuman(props) {
     "div",
     { id: "welcomeScreen2", className: "welcomeScreen" },
     React.createElement(
-      "h1",
-      null,
-      " Welcome "
-    ),
-    React.createElement(
       "div",
-      { className: "row" },
+      { className: "container_div" },
       React.createElement(
-        "div",
-        { className: "col" },
-        React.createElement(
-          "div",
-          { className: "time", onClick: () => props.onClick(60) },
-          " ",
-          React.createElement(
-            "h3",
-            null,
-            " 1 minute "
-          ),
-          " "
-        )
+        "button",
+        { className: "close_button btn btn-danger", onClick: () => {
+            document.querySelectorAll(".welcomeScreen").forEach(screen => {
+              screen.style.display = "None";
+            });
+          } },
+        " Close "
+      ),
+      React.createElement(
+        "h1",
+        null,
+        " Time "
       ),
       React.createElement(
         "div",
-        { className: "col" },
+        { className: "row ml-0 mr-0" },
         React.createElement(
           "div",
-          { className: "time", onClick: () => props.onClick(180) },
-          " ",
+          { className: "col" },
           React.createElement(
-            "h3",
-            null,
-            " 3 minutes "
-          ),
-          " "
-        )
-      ),
-      React.createElement(
-        "div",
-        { className: "col" },
+            "div",
+            { className: "time", onClick: () => props.onClick(60) },
+            " ",
+            React.createElement(
+              "h5",
+              null,
+              " 1 minute "
+            ),
+            " "
+          )
+        ),
         React.createElement(
           "div",
-          { className: "time", onClick: () => props.onClick(300) },
-          " ",
+          { className: "col" },
           React.createElement(
-            "h3",
-            null,
-            " 5 minutes "
-          ),
-          " "
-        )
-      ),
-      React.createElement(
-        "div",
-        { className: "col" },
+            "div",
+            { className: "time", onClick: () => props.onClick(180) },
+            " ",
+            React.createElement(
+              "h5",
+              null,
+              " 3 minutes "
+            ),
+            " "
+          )
+        ),
         React.createElement(
           "div",
-          { className: "time", onClick: () => props.onClick(600) },
-          " ",
+          { className: "col" },
           React.createElement(
-            "h3",
-            null,
-            " 10 minutes "
-          ),
-          " "
+            "div",
+            { className: "time", onClick: () => props.onClick(300) },
+            " ",
+            React.createElement(
+              "h5",
+              null,
+              " 5 minutes "
+            ),
+            " "
+          )
+        ),
+        React.createElement(
+          "div",
+          { className: "col" },
+          React.createElement(
+            "div",
+            { className: "time", onClick: () => props.onClick(600) },
+            " ",
+            React.createElement(
+              "h5",
+              null,
+              " 10 minutes "
+            ),
+            " "
+          )
         )
       )
     )
@@ -231,30 +257,43 @@ function WelcomeHumanOther(props) {
     "div",
     { id: "humanOther", className: "welcomeScreen" },
     React.createElement(
-      "h1",
-      null,
-      " Welcome "
-    ),
-    React.createElement(
       "div",
-      null,
+      { className: "container_div" },
       React.createElement(
-        "form",
-        { onSubmit: e => props.onSubmit(e) },
+        "button",
+        { className: "close_button btn btn-danger", onClick: () => {
+            document.querySelectorAll(".welcomeScreen").forEach(screen => {
+              screen.style.display = "None";
+            });
+          } },
+        " Close "
+      ),
+      React.createElement(
+        "h1",
+        null,
+        " Username "
+      ),
+      React.createElement(
+        "div",
+        null,
         React.createElement(
-          "label",
-          null,
-          " What is your username? "
-        ),
-        " ",
-        React.createElement("br", null),
-        React.createElement("input", { id: "username", type: "text", placeholder: "username", value: props.username, onChange: props.onChange }),
-        " ",
-        React.createElement("br", null),
-        React.createElement(
-          "button",
-          { className: "btn btn-primary mt-3" },
-          " Submit "
+          "form",
+          { onSubmit: e => props.onSubmit(e) },
+          React.createElement(
+            "label",
+            null,
+            " What is your username? "
+          ),
+          " ",
+          React.createElement("br", null),
+          React.createElement("input", { id: "username", type: "text", placeholder: "username", value: props.username, onChange: props.onChange }),
+          " ",
+          React.createElement("br", null),
+          React.createElement(
+            "button",
+            { className: "btn btn-primary mt-3" },
+            " Submit "
+          )
         )
       )
     )
@@ -294,54 +333,67 @@ function UsersOnline(props) {
     "div",
     { id: "usersOnline", className: "welcomeScreen" },
     React.createElement(
-      "h1",
-      null,
-      " Vs human on other PC "
-    ),
-    React.createElement(
       "div",
-      { className: "row" },
+      { className: "container_div" },
+      React.createElement(
+        "button",
+        { className: "close_button btn btn-danger", onClick: () => {
+            document.querySelectorAll(".welcomeScreen").forEach(screen => {
+              screen.style.display = "None";
+            });
+          } },
+        " Close "
+      ),
+      React.createElement(
+        "h1",
+        null,
+        " Online "
+      ),
       React.createElement(
         "div",
-        { className: "col" },
+        { className: "row" },
         React.createElement(
-          "h3",
-          null,
-          " Users online "
+          "div",
+          { className: "col" },
+          React.createElement(
+            "h3",
+            null,
+            " Users online "
+          ),
+          React.createElement(
+            "div",
+            { className: "align-left" },
+            React.createElement(
+              "ul",
+              null,
+              users
+            )
+          )
         ),
         React.createElement(
           "div",
-          { className: "align-left" },
+          { className: "col" },
           React.createElement(
-            "ul",
+            "h3",
             null,
-            users
+            " Games available "
+          ),
+          React.createElement(
+            "div",
+            { className: "align-left" },
+            React.createElement(
+              "ul",
+              null,
+              games
+            )
           )
         )
       ),
       React.createElement(
-        "div",
-        { className: "col" },
-        React.createElement(
-          "h3",
-          null,
-          " Games available "
-        ),
-        React.createElement(
-          "div",
-          { className: "align-left" },
-          React.createElement(
-            "ul",
-            null,
-            games
-          )
-        )
+        "button",
+        { className: "btn btn-primary", onClick: e => props.onClick(e) },
+        " Create new game "
       )
-    ),
-    React.createElement(
-      "button",
-      { className: "btn btn-primary", onClick: e => props.onClick(e) },
-      " Create new game "
     )
   );
 }
@@ -351,30 +403,43 @@ function WelcomePC(props) {
     "div",
     { id: "welcomeScreenPC", className: "welcomeScreen" },
     React.createElement(
-      "h1",
-      null,
-      " Welcome "
-    ),
-    React.createElement(
       "div",
-      null,
+      { className: "container_div" },
       React.createElement(
-        "form",
-        { onSubmit: e => props.onSubmit(e) },
+        "button",
+        { className: "close_button btn btn-danger", onClick: () => {
+            document.querySelectorAll(".welcomeScreen").forEach(screen => {
+              screen.style.display = "None";
+            });
+          } },
+        " Close "
+      ),
+      React.createElement(
+        "h1",
+        null,
+        " PC strength "
+      ),
+      React.createElement(
+        "div",
+        null,
         React.createElement(
-          "label",
-          null,
-          " Elo strength (1350-2850): "
-        ),
-        " ",
-        React.createElement("br", null),
-        React.createElement("input", { id: "elo", type: "number", name: "elo", min: "1350", max: "2850", value: props.elo_value, onChange: props.onChange }),
-        " ",
-        React.createElement("br", null),
-        React.createElement(
-          "button",
-          { className: "btn btn-primary mt-3" },
-          " Submit "
+          "form",
+          { onSubmit: e => props.onSubmit(e) },
+          React.createElement(
+            "label",
+            null,
+            " Elo strength (1350-2850): "
+          ),
+          " ",
+          React.createElement("br", null),
+          React.createElement("input", { id: "elo", type: "number", name: "elo", min: "1350", max: "2850", value: props.elo_value, onChange: props.onChange }),
+          " ",
+          React.createElement("br", null),
+          React.createElement(
+            "button",
+            { className: "btn btn-primary mt-3" },
+            " Submit "
+          )
         )
       )
     )

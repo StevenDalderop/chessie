@@ -56,16 +56,19 @@ function Message(props) {
 function StartScreen(props) {
   return (
     <div id="welcomeScreen1" className="welcomeScreen">
-      <h1> Welcome </h1>
-      <div className="row">
-        <div className="col">
-          <div className="time" onClick={() => props.onClick("human")}> <h3> vs Human on same PC </h3> </div>
-        </div>
-        <div className="col">
-          <div className="time" onClick={() => props.onClick("human_other")}> <h3> vs Human on other PC </h3> </div>
-        </div>
-        <div className="col">
-          <div className="time" onClick={() => props.onClick("pc")}> <h3> vs PC </h3> </div>
+      <div className="container_div">
+        <button className="close_button btn btn-danger" onClick={() => {document.querySelectorAll(".welcomeScreen").forEach((screen) => { screen.style.display = "None"})}}> Close </button>
+        <h1> New Game </h1>
+        <div className="row">
+          <div className="col">
+            <div className="time" onClick={() => props.onClick("human")}> <h3> vs Human offline </h3> </div>
+          </div>
+          <div className="col">
+            <div className="time" onClick={() => props.onClick("human_other")}> <h3> vs Human online </h3> </div>
+          </div>
+          <div className="col">
+            <div className="time" onClick={() => props.onClick("pc")}> <h3> vs PC </h3> </div>
+          </div>
         </div>
       </div>
     </div>
@@ -75,19 +78,22 @@ function StartScreen(props) {
 function WelcomeHuman(props) {
   return (
     <div id="welcomeScreen2" className="welcomeScreen">
-      <h1> Welcome </h1>
-      <div className="row">
-        <div className="col">
-          <div className="time" onClick={() => props.onClick(60)}> <h3> 1 minute </h3> </div>
-        </div>
-        <div className="col">
-          <div className="time" onClick={() => props.onClick(180)}> <h3> 3 minutes </h3> </div>
-        </div>
-        <div className="col">
-          <div className="time" onClick={() => props.onClick(300)}> <h3> 5 minutes </h3> </div>
-        </div>
-        <div className="col">
-          <div className="time" onClick={() => props.onClick(600)}> <h3> 10 minutes </h3> </div>
+      <div className="container_div">
+        <button className="close_button btn btn-danger" onClick={() => {document.querySelectorAll(".welcomeScreen").forEach((screen) => { screen.style.display = "None"})}}> Close </button>
+        <h1> Time </h1>
+        <div className="row ml-0 mr-0">
+          <div className="col">
+            <div className="time" onClick={() => props.onClick(60)}> <h5> 1 minute </h5> </div>
+          </div>
+          <div className="col">
+            <div className="time" onClick={() => props.onClick(180)}> <h5> 3 minutes </h5> </div>
+          </div>
+          <div className="col">
+            <div className="time" onClick={() => props.onClick(300)}> <h5> 5 minutes </h5> </div>
+          </div>
+          <div className="col">
+            <div className="time" onClick={() => props.onClick(600)}> <h5> 10 minutes </h5> </div>
+          </div>
         </div>
       </div>
     </div>
@@ -97,13 +103,16 @@ function WelcomeHuman(props) {
 function WelcomeHumanOther(props) {
   return (
     <div id="humanOther" className="welcomeScreen">
-      <h1> Welcome </h1>
-      <div>
-        <form onSubmit={(e) => props.onSubmit(e)}>
-          <label> What is your username? </label> <br></br>
-          <input id="username" type="text" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
-          <button className="btn btn-primary mt-3"> Submit </button>
-        </form>
+      <div className="container_div">
+        <button className="close_button btn btn-danger" onClick={() => {document.querySelectorAll(".welcomeScreen").forEach((screen) => { screen.style.display = "None"})}}> Close </button>
+        <h1> Username </h1>
+        <div>
+          <form onSubmit={(e) => props.onSubmit(e)}>
+            <label> What is your username? </label> <br></br>
+            <input id="username" type="text" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
+            <button className="btn btn-primary mt-3"> Submit </button>
+          </form>
+        </div>
       </div>
     </div>
   )
@@ -126,26 +135,30 @@ function UsersOnline(props) {
   }
   return (
     <div id="usersOnline" className="welcomeScreen">
-      <h1> Vs human on other PC </h1>
-      <div className="row">
-        <div className="col">
-          <h3> Users online </h3>
-          <div className="align-left">
-            <ul>
-              {users}
-            </ul>
+      <div className="container_div">
+        <button className="close_button btn btn-danger" onClick={() => {document.querySelectorAll(".welcomeScreen").forEach((screen) => { screen.style.display = "None"})}}> Close </button>
+
+        <h1> Online </h1>
+        <div className="row">
+          <div className="col">
+            <h3> Users online </h3>
+            <div className="align-left">
+              <ul>
+                {users}
+              </ul>
+            </div>
+          </div>
+          <div className="col">
+            <h3> Games available </h3>
+            <div className="align-left">
+              <ul>
+                {games}
+              </ul>
+            </div>
           </div>
         </div>
-        <div className="col">
-          <h3> Games available </h3>
-          <div className="align-left">
-            <ul>
-              {games}
-            </ul>
-          </div>
-        </div>
+        <button className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>
       </div>
-      <button className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>
     </div>
   )
 }
@@ -153,13 +166,17 @@ function UsersOnline(props) {
 function WelcomePC(props) {
   return (
     <div id="welcomeScreenPC" className="welcomeScreen">
-      <h1> Welcome </h1>
-      <div>
-        <form onSubmit={(e) => props.onSubmit(e)}>
-          <label> Elo strength (1350-2850): </label> <br></br>
-          <input id="elo" type="number" name="elo" min="1350" max="2850" value={props.elo_value} onChange={props.onChange} /> <br></br>
-          <button className="btn btn-primary mt-3"> Submit </button>
-        </form>
+      <div className="container_div">
+        <button className="close_button btn btn-danger" onClick={() => {document.querySelectorAll(".welcomeScreen").forEach((screen) => { screen.style.display = "None"})}}> Close </button>
+
+        <h1> PC strength </h1>
+        <div>
+          <form onSubmit={(e) => props.onSubmit(e)}>
+            <label> Elo strength (1350-2850): </label> <br></br>
+            <input id="elo" type="number" name="elo" min="1350" max="2850" value={props.elo_value} onChange={props.onChange} /> <br></br>
+            <button className="btn btn-primary mt-3"> Submit </button>
+          </form>
+        </div>
       </div>
     </div>
   )

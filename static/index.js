@@ -12,7 +12,12 @@ function Square(props) {
 
 function piece_icon(name) {
   if (name) {
-    return React.createElement("i", { className: "fas fa-chess-" + name[0] + " fa-3x color_" + name[1] });
+    if (name[1] === 0) {
+      var color = "d";
+    } else {
+      var color = "l";
+    }
+    return React.createElement("img", { className: "piece_icon", src: "/static/Chess_" + name[0] + color + "t45.svg" });
   } else {
     return null;
   }

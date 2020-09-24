@@ -2,6 +2,20 @@
   color: white;
 }
 
+#footer {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  z-index: 10000;
+  color: white;
+  padding-left: 15px;
+}
+
+.piece_icon {
+  height: 60px;
+  width: 60px;
+}
+
 #promotion {
   color: white;
   text-align: center;

@@ -257,43 +257,30 @@ function WelcomeHumanOther(props) {
     "div",
     { id: "humanOther", className: "welcomeScreen" },
     React.createElement(
+      "h1",
+      null,
+      " Username "
+    ),
+    React.createElement(
       "div",
-      { className: "container_div" },
+      null,
       React.createElement(
-        "button",
-        { className: "close_button btn btn-danger", onClick: () => {
-            document.querySelectorAll(".welcomeScreen").forEach(screen => {
-              screen.style.display = "None";
-            });
-          } },
-        " Close "
-      ),
-      React.createElement(
-        "h1",
-        null,
-        " Username "
-      ),
-      React.createElement(
-        "div",
-        null,
+        "form",
+        { onSubmit: e => props.onSubmit(e) },
         React.createElement(
-          "form",
-          { onSubmit: e => props.onSubmit(e) },
-          React.createElement(
-            "label",
-            null,
-            " What is your username? "
-          ),
-          " ",
-          React.createElement("br", null),
-          React.createElement("input", { id: "username", type: "text", placeholder: "username", value: props.username, onChange: props.onChange }),
-          " ",
-          React.createElement("br", null),
-          React.createElement(
-            "button",
-            { className: "btn btn-primary mt-3" },
-            " Submit "
-          )
+          "label",
+          null,
+          " What is your username? "
+        ),
+        " ",
+        React.createElement("br", null),
+        React.createElement("input", { id: "username", type: "text", placeholder: "username", value: props.username, onChange: props.onChange }),
+        " ",
+        React.createElement("br", null),
+        React.createElement(
+          "button",
+          { className: "btn btn-primary mt-3" },
+          " Submit "
         )
       )
     )
@@ -309,7 +296,7 @@ function UsersOnline(props) {
       "li",
       { key: i },
       " ",
-      u,
+      u["username"],
       " "
     ));
     i++;
@@ -320,12 +307,18 @@ function UsersOnline(props) {
   for (g of props["games"]) {
     games.push(React.createElement(
       "li",
-      { key: j, onClick: () => props.onClickGame(g["username"], g["room"], g["time"]) },
+      { key: j },
       " ",
       g["username"],
       " (",
       g["time"],
-      " seconds) "
+      " seconds) ",
+      React.createElement(
+        "a",
+        { className: "link", onClick: () => props.onClickGame(g["username"], g["room"], g["time"]) },
+        " Join game "
+      ),
+      " "
     ));
     j++;
   }
@@ -351,7 +344,7 @@ function UsersOnline(props) {
       ),
       React.createElement(
         "div",
-        { className: "row" },
+        { className: "row ml-0 mr-0" },
         React.createElement(
           "div",
           { className: "col" },
@@ -372,7 +365,7 @@ function UsersOnline(props) {
         ),
         React.createElement(
           "div",
-          { className: "col" },
+          { className: "col-auto" },
           React.createElement(
             "h3",
             null,
@@ -428,11 +421,11 @@ function WelcomePC(props) {
           React.createElement(
             "label",
             null,
-            " Elo strength (1350-2850): "
+            " Skill level (0-20): "
           ),
           " ",
           React.createElement("br", null),
-          React.createElement("input", { id: "elo", type: "number", name: "elo", min: "1350", max: "2850", value: props.elo_value, onChange: props.onChange }),
+          React.createElement("input", { id: "elo", type: "number", min: "0", max: "20", value: props.skill_level_pc, onChange: props.onChange }),
           " ",
           React.createElement("br", null),
           React.createElement(
@@ -520,7 +513,7 @@ class Game extends React.Component {
       "promotion": false,
       "vs": null,
       "score": 0,
-      "elo": 2000,
+      "skill_level_pc": 20,
       "result": null,
       "san": null,
       "username": "Player2",
@@ -606,13 +599,17 @@ class Game extends React.Component {
       if (promotion) {
         this.setState({ "promotion": [row, column] });
       } else {
-        this.make_moves(selected_square, row, column);
+        this.make_moves(selected_square, row, column, promotion);
       }
     }
   }
 
-  async make_moves(selected_square, row, column) {
-    let response = await fetch(`${baseURL}validated_move_info/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
+  async make_moves(selected_square, row, column, promotion) {
+    if (!promotion) {
+      var response = await fetch(`${baseURL}validated_move_info/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
+    } else {
+      var response = await fetch(`${baseURL}validated_move_info/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}/${promotion}`);
+    }
     let data = await response.json();
     let step = this.state.step;
 
@@ -654,7 +651,7 @@ class Game extends React.Component {
     if (option === "human") {
       document.querySelector("#welcomeScreen2").style.display = "initial";
     } else if (option === "human_other") {
-      document.querySelector("#humanOther").style.display = "initial";
+      document.querySelector("#usersOnline").style.display = "initial";
     } else {
       document.querySelector("#welcomeScreenPC").style.display = "initial";
     }
@@ -672,7 +669,7 @@ class Game extends React.Component {
 
   handleClick3(e) {
     e.preventDefault();
-    fetch(`${baseURL}configure/${this.state.elo}`);
+    fetch(`${baseURL}configure/${this.state.skill_level_pc}`);
     document.querySelector("#welcomeScreenPC").style.display = "none";
     document.querySelector("#welcomeScreen2").style.display = "initial";
   }
@@ -680,8 +677,8 @@ class Game extends React.Component {
   handleClick4(e) {
     e.preventDefault();
     document.querySelector("#humanOther").style.display = "none";
-    document.querySelector("#usersOnline").style.display = "initial";
-    socket.emit("add user online", { "username": this.state.username });
+    let d = new Date();
+    socket.emit("add user online", { "username": this.state.username, "time": d.toUTCString() });
   }
 
   handleClick5(e) {
@@ -700,13 +697,8 @@ class Game extends React.Component {
     let row = this.state.promotion[0];
     let column = this.state.promotion[1];
     let selected_square = this.state.selected_square;
-    fetch(`${baseURL}validated_move_info/${game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}/${piece}`).then(response => response.json()).then(data => {
-      if (data["validated"] === "true") {
-        console.log("move validated");
-        this.setState(state => ({ "history": state.history.concat([{ "pieces": this.fen_to_history(data["fen"]) }]), "result": data["result"], "last_move": data["last_move"], "score": data["score"], "selected_square": null, "san": data["moves_san"], "step": state.step + 1, "promotion": false }));
-        this.startTimer();
-      }
-    });
+
+    this.make_moves(selected_square, row, column, piece);
   }
 
   startTimer() {
@@ -734,7 +726,8 @@ class Game extends React.Component {
       "step": 0,
       "history": this.state.history.slice(0, 1),
       "san": null,
-      "score": 0 });
+      "score": 0,
+      "mirrored": false });
     fetch(`${baseURL}new_game`).then(response => response.json()).then(data => {
       this.setState({ "game_id": data["game_id"] });
     });
@@ -743,11 +736,26 @@ class Game extends React.Component {
   componentDidMount() {
     this.setState({ "history": [{ "pieces": this.fen_to_history(board) }], "game_id": game_id }); // Copy board from server
 
+    document.querySelector("#humanOther").style.display = "Initial";
+
+    setInterval(() => {
+      let d = new Date();
+      socket.emit("user online", { "username": this.state.username, "datetime": d.toUTCString() });
+    }, 30000);
+
     socket.on("announce user", data => {
       this.setState({ "users_online": data["users_online"] });
     });
 
+    socket.on("announce games available", data => {
+      this.setState({ "games_available": data["games_available"] });
+    });
+
     socket.on("announce new game", data => {
+      this.setState({ "games_available": data["games_available"] });
+    });
+
+    socket.on("announce game deleted", data => {
       this.setState({ "games_available": data["games_available"] });
     });
 
@@ -794,7 +802,7 @@ class Game extends React.Component {
       React.createElement(StartScreen, { onClick: option => this.handleClick1(option) }),
       React.createElement(WelcomeHuman, { onClick: time => this.handleClick2(time) }),
       React.createElement(WelcomeHumanOther, { onChange: e => this.setState({ "username": e.target.value }), username: this.state.username, onSubmit: e => this.handleClick4(e) }),
-      React.createElement(WelcomePC, { onChange: e => this.setState({ "elo": e.target.value }), elo_value: this.state.elo, onSubmit: e => this.handleClick3(e) }),
+      React.createElement(WelcomePC, { onChange: e => this.setState({ "skill_level_pc": e.target.value }), skill_level_pc: this.state.skill_level_pc, onSubmit: e => this.handleClick3(e) }),
       React.createElement(Promotion, { promotion: this.state.promotion, onClick: piece => this.handleClickPromotion(piece) }),
       React.createElement(Message, { title: "Result", text: this.state.result, onClick: () => {
           document.querySelector("#message").style.display = "none";this.setState({ "result": null });

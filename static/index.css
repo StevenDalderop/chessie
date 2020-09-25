@@ -44,6 +44,10 @@
   padding-bottom: 15px;
 }
 
+#message {
+  display: initial;
+}
+
 .align-left {
   text-align: left;
 }
@@ -243,6 +247,10 @@ body {
   padding-left: 15px;
   padding-right: 15px;
   padding-bottom: 15px;
+}
+
+.link {
+  color: blue;
 }
 
 #timer2_div {

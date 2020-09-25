@@ -5,6 +5,7 @@ import sys
 import os
 import stat
 from stockfish import Stockfish
+import datetime
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -75,10 +76,9 @@ def new_game():
     boards[str(game_id_last)] = chess.Board()
     return {"new_game": "true", "game_id": game_id_last}
 
-@app.route("/configure/<int:elo>")
-def configure(elo):
-    global engine
-    engine.configure({"UCI_LimitStrength": True, "UCI_Elo": elo})
+@app.route("/configure/<int:skill_level>")
+def configure(skill_level):
+    stockfish.set_skill_level(skill_level)
     return {"configured": "true"}
 
 @app.route("/get_pc_move/<int:game_id>")
@@ -103,19 +103,26 @@ def pc_move(game_id):
         "result": result
     }
 
-# @socketio.on('connect')
-# def test_connect():
-#     print('Client connected')
-#
-# @socketio.on('disconnect')
-# def test_disconnect():
-#     print('Client disconnected') # Takes one minute
+@socketio.on("connect")
+def connect():
+    socketio.emit("announce games available", {"games_available": games_available})
+
+@socketio.on("user online")
+def online(data):
+    global users_online
+    #print(data["username"])
+    #print(data["datetime"])
+    #date = datetime.datetime.strptime(data["datetime"], "%a, %d %b %Y %H:%M:%S %Z")
+    for dict in users_online:
+        if dict["username"] == data["username"]:
+            dict["last_seen"] = data["datetime"]
 
 @socketio.on("add user online")
 def user_online(data):
     global users_online
     username = data["username"]
-    users_online.append(username)
+    #date = datetime.datetime.strptime(data["time"], "%a, %d %b %Y %H:%M:%S %Z")
+    users_online.append({"username": username, "last_seen": data["time"]})
     socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
 
 @socketio.on("new game")
@@ -130,9 +137,13 @@ def new_game(data):
 
 @socketio.on("join game")
 def join_game(data):
-    global boards
+    global boards, games_available
     boards[str(data["game_id"])] = chess.Board()
     join_room(data["room"])
+    for (index, dict) in enumerate(games_available):
+        if dict["room"] == data["room"] and dict["username"] == data["username"]:
+            del games_available[index]
+            socketio.emit("announce game deleted", {"games_available": games_available}, broadcast=True)
     username = data["username"]
     username2 = data["username2"]
     socketio.emit("announce game starts", {"username": username, "username2": username2, "game_id": data["game_id"], "room": data["room"]}, room=data["room"])

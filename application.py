@@ -130,7 +130,7 @@ def new_game(data):
     global rooms, games_available
     username = data["username"]
     room = rooms
-    games_available.append({"room": room, "username": username, "time": data["time"]})
+    games_available.append({"game_id": data["game_id"], "room": room, "username": username, "time": data["time"]})
     join_room(room)
     rooms += 1
     socketio.emit("announce new game", {"games_available": games_available}, broadcast=True)
@@ -139,14 +139,17 @@ def new_game(data):
 def join_game(data):
     global boards, games_available
     boards[str(data["game_id"])] = chess.Board()
-    join_room(data["room"])
+    game_id = data["game_id"]
+    username = data["username"]
     for (index, dict) in enumerate(games_available):
-        if dict["room"] == data["room"] and dict["username"] == data["username"]:
+        if int(dict["game_id"]) == int(game_id):
+            username2 = dict["username"]
+            room = dict["room"]
+            time = dict["time"]
+            join_room(room)
+            socketio.emit("announce game starts", {"username": username, "username2": username2, "game_id": game_id, "room": room}, room=room)
             del games_available[index]
             socketio.emit("announce game deleted", {"games_available": games_available}, broadcast=True)
-    username = data["username"]
-    username2 = data["username2"]
-    socketio.emit("announce game starts", {"username": username, "username2": username2, "game_id": data["game_id"], "room": data["room"]}, room=data["room"])
 
 @socketio.on("make move")
 def make_move(data):

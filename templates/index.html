@@ -6,7 +6,6 @@
   <!-- CSS only -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
   <link rel="stylesheet" href={{ url_for('static', filename='index.css') }}>
-  <link rel="stylesheet" href={{ url_for('static', filename='@fortawesome/fontawesome-free/css/all.css') }}>
   <script type="text/javascript">
     var board = "{{ board }}"
     var game_id = "{{ game_id }}"
@@ -30,5 +29,8 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 
   <!-- Load our React component. -->
+  <script type="application/javascript" src={{ url_for('static', filename='board.js') }}></script>
+  <script type="application/javascript" src={{ url_for('static', filename='windows.js') }}></script>
+  <script type="application/javascript" src={{ url_for('static', filename='helpers.js') }}></script>
   <script type="application/javascript" src={{ url_for('static', filename='index.js') }}></script>
 </body>

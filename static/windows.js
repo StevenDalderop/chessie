@@ -301,7 +301,7 @@ function UsersOnline(props) {
       " seconds) ",
       React.createElement(
         "button",
-        { className: "link", name: "join_game", value: g["game_id"], onClick: e => props.onClick(e) },
+        { name: "join_game", value: g["game_id"], onClick: e => props.onClick(e) },
         " Join game "
       ),
       " "

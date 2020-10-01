@@ -142,7 +142,7 @@ def new_game(data):
     games_available.append({"game_id": data["game_id"], "room": room, "username": username, "time": data["time"]})
     join_room(room)
     rooms += 1
-    socketio.emit("announce new game", {"games_available": games_available}, broadcast=True)
+    socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
 
 @socketio.on("join game")
 def join_game(data):
@@ -158,9 +158,8 @@ def join_game(data):
             join_room(room)
             socketio.emit("announce game starts", {"username": username, "username2": username2, "game_id": game_id, "room": room}, room=room)
             del games_available[index]
-            socketio.emit("announce game deleted", {"games_available": games_available}, broadcast=True)
+            socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
 
 @socketio.on("make move")
 def make_move(data):
-    print("make move")
     socketio.emit("announce move", {"fen": data["fen"], "moves_san": data["moves_san"], "step": data["step"], "last_move": data["last_move"] , "score": data["score"], "result": data["result"]}, room=data["room"])

@@ -119,7 +119,7 @@ function UsersOnline(props) {
   let j = 0
   let g
   for (g of props["games"]) {
-    games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) <button className="link" name="join_game" value={g["game_id"]} onClick={(e) => props.onClick(e)}> Join game </button> </li>)
+    games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) <button name="join_game" value={g["game_id"]} onClick={(e) => props.onClick(e)}> Join game </button> </li>)
     j++
   }
 

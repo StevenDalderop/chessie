@@ -201,14 +201,6 @@ class Game extends React.Component {
       this.setState({"games_available": data["games_available"]})
     })
 
-    socket.on("announce new game", data => {
-      this.setState({"games_available": data["games_available"]})
-    })
-
-    socket.on("announce game deleted", data => {
-      this.setState({"games_available": data["games_available"]})
-    })
-
     socket.on("announce game starts", data => {
       console.log("game starts")
       console.log(data)

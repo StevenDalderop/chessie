@@ -372,6 +372,11 @@ function UsersOnline(props) {
           "button",
           { name: "usersOnline", className: "btn btn-primary", onClick: e => props.onClick(e) },
           " Create new game "
+        ),
+        React.createElement(
+          "button",
+          { name: "refresh", className: "btn btn-primary ml-3", onClick: e => props.onClick(e) },
+          " Refresh "
         )
       )
     );

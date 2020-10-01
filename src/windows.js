@@ -150,6 +150,7 @@ function UsersOnline(props) {
           </div>
         </div>
         <button name="usersOnline" className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>
+        <button name="refresh" className="btn btn-primary ml-3" onClick={(e) => props.onClick(e)}> Refresh </button>
       </div>
     </div>
   )

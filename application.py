@@ -104,15 +104,25 @@ def pc_move(game_id):
     }
 
 @socketio.on("connect")
+@socketio.on("refresh")
 def connect():
-    socketio.emit("announce games available", {"games_available": games_available})
+    global users_online, games_available # possible race condition
+    for (index, dict) in enumerate(users_online):
+        date = datetime.datetime.strptime(dict["last_seen"], "%a, %d %b %Y %H:%M:%S %Z")
+        now = datetime.datetime.utcnow()
+        diff = (now - date).total_seconds()
+        if diff > 30:
+            username = users_online[index]["username"]
+            del users_online[index]
+            for (index, dict) in enumerate(games_available):
+                if username == dict["username"]:
+                    del games_available[index]
+    socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
+    socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
 
 @socketio.on("user online")
 def online(data):
     global users_online
-    #print(data["username"])
-    #print(data["datetime"])
-    #date = datetime.datetime.strptime(data["datetime"], "%a, %d %b %Y %H:%M:%S %Z")
     for dict in users_online:
         if dict["username"] == data["username"]:
             dict["last_seen"] = data["datetime"]
@@ -121,7 +131,6 @@ def online(data):
 def user_online(data):
     global users_online
     username = data["username"]
-    #date = datetime.datetime.strptime(data["time"], "%a, %d %b %Y %H:%M:%S %Z")
     users_online.append({"username": username, "last_seen": data["time"]})
     socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
 

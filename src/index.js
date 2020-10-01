@@ -166,6 +166,8 @@ class Game extends React.Component {
       game_id = e.target.value
       socket.emit("join game", {"username": this.state.username, "game_id": game_id})
       console.log("join game " + this.state.username + " " + game_id)
+    } else if (e.target.name === "refresh") {
+      socket.emit("refresh")
     }
   }
 
@@ -186,7 +188,7 @@ class Game extends React.Component {
   componentDidMount() {
     this.setState({"history": [{"pieces": fen_to_history(board)}], "game_id": game_id}) // Copy board from server
 
-    setInterval(() => {
+    this.intervalOnline = setInterval(() => {
       let d = new Date()
       socket.emit("user online", {"username": this.state.username, "datetime": d.toUTCString()})
     }, 30000)
@@ -237,6 +239,7 @@ class Game extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this.interval)
+    clearInterval(this.intervalOnline)
   }
 
   render () {

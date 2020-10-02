@@ -1,4 +1,4 @@
-from flask import render_template, Flask
+from flask import render_template, Flask, request
 from flask_socketio import SocketIO, join_room, leave_room
 import chess
 import sys
@@ -131,14 +131,23 @@ def online(data):
 def user_online(data):
     global users_online
     username = data["username"]
-    users_online.append({"username": username, "last_seen": data["time"]})
-    socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
+    usernames = []
+    for dict in users_online:
+        usernames.append(dict["username"])
+    if username in usernames:
+        socketio.emit("user already exist", room=request.sid)
+    else:
+        users_online.append({"username": username, "last_seen": data["time"]})
+        socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
 
 @socketio.on("new game")
 def new_game(data):
     global rooms, games_available
     username = data["username"]
     room = rooms
+    for (index, dict) in enumerate(games_available):
+        if dict["username"] == username:
+            del games_available[index]
     games_available.append({"game_id": data["game_id"], "room": room, "username": username, "time": data["time"]})
     join_room(room)
     rooms += 1
@@ -156,7 +165,7 @@ def join_game(data):
             room = dict["room"]
             time = dict["time"]
             join_room(room)
-            socketio.emit("announce game starts", {"username": username, "username2": username2, "game_id": game_id, "room": room}, room=room)
+            socketio.emit("announce game starts", {"username": username, "username2": username2, "time": time, "game_id": game_id, "room": room}, room=room)
             del games_available[index]
             socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
 

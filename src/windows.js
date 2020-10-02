@@ -89,17 +89,23 @@ function WelcomeHuman(props) {
   )
 }}
 
-function WelcomeHumanOther(props) {
+function GetUsername(props) {
   if (!(props["display"] === "humanOther")) {
     return null
   } else {
+    if (props["message"]){
+      message = (<p> Username already exists </p>) 
+    } else {
+      message = null
+    }
   return (
     <div id="humanOther" className="welcomeScreen">
       <h1> Username </h1>
       <div>
-        <form name="humanOther" onSubmit={(e) => props.onSubmit(e)}>
+        <form name="username" onSubmit={(e) => props.onSubmit(e)}>
           <label> What is your username? </label> <br></br>
-          <input id="username" type="text" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
+          <input id="username" name="username" type="text" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
+          {message}
           <button className="btn btn-primary mt-3"> Submit </button>
         </form>
       </div>
@@ -119,7 +125,11 @@ function UsersOnline(props) {
   let j = 0
   let g
   for (g of props["games"]) {
-    games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) <button name="join_game" value={g["game_id"]} onClick={(e) => props.onClick(e)}> Join game </button> </li>)
+    if (props["username"] !== g["username"]) {
+      games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) <button name="join_game" value={g["game_id"]} onClick={(e) => props.onClick(e)}> Join game </button> </li>)
+    } else {
+      games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) </li>)   
+    }
     j++
   }
 

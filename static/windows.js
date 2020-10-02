@@ -234,10 +234,19 @@ function WelcomeHuman(props) {
   }
 }
 
-function WelcomeHumanOther(props) {
+function GetUsername(props) {
   if (!(props["display"] === "humanOther")) {
     return null;
   } else {
+    if (props["message"]) {
+      message = React.createElement(
+        "p",
+        null,
+        " Username already exists "
+      );
+    } else {
+      message = null;
+    }
     return React.createElement(
       "div",
       { id: "humanOther", className: "welcomeScreen" },
@@ -251,7 +260,7 @@ function WelcomeHumanOther(props) {
         null,
         React.createElement(
           "form",
-          { name: "humanOther", onSubmit: e => props.onSubmit(e) },
+          { name: "username", onSubmit: e => props.onSubmit(e) },
           React.createElement(
             "label",
             null,
@@ -259,9 +268,10 @@ function WelcomeHumanOther(props) {
           ),
           " ",
           React.createElement("br", null),
-          React.createElement("input", { id: "username", type: "text", placeholder: "username", value: props.username, onChange: props.onChange }),
+          React.createElement("input", { id: "username", name: "username", type: "text", placeholder: "username", value: props.username, onChange: props.onChange }),
           " ",
           React.createElement("br", null),
+          message,
           React.createElement(
             "button",
             { className: "btn btn-primary mt-3" },
@@ -291,21 +301,33 @@ function UsersOnline(props) {
   let j = 0;
   let g;
   for (g of props["games"]) {
-    games.push(React.createElement(
-      "li",
-      { key: j },
-      " ",
-      g["username"],
-      " (",
-      g["time"],
-      " seconds) ",
-      React.createElement(
-        "button",
-        { name: "join_game", value: g["game_id"], onClick: e => props.onClick(e) },
-        " Join game "
-      ),
-      " "
-    ));
+    if (props["username"] !== g["username"]) {
+      games.push(React.createElement(
+        "li",
+        { key: j },
+        " ",
+        g["username"],
+        " (",
+        g["time"],
+        " seconds) ",
+        React.createElement(
+          "button",
+          { name: "join_game", value: g["game_id"], onClick: e => props.onClick(e) },
+          " Join game "
+        ),
+        " "
+      ));
+    } else {
+      games.push(React.createElement(
+        "li",
+        { key: j },
+        " ",
+        g["username"],
+        " (",
+        g["time"],
+        " seconds) "
+      ));
+    }
     j++;
   }
 

@@ -34,7 +34,9 @@ class Game extends React.Component {
       "game_id": null,
       "mirrored": false,
       "display": "humanOther",
-      "game_state": null
+      "game_state": null, 
+      "username_already_exists": null, 
+      "color": null // 1 is white 0 is black 
     }
   }
 
@@ -52,7 +54,9 @@ class Game extends React.Component {
       var row = 7 - row
     }
 
-    if ((!selected_square && pieces[row][column]) || (selected_square && pieces[row][column] && pieces[row][column][1] !== this.state.last_move)) {
+    if ((this.state.vs === "pc" || this.state.vs === "human_other") && !selected_square && pieces[row][column] && pieces[row][column][1] === this.state.color && pieces[row][column][1] !== this.state.last_move) {
+      this.setState({"selected_square": [row, column]})
+    } else if ((this.state.vs === "human") && ((!selected_square && pieces[row][column]) || (selected_square && pieces[row][column] && pieces[row][column][1] !== this.state.last_move))) {
       this.setState({"selected_square": [row, column]})
     } else if ((selected_square && pieces[row][column] && pieces[row][column][1] === this.state.last_move) || (selected_square && !pieces[row][column])) { // Move or attack piece
         let move = [String.fromCharCode(selected_square[1] + 97) + String(8 - selected_square[0]) + String.fromCharCode(column + 97) + String(8 - row)]
@@ -112,7 +116,7 @@ class Game extends React.Component {
 
   handleClick (e) {
     e.preventDefault()
-    if (e.target.name === "humanOther") {
+    if (e.target.name === "username") {
       this.setState({"display": null})
       let d = new Date()
       socket.emit("add user online", {"username": this.state.username, "time": d.toUTCString()})
@@ -129,7 +133,7 @@ class Game extends React.Component {
         socket.emit("new game", {"game_id": this.state.game_id, "username": this.state.username, "time": time})
         this.setState({"display": "usersOnline"})
       } else {
-        this.setState({"game_state": "started"})
+        this.setState({"game_state": "started", "color": 1})
       }
     } else if (e.target.name === "vs") {
       if (e.target.value === "human") {
@@ -197,6 +201,8 @@ class Game extends React.Component {
       this.setState({"users_online": data["users_online"]})
     })
 
+    socket.on("user already exist", () => { this.setState({"display": "humanOther", "username_already_exists": true}) })
+
     socket.on("announce games available", data => {
       this.setState({"games_available": data["games_available"]})
     })
@@ -208,9 +214,9 @@ class Game extends React.Component {
         screen.style.display = "None"
       })
       if (data["username"] === this.state.username) {
-        this.setState({"username": data["username"], "game_id": data["game_id"], "username2": data["username2"], "room": data["room"], "game_state": "started"}) // Play as white
+        this.setState({"username": data["username"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username2"], "room": data["room"], "color": 1, "game_state": "started"}) // Play as white
       } else if (data["username2"] === this.state.username) {
-        this.setState({"username": data["username2"], "game_id": data["game_id"], "username2": data["username"], "room": data["room"], "mirrored": true, "game_state": "started"}) // Play as black
+        this.setState({"username": data["username2"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username"], "room": data["room"], "color": 0, "mirrored": true, "game_state": "started"}) // Play as black
       }
     })
 
@@ -239,11 +245,11 @@ class Game extends React.Component {
       <div>
         <StartScreen display={this.state.display} onClick={(e) => this.handleClick(e)} />
         <WelcomeHuman display={this.state.display} onClick={(e) => this.handleClick(e)} />
-        <WelcomeHumanOther display={this.state.display} onChange={(e) => this.setState({"username": e.target.value })} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
-        <WelcomePC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value })} skill_level_pc={this.state.skill_level_pc} onSubmit={(e) => this.handleClick(e)} />
+        <GetUsername display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
+        <WelcomePC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={(e) => this.handleClick(e)} />
         <Promotion promotion={this.state.promotion} onClick={(e) => this.handleClick(e)} />
         <Message text={this.state.result} onClick={() => {this.setState({"result": null})}} />
-        <UsersOnline display={this.state.display} usernames={this.state.users_online} games={this.state.games_available} onClick={(e) => this.handleClick(e)} />
+        <UsersOnline display={this.state.display} usernames={this.state.users_online} username={this.state.username} games={this.state.games_available} onClick={(e) => this.handleClick(e)} />
 
         <div className="container-fluid no-padding">
           <div className="row">

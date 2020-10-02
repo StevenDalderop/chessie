@@ -246,100 +246,23 @@ class Game extends React.Component {
           this.setState({ "result": null });
         } }),
       React.createElement(UsersOnline, { display: this.state.display, usernames: this.state.users_online, username: this.state.username, games: this.state.games_available, onClick: e => this.handleClick(e) }),
-      React.createElement(
-        "div",
-        { className: "container-fluid no-padding" },
-        React.createElement(
-          "div",
-          { className: "row" },
-          React.createElement(
-            "div",
-            { className: "col" },
-            React.createElement(
-              "div",
-              { className: "container_div" },
-              React.createElement(
-                "div",
-                { id: "board_container" },
-                React.createElement(Board, { pieces: this.state.history[this.state.step].pieces, onClick: (row, column) => this.handleClickBoard(row, column), mirrored: this.state.mirrored })
-              )
-            )
-          ),
-          React.createElement(
-            "div",
-            { className: "col-auto", id: "col_right" },
-            React.createElement(
-              "div",
-              { id: "timer1_div" },
-              React.createElement(
-                "h5",
-                null,
-                " ",
-                this.state.username2,
-                " "
-              ),
-              React.createElement(
-                "div",
-                { id: "timer" },
-                React.createElement(Timer, { seconds: this.state.times[0] })
-              )
-            ),
-            React.createElement(
-              "div",
-              { id: "history" },
-              React.createElement(
-                "h5",
-                null,
-                " History "
-              ),
-              React.createElement(
-                "div",
-                { id: "list" },
-                this.state.san
-              )
-            ),
-            React.createElement(
-              "div",
-              { id: "evaluation" },
-              React.createElement(
-                "h5",
-                null,
-                " Chess engine "
-              ),
-              React.createElement(
-                "div",
-                { id: "evaluation_figure" },
-                React.createElement(ScoreEvaluationBar, { score: this.state.score })
-              )
-            ),
-            React.createElement(
-              "div",
-              { id: "buttons" },
-              React.createElement(
-                "button",
-                { id: "button", name: "new_game", onClick: e => this.handleClick(e), className: "btn btn-primary" },
-                " New game "
-              )
-            ),
-            React.createElement(
-              "div",
-              { id: "timer2_div" },
-              React.createElement(
-                "h5",
-                null,
-                " ",
-                this.state.username,
-                " "
-              ),
-              React.createElement(
-                "div",
-                { id: "timer2" },
-                React.createElement(Timer, { seconds: this.state.times[1] })
-              )
-            )
-          )
-        )
-      )
+      React.createElement(Container, {
+        col_left: React.createElement(BoardContainer, {
+          pieces: this.state.history[this.state.step].pieces,
+          mirrored: this.state.mirrored,
+          onClick: (row, col) => this.handleClickBoard(row, col)
+        }),
+        sidebar_right: React.createElement(Sidebar, {
+          times: this.state.times,
+          username: this.state.username,
+          username2: this.state.username2,
+          san: this.state.san,
+          score: this.state.score,
+          onClick: e => {
+            this.handleClick(e);
+          }
+        })
+      })
     );
   }
 }

@@ -251,46 +251,21 @@ class Game extends React.Component {
         <Message text={this.state.result} onClick={() => {this.setState({"result": null})}} />
         <UsersOnline display={this.state.display} usernames={this.state.users_online} username={this.state.username} games={this.state.games_available} onClick={(e) => this.handleClick(e)} />
 
-        <div className="container-fluid no-padding">
-          <div className="row">
-            <div className="col">
-              <div className="container_div">
-                <div id="board_container">
-                  <Board pieces={this.state.history[this.state.step].pieces} onClick={(row, column) => this.handleClickBoard(row, column)} mirrored={this.state.mirrored} />
-                </div>
-              </div>
-            </div>
-            <div className="col-auto" id="col_right" >
-              <div id="timer1_div">
-                <h5> {this.state.username2} </h5>
-                <div id="timer">
-                  <Timer seconds={this.state.times[0]} />
-                </div>
-              </div>
-              <div id="history">
-                <h5> History </h5>
-                <div id="list">
-                    {this.state.san}
-                </div>
-              </div>
-              <div id="evaluation">
-                <h5> Chess engine </h5>
-                <div id="evaluation_figure">
-                  <ScoreEvaluationBar score={this.state.score} />
-                </div>
-              </div>
-              <div id="buttons">
-                <button id="button" name="new_game" onClick={(e) => this.handleClick(e)} className="btn btn-primary"> New game </button>
-              </div>
-              <div id="timer2_div">
-                <h5> {this.state.username} </h5>
-                <div id="timer2">
-                  <Timer seconds={this.state.times[1]} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Container 
+          col_left={<BoardContainer 
+            pieces={this.state.history[this.state.step].pieces} 
+            mirrored={this.state.mirrored} 
+            onClick={(row, col) => this.handleClickBoard(row, col)} 
+            />}
+          sidebar_right={<Sidebar 
+            times={this.state.times} 
+            username={this.state.username} 
+            username2={this.state.username2} 
+            san={this.state.san} 
+            score={this.state.score} 
+            onClick={(e) => {this.handleClick(e)}} 
+            />}
+        />
       </div>
     );
   }

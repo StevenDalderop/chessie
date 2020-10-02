@@ -71,7 +71,7 @@ function WelcomeHuman(props) {
       <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
         <h1> Time </h1>
         <div className="row ml-0 mr-0">
-            <div className="col">
+            <div className="col"> 
               <div data-value={60} name="time" className="time" onClick={(e) => props.onClick(e)}> <h5> 1 minute </h5> </div>
             </div>
             <div className="col">
@@ -170,19 +170,20 @@ function WelcomePC(props) {
   if (!(props["display"] === "welcomeScreenPC")) {
     return null
   } else {
-  return (
-    <div id="welcomeScreenPC" className="welcomeScreen">
-      <div className="container_div">
-        <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onSubmit(e)}> Close </button>
-        <h1> PC strength </h1>
-        <div>
-          <form name="pc_strength" onSubmit={(e) => props.onSubmit(e)}>
-            <label> Skill level (0-20): </label> <br></br>
-            <input id="elo" type="number" min="0" max="20" value={props.skill_level_pc} onChange={props.onChange} /> <br></br>
-            <button className="btn btn-primary mt-3"> Submit </button>
-          </form>
+    return (
+      <div id="welcomeScreenPC" className="welcomeScreen">
+        <div className="container_div">
+          <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onSubmit(e)}> Close </button>
+          <h1> PC strength </h1>
+          <div>
+            <form name="pc_strength" onSubmit={(e) => props.onSubmit(e)}>
+              <label> Skill level (0-20): </label> <br></br>
+              <input id="elo" type="number" min="0" max="20" value={props.skill_level_pc} onChange={props.onChange} /> <br></br>
+              <button className="btn btn-primary mt-3"> Submit </button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
-  )
-}}
+    )
+  }
+}

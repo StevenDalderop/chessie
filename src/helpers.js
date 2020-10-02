@@ -1,3 +1,62 @@
+function Container(props) {
+  return (
+    <div className="container-fluid no-padding">
+      <div className="row">
+        <div className="col">
+          {props.col_left}
+        </div>
+        <div id="col_right" className="col-auto">
+          {props.sidebar_right}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Sidebar(props) {
+  return (
+    <div>
+      <div id="timer1_div">
+        <h5> {props["username2"]} </h5>
+        <div id="timer">
+          <Timer seconds={props["times"][0]} />
+        </div>
+      </div>
+      <div id="history">
+        <h5> History </h5>
+        <div id="list">
+          {props["san"]}
+        </div>
+      </div>
+      <div id="evaluation">
+        <h5> Chess engine </h5>
+        <div id="evaluation_figure">
+          <ScoreEvaluationBar score={props["score"]} />
+        </div>
+      </div>
+      <div id="buttons">
+        <button id="button" name="new_game" onClick={(e) => props.onClick(e)} className="btn btn-primary"> New game </button>
+      </div>
+      <div id="timer2_div">
+        <h5> {props.username} </h5>
+        <div id="timer2">
+          <Timer seconds={props["times"][1]} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function BoardContainer(props) {
+  return (
+    <div className="container_div">
+      <div id="board_container">
+        <Board pieces={props.pieces} onClick={(row, column) => props.onClick(row, column)} mirrored={props.mirrored} />
+      </div>
+    </div>
+  )
+}
+
 function Timer(props) {
   let minutes = Math.floor(props.seconds / 60)
   let seconds = props.seconds - minutes * 60

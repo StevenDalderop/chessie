@@ -2,7 +2,7 @@
 
 function Square(props) {
   return (
-    <button className={"square bg-" + props.square_color + " " + props.class} onClick={() => props.onClick()}>
+    <button className={"square color-square-" + props.square_color + " " + props.class} onClick={() => props.onClick()}>
       {piece_icon(props.piece)}
     </button>
   )

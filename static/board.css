@@ -1,0 +1,68 @@
+.chess_row {
+    padding: 0px;
+    margin: 0px;
+    height: 70px;
+    width: 560px;
+    position: relative;
+  }
+  
+  .board {
+    margin: auto;
+    width: 560px;
+    position: relative;
+  }
+
+.piece_icon {
+    height: 60px;
+    width: 60px;
+  }
+
+  .square {
+    height: 70px;
+    width: 70px;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    position: absolute;
+    top: 0px;
+  }
+  
+  .square0 {
+    left: 0px;
+  }
+  
+  .square1 {
+    left: 70px;
+  }
+  
+  .square2 {
+    left: 140px;
+  }
+  
+  .square3 {
+    left: 210px;
+  }
+  
+  .square4 {
+    left: 280px;
+  }
+  
+  .square5 {
+    left: 350px;
+  }
+  
+  .square6 {
+    left: 420px;
+  }
+  
+  .square7 {
+    left: 490px;
+  }
+
+  .color-square-black {
+    background-color: rgb(90, 156, 96)
+  }
+  
+  .color-square-white {
+    background-color: white
+  }

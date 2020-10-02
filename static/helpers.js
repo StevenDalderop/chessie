@@ -1,3 +1,112 @@
+function Container(props) {
+  return React.createElement(
+    "div",
+    { className: "container-fluid no-padding" },
+    React.createElement(
+      "div",
+      { className: "row" },
+      React.createElement(
+        "div",
+        { className: "col" },
+        props.col_left
+      ),
+      React.createElement(
+        "div",
+        { id: "col_right", className: "col-auto" },
+        props.sidebar_right
+      )
+    )
+  );
+}
+
+function Sidebar(props) {
+  return React.createElement(
+    "div",
+    null,
+    React.createElement(
+      "div",
+      { id: "timer1_div" },
+      React.createElement(
+        "h5",
+        null,
+        " ",
+        props["username2"],
+        " "
+      ),
+      React.createElement(
+        "div",
+        { id: "timer" },
+        React.createElement(Timer, { seconds: props["times"][0] })
+      )
+    ),
+    React.createElement(
+      "div",
+      { id: "history" },
+      React.createElement(
+        "h5",
+        null,
+        " History "
+      ),
+      React.createElement(
+        "div",
+        { id: "list" },
+        props["san"]
+      )
+    ),
+    React.createElement(
+      "div",
+      { id: "evaluation" },
+      React.createElement(
+        "h5",
+        null,
+        " Chess engine "
+      ),
+      React.createElement(
+        "div",
+        { id: "evaluation_figure" },
+        React.createElement(ScoreEvaluationBar, { score: props["score"] })
+      )
+    ),
+    React.createElement(
+      "div",
+      { id: "buttons" },
+      React.createElement(
+        "button",
+        { id: "button", name: "new_game", onClick: e => props.onClick(e), className: "btn btn-primary" },
+        " New game "
+      )
+    ),
+    React.createElement(
+      "div",
+      { id: "timer2_div" },
+      React.createElement(
+        "h5",
+        null,
+        " ",
+        props.username,
+        " "
+      ),
+      React.createElement(
+        "div",
+        { id: "timer2" },
+        React.createElement(Timer, { seconds: props["times"][1] })
+      )
+    )
+  );
+}
+
+function BoardContainer(props) {
+  return React.createElement(
+    "div",
+    { className: "container_div" },
+    React.createElement(
+      "div",
+      { id: "board_container" },
+      React.createElement(Board, { pieces: props.pieces, onClick: (row, column) => props.onClick(row, column), mirrored: props.mirrored })
+    )
+  );
+}
+
 function Timer(props) {
   let minutes = Math.floor(props.seconds / 60);
   let seconds = props.seconds - minutes * 60;

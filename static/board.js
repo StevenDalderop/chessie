@@ -3,7 +3,7 @@
 function Square(props) {
   return React.createElement(
     "button",
-    { className: "square bg-" + props.square_color + " " + props.class, onClick: () => props.onClick() },
+    { className: "square color-square-" + props.square_color + " " + props.class, onClick: () => props.onClick() },
     piece_icon(props.piece)
   );
 }

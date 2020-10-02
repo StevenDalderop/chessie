@@ -26,8 +26,8 @@ class Game extends React.Component {
       "skill_level_pc": 20,
       "result": null,
       "san": null,
-      "username": "Player2",
-      "username2": "Player1",
+      "username": "Player1",
+      "username2": "Player2",
       "room": null,
       "users_online": [],
       "games_available": [],
@@ -120,7 +120,7 @@ class Game extends React.Component {
       this.setState({"display": "welcomeScreen2"})
     } else if (e.target.name === "pc_strength") {
       fetch(`${baseURL}configure/${this.state.skill_level_pc}`)
-      this.setState({"display": "welcomeScreen2"})
+      this.setState((state) => ({"display": "welcomeScreen2", "username2": "Stockfish " + "(skill: " + state.skill_level_pc + ")"}))
     } else if (e.target.getAttribute('name') === "time") {
       let time = e.target.getAttribute('data-value')
       this.setState({"display": null})
@@ -133,11 +133,11 @@ class Game extends React.Component {
       }
     } else if (e.target.name === "vs") {
       if (e.target.value === "human") {
-        this.setState({"display": "welcomeScreen2"})
+        this.setState({"display": "welcomeScreen2", "username2": "Player2"})
       } else if (e.target.value == "human_other") {
-        this.setState({"display": "usersOnline"})
+        this.setState({"display": "usersOnline", "username2": "Player2"})
       } else if (e.target.value === "pc") {
-        this.setState({"display": "welcomeScreenPC"})
+        this.setState({"display": "welcomeScreenPC", "username2": "Stockfish"})
       }
       this.setState({"vs": e.target.value})
     } else if (e.target.name === "new_game") {

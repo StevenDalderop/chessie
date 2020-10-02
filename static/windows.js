@@ -395,7 +395,7 @@ function WelcomePC(props) {
         { className: "container_div" },
         React.createElement(
           "button",
-          { name: "close", className: "close_button btn btn-danger", onClick: e => props.onClick(e) },
+          { name: "close", className: "close_button btn btn-danger", onClick: e => props.onSubmit(e) },
           " Close "
         ),
         React.createElement(

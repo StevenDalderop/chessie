@@ -163,7 +163,7 @@ function WelcomePC(props) {
   return (
     <div id="welcomeScreenPC" className="welcomeScreen">
       <div className="container_div">
-        <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
+        <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onSubmit(e)}> Close </button>
         <h1> PC strength </h1>
         <div>
           <form name="pc_strength" onSubmit={(e) => props.onSubmit(e)}>

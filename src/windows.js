@@ -41,15 +41,27 @@ function StartScreen(props) {
         <div className="container_div">
           <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
           <h1> New Game </h1>
-          <div className="row">
+          <div className="row mr-0 ml-0">
             <div className="col">
-              <div className="time" onClick={() => createInput("human")}> <h3> vs Human offline </h3> </div>
+              <div className="time" onClick={() => createInput("human")}>
+                <div className="centered_container no_click">
+                  <h5> vs Human Offline </h5>
+                </div> 
+              </div>
             </div>
             <div className="col">
-              <div className="time" onClick={() => createInput("human_other")}> <h3> vs Human Online </h3> </div>
+              <div className="time" onClick={() => createInput("human_other")}> 
+                <div className="centered_container no_click">
+                  <h5> vs Human Online </h5> 
+                </div>
+              </div>
             </div>
             <div className="col">
-              <div  className="time" onClick={() => createInput("pc")}> <h3> vs PC </h3> </div>
+              <div className="time" onClick={() => createInput("pc")}>
+                <div className="centered_container no_click"> 
+                  <h5> vs PC </h5>
+                </div> 
+              </div>
             </div>
             <form>
               <input id="hidden_input" name="vs" type="hidden" value="" onClick={(e) => props.onClick(e)}></input>
@@ -72,16 +84,32 @@ function WelcomeHuman(props) {
         <h1> Time </h1>
         <div className="row ml-0 mr-0">
             <div className="col"> 
-              <div data-value={60} name="time" className="time" onClick={(e) => props.onClick(e)}> <h5> 1 minute </h5> </div>
+              <div data-value={60} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+                <div className="centered_container no_click">
+                  <h5> 1 minute </h5> 
+                </div>
+              </div>
             </div>
             <div className="col">
-              <div data-value={180} name="time" className="time" onClick={(e) => props.onClick(e)}> <h5> 3 minutes </h5> </div>
+              <div data-value={180} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+                <div className="centered_container no_click">
+                  <h5> 3 minutes </h5> 
+                </div> 
+              </div>
             </div>
             <div className="col">
-              <div data-value={300} name="time" className="time" onClick={(e) => props.onClick(e)}> <h5> 5 minutes </h5> </div>
+              <div data-value={300} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+                <div className="centered_container no_click">
+                  <h5> 5 minutes </h5> 
+                </div> 
+              </div>
             </div>
             <div className="col">
-              <div data-value={600} name="time" className="time" onClick={(e) => props.onClick(e)}> <h5> 10 minutes </h5> </div>
+              <div data-value={600} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+                <div className="centered_container no_click">
+                  <h5> 10 minutes </h5> 
+                </div> 
+              </div>
             </div>
         </div>
       </div>
@@ -121,6 +149,7 @@ function UsersOnline(props) {
     users.push(<li key={i}> {u["username"]} </li>)
     i++
   }
+
   let games = []
   let j = 0
   let g
@@ -141,7 +170,7 @@ function UsersOnline(props) {
       <div className="container_div">
         <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
         <h1> Online </h1>
-        <div className="row ml-0 mr-0">
+        <div className="row">
           <div className="col">
             <h3> Users online </h3>
             <div className="align-left">
@@ -150,13 +179,11 @@ function UsersOnline(props) {
               </ul>
             </div>
           </div>
-          <div className="col-auto">
+          <div className="col"> 
             <h3> Games available </h3>
-            <div className="align-left">
-              <ul>
-                {games}
-              </ul>
-            </div>
+            <ul id="list">
+              {games}
+            </ul>
           </div>
         </div>
         <button name="usersOnline" className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>

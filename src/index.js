@@ -80,38 +80,38 @@ class Game extends React.Component {
     let step = this.state.step
 
     if (data["validated"] === "true" && this.state.vs !== "human_other") {
-       console.log("move validated")
-       this.setState((state) => ({
-         "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
-         "result": data["result"],
-         "last_move": data["last_move"],
-         "score": data["score"],
-         "selected_square": null,
-         "san": data["moves_san"],
-         "step": state.step + 1,
-         "promotion": false
+      console.log("move validated")
+      this.setState((state) => ({
+        "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
+        "result": data["result"],
+        "last_move": data["last_move"],
+        "score": data["score"],
+        "selected_square": null,
+        "san": data["moves_san"],
+        "step": state.step + 1,
+        "promotion": false
        }))
-       this.startTimer()
+      this.startTimer()
      }
 
-     if (this.state.vs === "pc") {
-       fetch(`${baseURL}get_pc_move/${this.state.game_id}`)
-       .then(response => response.json())
-       .then((data) => {
-         this.setState((state) => ({
-           "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
-           "result": data["result"],
-           "last_move": data["last_move"],
-           "score": data["score"],
-           "selected_square": null,
-           "san": data["moves_san"],
-           "step": state.step + 1,
-           "promotion": false
-         }))
-       })
-     } else if (this.state.vs === "human_other" && data["validated"] === "true") {
-       socket.emit("make move", {"fen": data["fen"], "moves_san": data["moves_san"], "step": step + 1, "last_move": data["last_move"] , "score": data["score"], "result": data["result"], "room": this.state.room})
-     }
+    if (this.state.vs === "pc" && data["validated"] === "true") {
+      fetch(`${baseURL}get_pc_move/${this.state.game_id}`)
+      .then(response => response.json())
+      .then((data) => {
+        this.setState((state) => ({
+          "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
+          "result": data["result"],
+          "last_move": data["last_move"],
+          "score": data["score"],
+          "selected_square": null,
+          "san": data["moves_san"],
+          "step": state.step + 1,
+          "promotion": false
+        }))
+      })
+    } else if (this.state.vs === "human_other" && data["validated"] === "true") {
+      socket.emit("make move", {"fen": data["fen"], "moves_san": data["moves_san"], "step": step + 1, "last_move": data["last_move"] , "score": data["score"], "result": data["result"], "room": this.state.room})
+    }
   }
 
   handleClick (e) {

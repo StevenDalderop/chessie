@@ -88,20 +88,22 @@ function StartScreen(props) {
         ),
         React.createElement(
           "div",
-          { className: "row" },
+          { className: "row mr-0 ml-0" },
           React.createElement(
             "div",
             { className: "col" },
             React.createElement(
               "div",
               { className: "time", onClick: () => createInput("human") },
-              " ",
               React.createElement(
-                "h3",
-                null,
-                " vs Human offline "
-              ),
-              " "
+                "div",
+                { className: "centered_container no_click" },
+                React.createElement(
+                  "h5",
+                  null,
+                  " vs Human Offline "
+                )
+              )
             )
           ),
           React.createElement(
@@ -110,13 +112,15 @@ function StartScreen(props) {
             React.createElement(
               "div",
               { className: "time", onClick: () => createInput("human_other") },
-              " ",
               React.createElement(
-                "h3",
-                null,
-                " vs Human Online "
-              ),
-              " "
+                "div",
+                { className: "centered_container no_click" },
+                React.createElement(
+                  "h5",
+                  null,
+                  " vs Human Online "
+                )
+              )
             )
           ),
           React.createElement(
@@ -125,13 +129,15 @@ function StartScreen(props) {
             React.createElement(
               "div",
               { className: "time", onClick: () => createInput("pc") },
-              " ",
               React.createElement(
-                "h3",
-                null,
-                " vs PC "
-              ),
-              " "
+                "div",
+                { className: "centered_container no_click" },
+                React.createElement(
+                  "h5",
+                  null,
+                  " vs PC "
+                )
+              )
             )
           ),
           React.createElement(
@@ -174,13 +180,15 @@ function WelcomeHuman(props) {
             React.createElement(
               "div",
               { "data-value": 60, name: "time", className: "time", onClick: e => props.onClick(e) },
-              " ",
               React.createElement(
-                "h5",
-                null,
-                " 1 minute "
-              ),
-              " "
+                "div",
+                { className: "centered_container no_click" },
+                React.createElement(
+                  "h5",
+                  null,
+                  " 1 minute "
+                )
+              )
             )
           ),
           React.createElement(
@@ -189,13 +197,15 @@ function WelcomeHuman(props) {
             React.createElement(
               "div",
               { "data-value": 180, name: "time", className: "time", onClick: e => props.onClick(e) },
-              " ",
               React.createElement(
-                "h5",
-                null,
-                " 3 minutes "
-              ),
-              " "
+                "div",
+                { className: "centered_container no_click" },
+                React.createElement(
+                  "h5",
+                  null,
+                  " 3 minutes "
+                )
+              )
             )
           ),
           React.createElement(
@@ -204,13 +214,15 @@ function WelcomeHuman(props) {
             React.createElement(
               "div",
               { "data-value": 300, name: "time", className: "time", onClick: e => props.onClick(e) },
-              " ",
               React.createElement(
-                "h5",
-                null,
-                " 5 minutes "
-              ),
-              " "
+                "div",
+                { className: "centered_container no_click" },
+                React.createElement(
+                  "h5",
+                  null,
+                  " 5 minutes "
+                )
+              )
             )
           ),
           React.createElement(
@@ -219,13 +231,15 @@ function WelcomeHuman(props) {
             React.createElement(
               "div",
               { "data-value": 600, name: "time", className: "time", onClick: e => props.onClick(e) },
-              " ",
               React.createElement(
-                "h5",
-                null,
-                " 10 minutes "
-              ),
-              " "
+                "div",
+                { className: "centered_container no_click" },
+                React.createElement(
+                  "h5",
+                  null,
+                  " 10 minutes "
+                )
+              )
             )
           )
         )
@@ -297,6 +311,7 @@ function UsersOnline(props) {
     ));
     i++;
   }
+
   let games = [];
   let j = 0;
   let g;
@@ -352,7 +367,7 @@ function UsersOnline(props) {
         ),
         React.createElement(
           "div",
-          { className: "row ml-0 mr-0" },
+          { className: "row" },
           React.createElement(
             "div",
             { className: "col" },
@@ -373,20 +388,16 @@ function UsersOnline(props) {
           ),
           React.createElement(
             "div",
-            { className: "col-auto" },
+            { className: "col" },
             React.createElement(
               "h3",
               null,
               " Games available "
             ),
             React.createElement(
-              "div",
-              { className: "align-left" },
-              React.createElement(
-                "ul",
-                null,
-                games
-              )
+              "ul",
+              { id: "list" },
+              games
             )
           )
         ),

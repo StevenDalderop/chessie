@@ -87,7 +87,7 @@ class Game extends React.Component {
       this.startTimer();
     }
 
-    if (this.state.vs === "pc") {
+    if (this.state.vs === "pc" && data["validated"] === "true") {
       fetch(`${baseURL}get_pc_move/${this.state.game_id}`).then(response => response.json()).then(data => {
         this.setState(state => ({
           "history": state.history.concat([{ "pieces": fen_to_history(data["fen"]) }]),

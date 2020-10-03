@@ -143,12 +143,29 @@ body {
   transform: translate(-50%, -50%);
 }
 
+.centered_container {
+  position: absolute;
+  margin: 0;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+#list {
+  height: 100px;
+}
+
 #col_left {
   margin: 0;
   top: 50%;
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+}
+
+.no_click {
+  pointer-events: none;
 }
 
 #col_right {
@@ -192,6 +209,11 @@ body {
   margin-bottom: 0px;
 }
 
+.square_container {
+  width: 100px;
+  height: 100px;
+}
+
 .time {
   background-color: rgb(200,200,200);
   color: black;
@@ -199,6 +221,7 @@ body {
   width: 100px;
   text-align: center;
   margin: auto;
+  position: relative;
 }
 
 svg {

@@ -102,7 +102,7 @@ function BoardContainer(props) {
     React.createElement(
       "div",
       { id: "board_container" },
-      React.createElement(Board, { pieces: props.pieces, onClick: (row, column) => props.onClick(row, column), mirrored: props.mirrored })
+      React.createElement(Board, { pieces: props.pieces, selected_square: props.selected_square, onClick: (row, column) => props.onClick(row, column), mirrored: props.mirrored })
     )
   );
 }

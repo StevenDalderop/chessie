@@ -107,7 +107,7 @@ class Game extends React.Component {
     }
 
     if (this.state.result) {
-      this.setState({ "game_state": "finished" });
+      this.setState({ "game_state": "finished", "selected_square": null });
       clearInterval(this.interval);
     }
   }
@@ -178,7 +178,7 @@ class Game extends React.Component {
     this.interval = setInterval(() => {
       let seconds = this.state.times[!this.state.last_move ? 1 : 0];
       if (seconds === 0) {
-        this.setState(state => ({ "result": state.last_move ? "1-0" : "0-1", "game_state": "finished" }));
+        this.setState(state => ({ "result": state.last_move ? "1-0" : "0-1", "game_state": "finished", "selected_square": null }));
         clearInterval(this.interval);
       } else {
         seconds = seconds - 1;
@@ -257,6 +257,7 @@ class Game extends React.Component {
         col_left: React.createElement(BoardContainer, {
           pieces: this.state.history[this.state.step].pieces,
           mirrored: this.state.mirrored,
+          selected_square: this.state.selected_square,
           onClick: (row, col) => this.handleClickBoard(row, col)
         }),
         sidebar_right: React.createElement(Sidebar, {

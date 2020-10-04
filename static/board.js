@@ -2,9 +2,13 @@
 
 function Square(props) {
   return React.createElement(
-    "button",
+    "div",
     { className: "square color-square-" + props.square_color + " " + props.class, onClick: () => props.onClick() },
-    piece_icon(props.piece)
+    React.createElement(
+      "div",
+      { className: "centered_container" },
+      piece_icon(props.piece)
+    )
   );
 }
 
@@ -35,6 +39,9 @@ class Board extends React.Component {
       square_color = "white";
     } else {
       square_color = "black";
+    }
+    if (this.props.selected_square && this.props.selected_square[0] === row_new && this.props.selected_square[1] === col_new) {
+      square_color = "yellow";
     }
     return React.createElement(Square, { "class": "square" + column, square_color: square_color, piece: this.props.pieces[row_new][col_new], onClick: () => this.props.onClick(row_new, col_new), key: row_new * 8 + col_new });
   }

@@ -51,7 +51,7 @@ function BoardContainer(props) {
   return (
     <div className="container_div">
       <div id="board_container">
-        <Board pieces={props.pieces} onClick={(row, column) => props.onClick(row, column)} mirrored={props.mirrored} />
+        <Board pieces={props.pieces} selected_square={props.selected_square} onClick={(row, column) => props.onClick(row, column)} mirrored={props.mirrored} />
       </div>
     </div>
   )

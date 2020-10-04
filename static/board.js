@@ -26,15 +26,17 @@ class Board extends React.Component {
     let square_color;
     if (this.props.mirrored) {
       var row_new = 7 - row;
+      var col_new = 7 - column;
     } else {
       var row_new = row;
+      var col_new = column;
     }
-    if ((row_new + column) % 2 === 0) {
+    if ((row_new + col_new) % 2 === 0) {
       square_color = "white";
     } else {
       square_color = "black";
     }
-    return React.createElement(Square, { "class": "square" + column, square_color: square_color, piece: this.props.pieces[row_new][column], onClick: () => this.props.onClick(row, column), key: row * 8 + column });
+    return React.createElement(Square, { "class": "square" + column, square_color: square_color, piece: this.props.pieces[row_new][col_new], onClick: () => this.props.onClick(row_new, col_new), key: row_new * 8 + col_new });
   }
 
   renderRow(row) {

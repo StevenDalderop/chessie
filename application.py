@@ -37,6 +37,16 @@ def index():
     fen = boards[str(game_id_last)].fen()
     return render_template("index.html", board = fen, game_id = game_id_last)
 
+@app.route("/check_promotion_valid/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>")
+def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
+    board = boards[str(game_id)] # Reference not copy
+    promotion = chess.QUEEN
+    human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
+    if (human_move in board.legal_moves):
+        return {"validated": "true"}
+    else:
+        return {"validated": "false"}
+
 @app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>", defaults={'promotion': None})
 @app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>/<string:promotion>")
 def validated_move_info(game_id, row_start, col_start, row_end, col_end, promotion):

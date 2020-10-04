@@ -42,28 +42,30 @@ class Game extends React.Component {
     let pieces = current.pieces;
     let selected_square = this.state.selected_square;
 
-    if (this.state.mirrored) {
-      var row = 7 - row;
-    }
-
-    if ((this.state.vs === "pc" || this.state.vs === "human_other") && !selected_square && pieces[row][column] && pieces[row][column][1] === this.state.color && pieces[row][column][1] !== this.state.last_move) {
+    if ((this.state.vs === "pc" || this.state.vs === "human_other") && pieces[row][column] && pieces[row][column][1] === this.state.color) {
       this.setState({ "selected_square": [row, column] });
-    } else if (this.state.vs === "human" && (!selected_square && pieces[row][column] || selected_square && pieces[row][column] && pieces[row][column][1] !== this.state.last_move)) {
+    } else if (this.state.vs === "human" && pieces[row][column] && pieces[row][column][1] !== this.state.last_move) {
       this.setState({ "selected_square": [row, column] });
     } else if (selected_square && pieces[row][column] && pieces[row][column][1] === this.state.last_move || selected_square && !pieces[row][column]) {
       // Move or attack piece
-      let move = [String.fromCharCode(selected_square[1] + 97) + String(8 - selected_square[0]) + String.fromCharCode(column + 97) + String(8 - row)];
-      console.log("move human: " + move);
-      let promotion = pieces[selected_square[0]][selected_square[1]][0] === "pawn" && (row === 0 || row === 7);
-      if (promotion) {
-        this.setState({ "promotion": [row, column], "display": "promotion" });
-      } else {
-        this.make_moves(selected_square, row, column, promotion);
-      }
+      let promotion = false;
+      this.make_moves(selected_square, row, column, promotion);
     }
   }
 
   async make_moves(selected_square, row, column, promotion) {
+    let pieces = this.state.history[this.state.step].pieces;
+    let possible_promotion = pieces[selected_square[0]][selected_square[1]][0] === "pawn" && (row === 0 || row === 7);
+
+    if (possible_promotion && !this.state.promotion) {
+      let check_promotion = await fetch(`${baseURL}check_promotion_valid/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
+      let data = await check_promotion.json();
+      if (data["validated"] === "true") {
+        this.setState({ "promotion": [row, column], "display": "promotion" });
+        return;
+      }
+    }
+
     if (!promotion) {
       var response = await fetch(`${baseURL}validated_move_info/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
     } else {
@@ -102,6 +104,11 @@ class Game extends React.Component {
       });
     } else if (this.state.vs === "human_other" && data["validated"] === "true") {
       socket.emit("make move", { "fen": data["fen"], "moves_san": data["moves_san"], "step": step + 1, "last_move": data["last_move"], "score": data["score"], "result": data["result"], "room": this.state.room });
+    }
+
+    if (this.state.result) {
+      this.setState({ "game_state": "finished" });
+      clearInterval(this.interval);
     }
   }
 
@@ -171,7 +178,7 @@ class Game extends React.Component {
     this.interval = setInterval(() => {
       let seconds = this.state.times[!this.state.last_move ? 1 : 0];
       if (seconds === 0) {
-        this.setState(state => ({ "result": state.last_move ? "1-0" : "0-1" }));
+        this.setState(state => ({ "result": state.last_move ? "1-0" : "0-1", "game_state": "finished" }));
         clearInterval(this.interval);
       } else {
         seconds = seconds - 1;

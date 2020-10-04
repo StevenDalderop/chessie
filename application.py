@@ -6,6 +6,7 @@ import os
 import stat
 from stockfish import Stockfish
 import datetime
+import threading 
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -24,6 +25,7 @@ game_id_last = 0
 users_online = []
 rooms = 0
 games_available = []
+lock = threading.Lock()
 
 @app.route("/")
 def index():
@@ -38,6 +40,7 @@ def index():
 @app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>", defaults={'promotion': None})
 @app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>/<string:promotion>")
 def validated_move_info(game_id, row_start, col_start, row_end, col_end, promotion):
+    lock.acquire()
     global boards
     board = boards[str(game_id)] # Reference not copy
 
@@ -56,15 +59,18 @@ def validated_move_info(game_id, row_start, col_start, row_end, col_end, promoti
         info = stockfish.get_evaluation()
         score = None if len(info) == 0 else None if info["type"] != "cp" else info["value"]
         result = None if not board.is_game_over() else board.result()
+        fen = board.fen()
+        lock.release()
         return {
             "validated": "true",
-            "fen": board.fen(),
+            "fen": fen,
             "moves_san": moves_san,
             "last_move": last_move,
             "score": score,
             "result": result
         }
     else:
+        lock.release()
         return {"validated": "false"}
 
 @app.route("/new_game")
@@ -95,8 +101,9 @@ def pc_move(game_id):
     info = stockfish.get_evaluation()
     score = None if len(info) == 0 else None if info["type"] != "cp" else info["value"]
     result = None if not board.is_game_over() else board.result()
+    fen = board.fen()
     return {
-        "fen": board.fen(),
+        "fen": fen,
         "moves_san": moves_san,
         "last_move": last_move,
         "score": score,

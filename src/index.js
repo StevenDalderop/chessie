@@ -23,7 +23,7 @@ class Game extends React.Component {
       "promotion": false,
       "vs": null,
       "score": 0,
-      "skill_level_pc": 20,
+      "skill_level_pc": 10,
       "result": null,
       "san": null,
       "username": "Player1",

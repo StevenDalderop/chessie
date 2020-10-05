@@ -155,11 +155,16 @@ function UsersOnline(props) {
   let g
   for (g of props["games"]) {
     if (props["username"] !== g["username"]) {
-      games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) <button name="join_game" value={g["game_id"]} onClick={(e) => props.onClick(e)}> Join game </button> </li>)
+      games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) <a className="color_blue" name="join_game" value={g["game_id"]} onClick={() => click(g["game_id"])}> Join game </a> </li>)
     } else {
       games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) </li>)   
     }
     j++
+  }
+
+  function click(value) {
+    document.getElementById("hidden_input").value = value;
+    document.getElementById("hidden_input").click()
   }
 
   if (!(props["display"] === "usersOnline")) {
@@ -170,20 +175,27 @@ function UsersOnline(props) {
       <div className="container_div">
         <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
         <h1> Online </h1>
-        <div className="row">
-          <div className="col">
-            <h3> Users online </h3>
-            <div className="align-left">
-              <ul>
-                {users}
-              </ul>
+        <div className="row_container">
+          <div className="col_left">
+            <div className="relative">
+              <h3> Users online </h3>
+              <div id="users_online_div" className="align-left scrollable_y">
+                <ul>
+                  {users}
+                </ul>
+                <input id="hidden_input" type="hidden" name="join_game" onClick={(e) => props.onClick(e)}></input>
+              </div>
             </div>
           </div>
-          <div className="col"> 
-            <h3> Games available </h3>
-            <ul id="games_list">
-              {games}
-            </ul>
+          <div className="col_right">
+            <div className="relative"> 
+              <h3> Games available </h3>
+              <div id="games_available_div" className="align-left scrollable_y">
+                <ul>
+                  {games}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
         <button name="usersOnline" className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>

@@ -326,8 +326,8 @@ function UsersOnline(props) {
         g["time"],
         " seconds) ",
         React.createElement(
-          "button",
-          { name: "join_game", value: g["game_id"], onClick: e => props.onClick(e) },
+          "a",
+          { className: "color_blue", name: "join_game", value: g["game_id"], onClick: () => click(g["game_id"]) },
           " Join game "
         ),
         " "
@@ -344,6 +344,11 @@ function UsersOnline(props) {
       ));
     }
     j++;
+  }
+
+  function click(value) {
+    document.getElementById("hidden_input").value = value;
+    document.getElementById("hidden_input").click();
   }
 
   if (!(props["display"] === "usersOnline")) {
@@ -367,37 +372,50 @@ function UsersOnline(props) {
         ),
         React.createElement(
           "div",
-          { className: "row" },
+          { className: "row_container" },
           React.createElement(
             "div",
-            { className: "col" },
-            React.createElement(
-              "h3",
-              null,
-              " Users online "
-            ),
+            { className: "col_left" },
             React.createElement(
               "div",
-              { className: "align-left" },
+              { className: "relative" },
               React.createElement(
-                "ul",
+                "h3",
                 null,
-                users
+                " Users online "
+              ),
+              React.createElement(
+                "div",
+                { id: "users_online_div", className: "align-left scrollable_y" },
+                React.createElement(
+                  "ul",
+                  null,
+                  users
+                ),
+                React.createElement("input", { id: "hidden_input", type: "hidden", name: "join_game", onClick: e => props.onClick(e) })
               )
             )
           ),
           React.createElement(
             "div",
-            { className: "col" },
+            { className: "col_right" },
             React.createElement(
-              "h3",
-              null,
-              " Games available "
-            ),
-            React.createElement(
-              "ul",
-              { id: "games_list" },
-              games
+              "div",
+              { className: "relative" },
+              React.createElement(
+                "h3",
+                null,
+                " Games available "
+              ),
+              React.createElement(
+                "div",
+                { id: "games_available_div", className: "align-left scrollable_y" },
+                React.createElement(
+                  "ul",
+                  null,
+                  games
+                )
+              )
             )
           )
         ),

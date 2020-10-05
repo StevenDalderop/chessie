@@ -2,6 +2,11 @@ const baseURL = window.location.href;
 
 var socket = io();
 
+window.onresize = function () {
+  document.body.height = window.innerHeight;
+};
+window.onresize(); // called to initially set the height.
+
 class Game extends React.Component {
   constructor(props) {
     super(props);

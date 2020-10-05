@@ -188,4 +188,4 @@ def join_game(data):
 
 @socketio.on("make move")
 def make_move(data):
-    socketio.emit("announce move", {"fen": data["fen"], "moves_san": data["moves_san"], "step": data["step"], "last_move": data["last_move"] , "score": data["score"], "result": data["result"]}, room=data["room"])
+    socketio.emit("announce move", {"fen": data["fen"], "moves_san": data["moves_san"], "step": data["step"], "last_move": data["last_move"] , "score": data["score"], "times": data["times"], "result": data["result"]}, room=data["room"])

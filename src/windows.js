@@ -181,7 +181,7 @@ function UsersOnline(props) {
           </div>
           <div className="col"> 
             <h3> Games available </h3>
-            <ul id="list">
+            <ul id="games_list">
               {games}
             </ul>
           </div>

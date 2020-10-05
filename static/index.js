@@ -2,11 +2,6 @@ const baseURL = window.location.href;
 
 var socket = io();
 
-window.onresize = function () {
-  document.body.height = window.innerHeight;
-};
-window.onresize(); // called to initially set the height.
-
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -30,7 +25,7 @@ class Game extends React.Component {
       "games_available": [],
       "game_id": null,
       "mirrored": false,
-      "display": null, // "humanOther"
+      "display": "humanOther",
       "game_state": null,
       "username_already_exists": null,
       "color": null // 1 is white 0 is black 
@@ -108,7 +103,7 @@ class Game extends React.Component {
         }));
       });
     } else if (this.state.vs === "human_other" && data["validated"] === "true") {
-      socket.emit("make move", { "fen": data["fen"], "moves_san": data["moves_san"], "step": step + 1, "last_move": data["last_move"], "score": data["score"], "result": data["result"], "room": this.state.room });
+      socket.emit("make move", { "fen": data["fen"], "moves_san": data["moves_san"], "step": step + 1, "last_move": data["last_move"], "score": data["score"], "result": data["result"], "times": this.state.times, "room": this.state.room });
     }
 
     if (this.state.result) {
@@ -234,6 +229,7 @@ class Game extends React.Component {
         "selected_square": null,
         "san": data["moves_san"],
         "step": data["step"],
+        "times": data["times"],
         "promotion": false
       }));
       this.startTimer();
@@ -271,6 +267,7 @@ class Game extends React.Component {
           username2: this.state.username2,
           san: this.state.san,
           score: this.state.score,
+          mirrored: this.state.mirrored,
           onClick: e => {
             this.handleClick(e);
           }

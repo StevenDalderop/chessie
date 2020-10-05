@@ -20,6 +20,9 @@ function Container(props) {
 }
 
 function Sidebar(props) {
+  let time_above = !props.mirrored ? 0 : 1;
+  let time_below = !props.mirrored ? 1 : 0;
+
   return React.createElement(
     "div",
     null,
@@ -36,7 +39,7 @@ function Sidebar(props) {
       React.createElement(
         "div",
         { id: "timer" },
-        React.createElement(Timer, { seconds: props["times"][0] })
+        React.createElement(Timer, { seconds: props["times"][time_above] })
       )
     ),
     React.createElement(
@@ -89,7 +92,7 @@ function Sidebar(props) {
       React.createElement(
         "div",
         { id: "timer2" },
-        React.createElement(Timer, { seconds: props["times"][1] })
+        React.createElement(Timer, { seconds: props["times"][time_below] })
       )
     )
   );

@@ -38,6 +38,10 @@
   padding-bottom: 15px;
 }
 
+#games_list {
+  height: 100px;
+}
+
 #message {
   display: initial;
 }
@@ -244,8 +248,6 @@ svg {
   font-size: 16px;
   fill: grey;
 }
-
-
 
 @media screen and (min-height: 600px) and (max-height: 800px) and (max-width: 1100px) {
   /* For tablets: */

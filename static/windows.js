@@ -396,7 +396,7 @@ function UsersOnline(props) {
             ),
             React.createElement(
               "ul",
-              { id: "list" },
+              { id: "games_list" },
               games
             )
           )

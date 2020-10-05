@@ -14,12 +14,15 @@ function Container(props) {
 }
 
 function Sidebar(props) {
+  let time_above = !props.mirrored ? 0 : 1
+  let time_below = !props.mirrored ? 1 : 0
+
   return (
     <div>
       <div id="timer1_div">
         <h5> {props["username2"]} </h5>
         <div id="timer">
-          <Timer seconds={props["times"][0]} />
+          <Timer seconds={props["times"][time_above]} />
         </div>
       </div>
       <div id="history">
@@ -40,7 +43,7 @@ function Sidebar(props) {
       <div id="timer2_div">
         <h5> {props.username} </h5>
         <div id="timer2">
-          <Timer seconds={props["times"][1]} />
+          <Timer seconds={props["times"][time_below]} />
         </div>
       </div>
     </div>

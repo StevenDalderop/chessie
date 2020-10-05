@@ -33,7 +33,7 @@ class Game extends React.Component {
       "games_available": [],
       "game_id": null,
       "mirrored": false,
-      "display": "humanOther",
+      "display": null, // "humanOther"
       "game_state": null, 
       "username_already_exists": null, 
       "color": null // 1 is white 0 is black 

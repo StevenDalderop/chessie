@@ -70,3 +70,14 @@
   .color-square-yellow {
     background-color: yellow;
   }
+
+  .row_number {
+    position: absolute;
+    left: 2px;
+  }
+
+  .col_letter {
+    position: absolute;
+    right: 2px;
+    bottom: 0px;
+  }

@@ -6,6 +6,16 @@ function Square(props) {
     { className: "square color-square-" + props.square_color + " " + props.class, onClick: () => props.onClick() },
     React.createElement(
       "div",
+      { className: "row_number" },
+      props.row
+    ),
+    React.createElement(
+      "div",
+      { className: "col_letter" },
+      props.col
+    ),
+    React.createElement(
+      "div",
       { className: "centered_container" },
       piece_icon(props.piece)
     )
@@ -35,6 +45,9 @@ class Board extends React.Component {
       var row_new = row;
       var col_new = column;
     }
+    let row_number = column === 0 ? 8 - row_new : null;
+    let col_letter = row === 7 ? String.fromCharCode(col_new + 1 + 64) : null;
+
     if ((row_new + col_new) % 2 === 0) {
       square_color = "white";
     } else {
@@ -43,7 +56,7 @@ class Board extends React.Component {
     if (this.props.selected_square && this.props.selected_square[0] === row_new && this.props.selected_square[1] === col_new) {
       square_color = "yellow";
     }
-    return React.createElement(Square, { "class": "square" + column, square_color: square_color, piece: this.props.pieces[row_new][col_new], onClick: () => this.props.onClick(row_new, col_new), key: row_new * 8 + col_new });
+    return React.createElement(Square, { row: row_number, col: col_letter, "class": "square" + column, square_color: square_color, piece: this.props.pieces[row_new][col_new], onClick: () => this.props.onClick(row_new, col_new), key: row_new * 8 + col_new });
   }
 
   renderRow(row) {

@@ -272,6 +272,21 @@ class Game extends React.Component {
             this.handleClick(e);
           }
         })
+      }),
+      React.createElement(Container_mobile, {
+        board: React.createElement(Board, {
+          pieces: this.state.history[this.state.step].pieces,
+          mirrored: this.state.mirrored,
+          selected_square: this.state.selected_square,
+          onClick: (row, col) => this.handleClickBoard(row, col)
+        }),
+        mobile_bar: React.createElement(Mobile_bar, {
+          mirrored: this.state.mirrored,
+          onClick: e => this.handleClick(e),
+          times: this.state.times,
+          username: this.state.username,
+          username2: this.state.username2
+        })
       })
     );
   }

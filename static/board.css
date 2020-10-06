@@ -9,7 +9,6 @@
   
   .board {
     margin: auto;
-    width: 560px;
     position: relative;
   }
 
@@ -19,7 +18,7 @@
   }
 
   .square {
-    height: 70px;
+    height: 100%;;
     width: 70px;
     border: 0px;
     padding: 0px;

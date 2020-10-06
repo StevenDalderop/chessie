@@ -1,12 +1,52 @@
 function Container(props) {
   return (
-    <div className="container-fluid no-padding">
+    <div className="container-fluid no-padding not_mobile">
       <div className="row">
         <div className="col">
           {props.col_left}
         </div>
         <div id="col_right" className="col-auto">
           {props.sidebar_right}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Container_mobile(props) {
+  return (
+    <div className="container-fluid no-padding mobile">
+      <div className="row">
+        <div className="col">
+          <div className="content_box">
+            {props.board}
+          </div>
+        </div>
+      </div>
+      {props.mobile_bar} 
+    </div>
+  )
+}
+
+function Mobile_bar(props) {
+  let time_right = !props.mirrored ? 0 : 1
+  let time_left = !props.mirrored ? 1 : 0
+  
+  return(
+    <div className="row">
+      <div className="col" id="timer1_div">
+        <h5 className="overflow_hiddden"> {props["username"]} </h5>
+        <div id="timer">
+          <Timer seconds={props["times"][time_right]} />
+        </div>
+      </div>
+      <div className="col" id="buttons">
+        <button id="button" name="new_game" onClick={(e) => props.onClick(e)} className="btn btn-primary"> New game </button>
+      </div>
+      <div className="col" id="timer2_div">
+        <h5 className="overflow_hiddden"> {props.username2} </h5>
+        <div id="timer2">
+          <Timer seconds={props["times"][time_left]} />
         </div>
       </div>
     </div>

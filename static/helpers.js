@@ -1,7 +1,7 @@
 function Container(props) {
   return React.createElement(
     "div",
-    { className: "container-fluid no-padding" },
+    { className: "container-fluid no-padding not_mobile" },
     React.createElement(
       "div",
       { className: "row" },
@@ -14,6 +14,78 @@ function Container(props) {
         "div",
         { id: "col_right", className: "col-auto" },
         props.sidebar_right
+      )
+    )
+  );
+}
+
+function Container_mobile(props) {
+  return React.createElement(
+    "div",
+    { className: "container-fluid no-padding mobile" },
+    React.createElement(
+      "div",
+      { className: "row" },
+      React.createElement(
+        "div",
+        { className: "col" },
+        React.createElement(
+          "div",
+          { className: "content_box" },
+          props.board
+        )
+      )
+    ),
+    props.mobile_bar
+  );
+}
+
+function Mobile_bar(props) {
+  let time_right = !props.mirrored ? 0 : 1;
+  let time_left = !props.mirrored ? 1 : 0;
+
+  return React.createElement(
+    "div",
+    { className: "row" },
+    React.createElement(
+      "div",
+      { className: "col", id: "timer1_div" },
+      React.createElement(
+        "h5",
+        { className: "overflow_hiddden" },
+        " ",
+        props["username"],
+        " "
+      ),
+      React.createElement(
+        "div",
+        { id: "timer" },
+        React.createElement(Timer, { seconds: props["times"][time_right] })
+      )
+    ),
+    React.createElement(
+      "div",
+      { className: "col", id: "buttons" },
+      React.createElement(
+        "button",
+        { id: "button", name: "new_game", onClick: e => props.onClick(e), className: "btn btn-primary" },
+        " New game "
+      )
+    ),
+    React.createElement(
+      "div",
+      { className: "col", id: "timer2_div" },
+      React.createElement(
+        "h5",
+        { className: "overflow_hiddden" },
+        " ",
+        props.username2,
+        " "
+      ),
+      React.createElement(
+        "div",
+        { id: "timer2" },
+        React.createElement(Timer, { seconds: props["times"][time_left] })
       )
     )
   );

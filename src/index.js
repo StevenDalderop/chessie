@@ -276,6 +276,22 @@ class Game extends React.Component {
             onClick={(e) => {this.handleClick(e)}} 
             />}
         />
+
+        <Container_mobile 
+          board={<Board
+            pieces={this.state.history[this.state.step].pieces} 
+            mirrored={this.state.mirrored}
+            selected_square={this.state.selected_square} 
+            onClick={(row, col) => this.handleClickBoard(row, col)} 
+            />} 
+          mobile_bar={<Mobile_bar 
+            mirrored={this.state.mirrored}
+            onClick={(e) => this.handleClick(e)}
+            times={this.state.times}
+            username={this.state.username} 
+            username2={this.state.username2} 
+            />}
+        />
       </div>
     );
   }

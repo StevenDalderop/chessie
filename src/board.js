@@ -2,7 +2,7 @@
 
 function Square(props) {
   return (
-    <div className={"square color-square-" + props.square_color + " " + props.class} onClick={() => props.onClick()}>
+    <div className={"square color-square-" + props.square_color} onClick={() => props.onClick()}>
       <div className={"row_number"}>
         {props.row} 
       </div>
@@ -51,7 +51,7 @@ class Board extends React.Component {
       square_color = "yellow"
     }
     return (
-      <Square row={row_number} col={col_letter} class={"square" + column} square_color={square_color} piece={this.props.pieces[row_new][col_new]} onClick={() => this.props.onClick(row_new, col_new)} key={row_new * 8 + col_new} />
+      <Square row={row_number} col={col_letter} square_color={square_color} piece={this.props.pieces[row_new][col_new]} onClick={() => this.props.onClick(row_new, col_new)} key={row_new * 8 + col_new} />
     )
   }
 

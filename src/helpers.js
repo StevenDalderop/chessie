@@ -75,7 +75,7 @@ function Sidebar(props) {
         </div>
       </div>
       <div id="buttons">
-        <button id="button" name="new_game" onClick={(e) => props.onClick(e)} className="btn btn-primary"> New game </button>
+        <button id="button" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onClick(e)} className="btn btn-primary"> New game </button>
       </div>
       <div id="timer2_div">
         <h5> {props.username} </h5>
@@ -118,6 +118,15 @@ function ScoreEvaluationBar(props) {
       <rect id="rect_right" x={String(score_to_with(props["score"]))+"%"} width={String(100 - score_to_with(props["score"]))+"%"}/>
       <text id="text" x="15" y="18"> Centipawns: {props["score"]} </text>
     </svg>
+  )
+}
+
+function Header(props) {
+  return (
+    <div className="container-fluid bg-black-main">
+      <h1 id="title" className="center"> Chessie </h1>
+      <button id="button_mobile" className="btn btn-primary" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onclick(e)} > New game </button>
+  </div>
   )
 }
 

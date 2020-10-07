@@ -176,7 +176,7 @@ class Game extends React.Component {
   startTimer() {
     clearInterval(this.interval);
     this.interval = setInterval(() => {
-      let seconds = this.state.times[this.state.last_move ? 1 : 0];
+      let seconds = this.state.times[this.state.last_move ? 0 : 1];
       if (seconds === 0) {
         this.setState(state => ({ "result": !state.last_move ? "1-0" : "0-1", "game_state": "finished", "selected_square": null }));
         clearInterval(this.interval);
@@ -244,20 +244,7 @@ class Game extends React.Component {
     return React.createElement(
       "div",
       null,
-      React.createElement(
-        "div",
-        { className: "container-fluid bg-black-main" },
-        React.createElement(
-          "h1",
-          { id: "title", className: "center" },
-          " Chessie "
-        ),
-        React.createElement(
-          "button",
-          { id: "button_mobile", className: "btn btn-primary", name: "new_game", onClick: e => this.handleClick(e) },
-          " New game "
-        )
-      ),
+      React.createElement(Header, { display: this.state.display, onclick: e => this.handleClick(e) }),
       React.createElement(
         "div",
         { className: "container-fluid" },
@@ -281,6 +268,7 @@ class Game extends React.Component {
             times: this.state.times,
             username: this.state.username,
             username2: this.state.username2,
+            display: this.state.display,
             san: this.state.san,
             score: this.state.score,
             mirrored: this.state.mirrored,

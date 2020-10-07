@@ -138,7 +138,7 @@ function Sidebar(props) {
       { id: "buttons" },
       React.createElement(
         "button",
-        { id: "button", name: "new_game", onClick: e => props.onClick(e), className: "btn btn-primary" },
+        { id: "button", name: "new_game", disabled: props.display === "humanOther" ? true : false, onClick: e => props.onClick(e), className: "btn btn-primary" },
         " New game "
       )
     ),
@@ -203,6 +203,23 @@ function ScoreEvaluationBar(props) {
       " Centipawns: ",
       props["score"],
       " "
+    )
+  );
+}
+
+function Header(props) {
+  return React.createElement(
+    "div",
+    { className: "container-fluid bg-black-main" },
+    React.createElement(
+      "h1",
+      { id: "title", className: "center" },
+      " Chessie "
+    ),
+    React.createElement(
+      "button",
+      { id: "button_mobile", className: "btn btn-primary", name: "new_game", disabled: props.display === "humanOther" ? true : false, onClick: e => props.onclick(e) },
+      " New game "
     )
   );
 }

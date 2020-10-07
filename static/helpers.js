@@ -41,8 +41,8 @@ function Container_mobile(props) {
 }
 
 function Mobile_bar(props) {
-  let time_right = !props.mirrored ? 0 : 1;
-  let time_left = !props.mirrored ? 1 : 0;
+  let time_right = !props.mirrored ? 1 : 0;
+  let time_left = !props.mirrored ? 0 : 1;
 
   return React.createElement(
     "div",
@@ -60,16 +60,7 @@ function Mobile_bar(props) {
       React.createElement(
         "div",
         { id: "timer" },
-        React.createElement(Timer, { seconds: props["times"][time_right] })
-      )
-    ),
-    React.createElement(
-      "div",
-      { className: "col", id: "buttons" },
-      React.createElement(
-        "button",
-        { id: "button", name: "new_game", onClick: e => props.onClick(e), className: "btn btn-primary" },
-        " New game "
+        React.createElement(Timer, { seconds: props["times"][time_left] })
       )
     ),
     React.createElement(
@@ -85,15 +76,15 @@ function Mobile_bar(props) {
       React.createElement(
         "div",
         { id: "timer2" },
-        React.createElement(Timer, { seconds: props["times"][time_left] })
+        React.createElement(Timer, { seconds: props["times"][time_right] })
       )
     )
   );
 }
 
 function Sidebar(props) {
-  let time_above = !props.mirrored ? 0 : 1;
-  let time_below = !props.mirrored ? 1 : 0;
+  let time_above = !props.mirrored ? 1 : 0;
+  let time_below = !props.mirrored ? 0 : 1;
 
   return React.createElement(
     "div",
@@ -236,29 +227,29 @@ function fen_to_history(fen) {
           out2_row.push(null);
         }
       } else if (e === "R") {
-        out2_row.push(["rook", 1]);
-      } else if (e === "N") {
-        out2_row.push(["knight", 1]);
-      } else if (e === "B") {
-        out2_row.push(["bishop", 1]);
-      } else if (e === "K") {
-        out2_row.push(["king", 1]);
-      } else if (e === "Q") {
-        out2_row.push(["queen", 1]);
-      } else if (e === "P") {
-        out2_row.push(["pawn", 1]);
-      } else if (e === "r") {
         out2_row.push(["rook", 0]);
-      } else if (e === "n") {
+      } else if (e === "N") {
         out2_row.push(["knight", 0]);
-      } else if (e === "b") {
+      } else if (e === "B") {
         out2_row.push(["bishop", 0]);
-      } else if (e === "k") {
+      } else if (e === "K") {
         out2_row.push(["king", 0]);
-      } else if (e === "q") {
+      } else if (e === "Q") {
         out2_row.push(["queen", 0]);
-      } else if (e === "p") {
+      } else if (e === "P") {
         out2_row.push(["pawn", 0]);
+      } else if (e === "r") {
+        out2_row.push(["rook", 1]);
+      } else if (e === "n") {
+        out2_row.push(["knight", 1]);
+      } else if (e === "b") {
+        out2_row.push(["bishop", 1]);
+      } else if (e === "k") {
+        out2_row.push(["king", 1]);
+      } else if (e === "q") {
+        out2_row.push(["queen", 1]);
+      } else if (e === "p") {
+        out2_row.push(["pawn", 1]);
       }
     }
     out2.push(out2_row);

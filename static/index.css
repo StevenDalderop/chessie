@@ -246,6 +246,7 @@ body {
   padding-left: 15px;
   padding-right: 15px;
   padding-bottom: 15px;
+  overflow: hidden;
 }
 
 #timer2_div {
@@ -255,6 +256,7 @@ body {
   padding-right: 15px;
   margin-top: 15px;
   padding-bottom: 15px;
+  overflow: hidden;
 }
 
 .times {
@@ -275,6 +277,7 @@ body {
   margin: auto;
   position: relative;
   border: 3px solid black;
+  margin-bottom: 15px;
 }
 
 .time:hover {
@@ -315,7 +318,18 @@ svg {
   width: 100%;
 }
 
+#button_mobile {
+  display: none;
+}
+
 @media screen and (max-width: 767px) {
+  #button_mobile {
+    display: initial; 
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
+
   .mobile {
     display: initial;
   }
@@ -380,6 +394,35 @@ svg {
     margin-left: 0px;
     margin-top: 0px;
   }
+
+  h5 {
+    font-size: 0.95rem;  
+  }
+
+  .no_padding_mobile {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  #title {
+    text-align: left;
+  }
+
+  #users_online_subtitle {
+    display: none;
+  }
+
+  .col_right {
+    left: 0px;
+  }
+
+  .col_left {
+    display: none;
+  }
+
+  #games_available_div {
+    position: initial;
+  }
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) {
@@ -388,6 +431,11 @@ svg {
     height: 200px;
   }
 
+  .welcomeScreen {
+    width: 70%;
+    left: 15%;
+  }
+  
   #col_right {
     width: 210px;
   }

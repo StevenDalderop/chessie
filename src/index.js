@@ -7,17 +7,17 @@ class Game extends React.Component {
     super(props)
     this.state = {
       "history": [{"pieces":
-                  [[["rook", 0], ["knight", 0], ["bishop", 0], ["queen", 0], ["king", 0], ["bishop", 0], ["knight", 0], ["rook", 0]],
-                  [["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0]],
-                  [null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null],
+                  [[["rook", 1], ["knight", 1], ["bishop", 1], ["queen", 1], ["king", 1], ["bishop", 1], ["knight", 1], ["rook", 1]],
                   [["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1]],
-                  [["rook", 1], ["knight", 1], ["bishop", 1], ["queen", 1], ["king", 1], ["bishop", 1], ["knight", 1], ["rook", 1]]]
+                  [null, null, null, null, null, null, null, null],
+                  [null, null, null, null, null, null, null, null],
+                  [null, null, null, null, null, null, null, null],
+                  [null, null, null, null, null, null, null, null],
+                  [["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0]],
+                  [["rook", 0], ["knight", 0], ["bishop", 0], ["queen", 0], ["king", 0], ["bishop", 0], ["knight", 0], ["rook", 0]]]
                 }],
       "selected_square": null,
-      "last_move": 0,
+      "last_move": 1,
       "times": [60, 60],
       "step": 0,
       "promotion": false,
@@ -36,7 +36,7 @@ class Game extends React.Component {
       "display": "humanOther",
       "game_state": null, 
       "username_already_exists": null, 
-      "color": null // 1 is white 0 is black 
+      "color": null // 0 is white 1 is black 
     }
   }
 
@@ -131,7 +131,7 @@ class Game extends React.Component {
       this.setState({"display": "welcomeScreen2"})
     } else if (e.target.name === "pc_strength") {
       fetch(`${baseURL}configure/${this.state.skill_level_pc}`)
-      this.setState((state) => ({"display": "welcomeScreen2", "username2": "Stockfish " + "(skill: " + state.skill_level_pc + ")"}))
+      this.setState((state) => ({"display": "welcomeScreen2", "username2": "Stockfish (" + state.skill_level_pc + ")"}))
     } else if (e.target.getAttribute('name') === "time") {
       let time = e.target.getAttribute('data-value')
       this.setState({"display": null})
@@ -140,7 +140,7 @@ class Game extends React.Component {
         socket.emit("new game", {"game_id": this.state.game_id, "username": this.state.username, "time": time})
         this.setState({"display": "usersOnline"})
       } else {
-        this.setState({"game_state": "started", "color": 1})
+        this.setState({"game_state": "started", "color": 0})
       }
     } else if (e.target.name === "vs") {
       if (e.target.value === "human") {
@@ -154,7 +154,7 @@ class Game extends React.Component {
     } else if (e.target.name === "new_game") {
       clearInterval(this.interval)
       this.setState({"selected_square": null,
-                     "last_move": 0,
+                     "last_move": 1,
                      "step": 0,
                      "history": this.state.history.slice(0,1),
                      "san": null,
@@ -185,14 +185,13 @@ class Game extends React.Component {
   startTimer() {
       clearInterval(this.interval)
       this.interval = setInterval(() => {
-      let seconds = this.state.times[!this.state.last_move ? 1 : 0]
+      let seconds = this.state.times[this.state.last_move ? 1 : 0]
       if (seconds === 0) {
-        this.setState((state)=> ({"result": state.last_move ? "1-0" : "0-1", "game_state": "finished", "selected_square": null}))
+        this.setState((state)=> ({"result": !state.last_move ? "1-0" : "0-1", "game_state": "finished", "selected_square": null}))
         clearInterval(this.interval)
       } else {
-        seconds = seconds - 1
+        this.setState((state) => ({"times": state.last_move === 0 ? [state.times[0], state.times[1] - 1] : [state.times[0] - 1, state.times[1]]}))
       }
-      this.setState({"times": this.state.last_move === 0 ? [this.state.times[0], seconds] : [seconds, this.state.times[1]]})
     }, 1000)
   }
 
@@ -221,9 +220,9 @@ class Game extends React.Component {
         screen.style.display = "None"
       })
       if (data["username"] === this.state.username) {
-        this.setState({"username": data["username"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username2"], "room": data["room"], "color": 1, "game_state": "started"}) // Play as white
+        this.setState({"username": data["username"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username2"], "room": data["room"], "color": 0, "game_state": "started"}) // Play as white
       } else if (data["username2"] === this.state.username) {
-        this.setState({"username": data["username2"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username"], "room": data["room"], "color": 0, "mirrored": true, "game_state": "started"}) // Play as black
+        this.setState({"username": data["username2"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username"], "room": data["room"], "color": 1, "mirrored": true, "game_state": "started"}) // Play as black
       }
     })
 
@@ -251,47 +250,52 @@ class Game extends React.Component {
   render () {
     return (
       <div>
-        <StartScreen display={this.state.display} onClick={(e) => this.handleClick(e)} />
-        <WelcomeHuman display={this.state.display} onClick={(e) => this.handleClick(e)} />
-        <GetUsername display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
-        <WelcomePC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={(e) => this.handleClick(e)} />
-        <Promotion promotion={this.state.promotion} onClick={(e) => this.handleClick(e)} />
-        <Message text={this.state.result} onClick={() => {this.setState({"result": null})}} />
-        <UsersOnline display={this.state.display} usernames={this.state.users_online} username={this.state.username} games={this.state.games_available} onClick={(e) => this.handleClick(e)} />
+        <div className="container-fluid bg-black-main">
+          <h1 id="title" className="center"> Chessie </h1>
+          <button id="button_mobile" className="btn btn-primary" name="new_game" onClick={(e) => this.handleClick(e)} > New game </button>
+        </div>
+        <div className="container-fluid">
+          <StartScreen display={this.state.display} onClick={(e) => this.handleClick(e)} />
+          <WelcomeHuman display={this.state.display} onClick={(e) => this.handleClick(e)} />
+          <GetUsername display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
+          <WelcomePC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={(e) => this.handleClick(e)} />
+          <Promotion promotion={this.state.promotion} onClick={(e) => this.handleClick(e)} />
+          <Message text={this.state.result} onClick={() => {this.setState({"result": null})}} />
+          <UsersOnline display={this.state.display} usernames={this.state.users_online} username={this.state.username} games={this.state.games_available} onClick={(e) => this.handleClick(e)} />
 
-        <Container 
-          col_left={<BoardContainer 
-            pieces={this.state.history[this.state.step].pieces} 
-            mirrored={this.state.mirrored}
-            selected_square={this.state.selected_square} 
-            onClick={(row, col) => this.handleClickBoard(row, col)} 
-            />}
-          sidebar_right={<Sidebar 
-            times={this.state.times} 
-            username={this.state.username} 
-            username2={this.state.username2} 
-            san={this.state.san} 
-            score={this.state.score} 
-            mirrored={this.state.mirrored}
-            onClick={(e) => {this.handleClick(e)}} 
-            />}
-        />
+          <Container 
+            col_left={<BoardContainer 
+              pieces={this.state.history[this.state.step].pieces} 
+              mirrored={this.state.mirrored}
+              selected_square={this.state.selected_square} 
+              onClick={(row, col) => this.handleClickBoard(row, col)} 
+              />}
+            sidebar_right={<Sidebar 
+              times={this.state.times} 
+              username={this.state.username} 
+              username2={this.state.username2} 
+              san={this.state.san} 
+              score={this.state.score} 
+              mirrored={this.state.mirrored}
+              onClick={(e) => {this.handleClick(e)}} 
+              />}
+          />
 
-        <Container_mobile 
-          board={<Board
-            pieces={this.state.history[this.state.step].pieces} 
-            mirrored={this.state.mirrored}
-            selected_square={this.state.selected_square} 
-            onClick={(row, col) => this.handleClickBoard(row, col)} 
-            />} 
-          mobile_bar={<Mobile_bar 
-            mirrored={this.state.mirrored}
-            onClick={(e) => this.handleClick(e)}
-            times={this.state.times}
-            username={this.state.username} 
-            username2={this.state.username2} 
-            />}
-        />
+          <Container_mobile 
+            board={<Board
+              pieces={this.state.history[this.state.step].pieces} 
+              mirrored={this.state.mirrored}
+              selected_square={this.state.selected_square} 
+              onClick={(row, col) => this.handleClickBoard(row, col)} 
+              />} 
+            mobile_bar={<Mobile_bar 
+              mirrored={this.state.mirrored}
+              times={this.state.times}
+              username={this.state.username} 
+              username2={this.state.username2} 
+              />}
+          />
+        </div>
       </div>
     );
   }

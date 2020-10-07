@@ -64,7 +64,7 @@ def validated_move_info(game_id, row_start, col_start, row_end, col_end, promoti
         board.push(human_move)
         init_board = chess.Board()
         moves_san = init_board.variation_san(board.move_stack)
-        last_move = 0 if board.turn else 1
+        last_move = 1 if board.turn else 0 #board.turn returns 1 if it is white's turn on client side we use opposite
         stockfish.set_fen_position(board.fen())
         info = stockfish.get_evaluation()
         score = None if len(info) == 0 else None if info["type"] != "cp" else info["value"]

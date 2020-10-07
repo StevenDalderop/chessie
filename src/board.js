@@ -19,9 +19,9 @@ function Square(props) {
 function piece_icon(name) {
   if (name) {
     if (name[1] === 0) {
-      var color = "d";
-    } else {
       var color = "l";
+    } else {
+      var color = "d";
     }
     return (<img className="piece_icon" src={"/static/Chess_" + name[0] + color + "t45.svg"}></img>)
   } else {

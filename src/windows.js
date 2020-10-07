@@ -40,23 +40,23 @@ function StartScreen(props) {
       <div id="welcomeScreen1" className="welcomeScreen">
         <div className="container_div">
           <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
-          <h1> New Game </h1>
-          <div className="row mr-0 ml-0">
-            <div className="col">
+          <h2> New Game </h2>
+          <div className="row mr-0 ml-0 mt-3">
+            <div className="col no_padding_mobile">
               <div className="time" onClick={() => createInput("human")}>
                 <div className="centered_container no_click">
                   <h5> vs Human Offline </h5>
                 </div> 
               </div>
             </div>
-            <div className="col">
+            <div className="col no_padding_mobile">
               <div className="time" onClick={() => createInput("human_other")}> 
                 <div className="centered_container no_click">
                   <h5> vs Human Online </h5> 
                 </div>
               </div>
             </div>
-            <div className="col">
+            <div className="col no_padding_mobile">
               <div className="time" onClick={() => createInput("pc")}>
                 <div className="centered_container no_click"> 
                   <h5> vs PC </h5>
@@ -81,30 +81,30 @@ function WelcomeHuman(props) {
     <div id="welcomeScreen2" className="welcomeScreen">
       <div className="container_div">
       <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
-        <h1> Time </h1>
-        <div className="row ml-0 mr-0">
-            <div className="col"> 
+        <h2> Time </h2>
+        <div className="row ml-0 mr-0 mt-3">
+            <div className="col no_padding_mobile"> 
               <div data-value={60} name="time" className="time" onClick={(e) => props.onClick(e)}> 
                 <div className="centered_container no_click">
                   <h5> 1 minute </h5> 
                 </div>
               </div>
             </div>
-            <div className="col">
+            <div className="col no_padding_mobile">
               <div data-value={180} name="time" className="time" onClick={(e) => props.onClick(e)}> 
                 <div className="centered_container no_click">
                   <h5> 3 minutes </h5> 
                 </div> 
               </div>
             </div>
-            <div className="col">
+            <div className="col no_padding_mobile">
               <div data-value={300} name="time" className="time" onClick={(e) => props.onClick(e)}> 
                 <div className="centered_container no_click">
                   <h5> 5 minutes </h5> 
                 </div> 
               </div>
             </div>
-            <div className="col">
+            <div className="col no_padding_mobile">
               <div data-value={600} name="time" className="time" onClick={(e) => props.onClick(e)}> 
                 <div className="centered_container no_click">
                   <h5> 10 minutes </h5> 
@@ -128,11 +128,11 @@ function GetUsername(props) {
     }
   return (
     <div id="humanOther" className="welcomeScreen">
-      <h1> Username </h1>
+      <h2> Username </h2>
       <div>
         <form name="username" onSubmit={(e) => props.onSubmit(e)}>
           <label> What is your username? </label> <br></br>
-          <input id="username" name="username" type="text" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
+          <input id="username" name="username" type="text" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
           {message}
           <button className="btn btn-primary mt-3"> Submit </button>
         </form>
@@ -167,6 +167,8 @@ function UsersOnline(props) {
     document.getElementById("hidden_input").click()
   }
 
+  let title = window.innerWidth < 768 ? "Games" : "Online"
+
   if (!(props["display"] === "usersOnline")) {
     return null
   } else {
@@ -174,11 +176,11 @@ function UsersOnline(props) {
     <div id="usersOnline" className="welcomeScreen">
       <div className="container_div">
         <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
-        <h1> Online </h1>
-        <div className="row_container">
+        <h2> {title} </h2>
+        <div className="row_container mt-3">
           <div className="col_left">
             <div className="relative">
-              <h3> Users online </h3>
+              <h5> Users online </h5>
               <div id="users_online_div" className="align-left scrollable_y">
                 <ul>
                   {users}
@@ -189,7 +191,7 @@ function UsersOnline(props) {
           </div>
           <div className="col_right">
             <div className="relative"> 
-              <h3> Games available </h3>
+              <h5 id="users_online_subtitle"> Games available </h5>
               <div id="games_available_div" className="align-left scrollable_y">
                 <ul>
                   {games}
@@ -213,8 +215,8 @@ function WelcomePC(props) {
       <div id="welcomeScreenPC" className="welcomeScreen">
         <div className="container_div">
           <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onSubmit(e)}> Close </button>
-          <h1> PC strength </h1>
-          <div>
+          <h2> PC strength </h2>
+          <div className="mt-3">
             <form name="pc_strength" onSubmit={(e) => props.onSubmit(e)}>
               <label> Skill level (0-20): </label> <br></br>
               <input id="elo" type="number" min="0" max="20" value={props.skill_level_pc} onChange={props.onChange} /> <br></br>

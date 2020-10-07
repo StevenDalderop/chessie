@@ -82,16 +82,16 @@ function StartScreen(props) {
           " Close "
         ),
         React.createElement(
-          "h1",
+          "h2",
           null,
           " New Game "
         ),
         React.createElement(
           "div",
-          { className: "row mr-0 ml-0" },
+          { className: "row mr-0 ml-0 mt-3" },
           React.createElement(
             "div",
-            { className: "col" },
+            { className: "col no_padding_mobile" },
             React.createElement(
               "div",
               { className: "time", onClick: () => createInput("human") },
@@ -108,7 +108,7 @@ function StartScreen(props) {
           ),
           React.createElement(
             "div",
-            { className: "col" },
+            { className: "col no_padding_mobile" },
             React.createElement(
               "div",
               { className: "time", onClick: () => createInput("human_other") },
@@ -125,7 +125,7 @@ function StartScreen(props) {
           ),
           React.createElement(
             "div",
-            { className: "col" },
+            { className: "col no_padding_mobile" },
             React.createElement(
               "div",
               { className: "time", onClick: () => createInput("pc") },
@@ -167,16 +167,16 @@ function WelcomeHuman(props) {
           " Close "
         ),
         React.createElement(
-          "h1",
+          "h2",
           null,
           " Time "
         ),
         React.createElement(
           "div",
-          { className: "row ml-0 mr-0" },
+          { className: "row ml-0 mr-0 mt-3" },
           React.createElement(
             "div",
-            { className: "col" },
+            { className: "col no_padding_mobile" },
             React.createElement(
               "div",
               { "data-value": 60, name: "time", className: "time", onClick: e => props.onClick(e) },
@@ -193,7 +193,7 @@ function WelcomeHuman(props) {
           ),
           React.createElement(
             "div",
-            { className: "col" },
+            { className: "col no_padding_mobile" },
             React.createElement(
               "div",
               { "data-value": 180, name: "time", className: "time", onClick: e => props.onClick(e) },
@@ -210,7 +210,7 @@ function WelcomeHuman(props) {
           ),
           React.createElement(
             "div",
-            { className: "col" },
+            { className: "col no_padding_mobile" },
             React.createElement(
               "div",
               { "data-value": 300, name: "time", className: "time", onClick: e => props.onClick(e) },
@@ -227,7 +227,7 @@ function WelcomeHuman(props) {
           ),
           React.createElement(
             "div",
-            { className: "col" },
+            { className: "col no_padding_mobile" },
             React.createElement(
               "div",
               { "data-value": 600, name: "time", className: "time", onClick: e => props.onClick(e) },
@@ -265,7 +265,7 @@ function GetUsername(props) {
       "div",
       { id: "humanOther", className: "welcomeScreen" },
       React.createElement(
-        "h1",
+        "h2",
         null,
         " Username "
       ),
@@ -282,7 +282,7 @@ function GetUsername(props) {
           ),
           " ",
           React.createElement("br", null),
-          React.createElement("input", { id: "username", name: "username", type: "text", placeholder: "username", value: props.username, onChange: props.onChange }),
+          React.createElement("input", { id: "username", name: "username", type: "text", maxLength: "15", placeholder: "username", value: props.username, onChange: props.onChange }),
           " ",
           React.createElement("br", null),
           message,
@@ -351,6 +351,8 @@ function UsersOnline(props) {
     document.getElementById("hidden_input").click();
   }
 
+  let title = window.innerWidth < 768 ? "Games" : "Online";
+
   if (!(props["display"] === "usersOnline")) {
     return null;
   } else {
@@ -366,13 +368,15 @@ function UsersOnline(props) {
           " Close "
         ),
         React.createElement(
-          "h1",
+          "h2",
           null,
-          " Online "
+          " ",
+          title,
+          " "
         ),
         React.createElement(
           "div",
-          { className: "row_container" },
+          { className: "row_container mt-3" },
           React.createElement(
             "div",
             { className: "col_left" },
@@ -380,7 +384,7 @@ function UsersOnline(props) {
               "div",
               { className: "relative" },
               React.createElement(
-                "h3",
+                "h5",
                 null,
                 " Users online "
               ),
@@ -403,8 +407,8 @@ function UsersOnline(props) {
               "div",
               { className: "relative" },
               React.createElement(
-                "h3",
-                null,
+                "h5",
+                { id: "users_online_subtitle" },
                 " Games available "
               ),
               React.createElement(
@@ -450,13 +454,13 @@ function WelcomePC(props) {
           " Close "
         ),
         React.createElement(
-          "h1",
+          "h2",
           null,
           " PC strength "
         ),
         React.createElement(
           "div",
-          null,
+          { className: "mt-3" },
           React.createElement(
             "form",
             { name: "pc_strength", onSubmit: e => props.onSubmit(e) },

@@ -59,7 +59,6 @@ def validated_move_info(game_id, row_start, col_start, row_end, col_end, promoti
         promotion = pieces[promotion]
 
     human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
-    print(human_move)
     if (human_move in board.legal_moves):
         board.push(human_move)
         init_board = chess.Board()

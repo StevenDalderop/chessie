@@ -147,7 +147,7 @@ function Sidebar(props) {
       { id: "timer2_div" },
       React.createElement(
         "h5",
-        null,
+        { id: "username_below" },
         " ",
         props.username,
         " "

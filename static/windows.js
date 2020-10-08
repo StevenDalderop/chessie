@@ -288,7 +288,7 @@ function GetUsername(props) {
           message,
           React.createElement(
             "button",
-            { className: "btn btn-primary mt-3" },
+            { id: "submit_username_button", className: "btn btn-primary mt-3" },
             " Submit "
           )
         )

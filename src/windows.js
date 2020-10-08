@@ -134,7 +134,7 @@ function GetUsername(props) {
           <label> What is your username? </label> <br></br>
           <input id="username" name="username" type="text" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
           {message}
-          <button className="btn btn-primary mt-3"> Submit </button>
+          <button id="submit_username_button" className="btn btn-primary mt-3"> Submit </button>
         </form>
       </div>
     </div>

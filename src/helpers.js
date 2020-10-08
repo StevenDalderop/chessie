@@ -78,7 +78,7 @@ function Sidebar(props) {
         <button id="button" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onClick(e)} className="btn btn-primary"> New game </button>
       </div>
       <div id="timer2_div">
-        <h5> {props.username} </h5>
+        <h5 id="username_below"> {props.username} </h5>
         <div id="timer2">
           <Timer seconds={props["times"][time_below]} />
         </div>

@@ -91,15 +91,11 @@ def new_game():
     boards[str(game_id_last)] = chess.Board()
     return {"new_game": "true", "game_id": game_id_last}
 
-@app.route("/configure/<int:skill_level>")
-def configure(skill_level):
-    stockfish.set_skill_level(skill_level)
-    return {"configured": "true"}
-
-@app.route("/get_pc_move/<int:game_id>")
-def pc_move(game_id):
+@app.route("/get_pc_move/<int:game_id>/<int:skill_level>")
+def pc_move(game_id, skill_level):
     global boards
     board = boards[str(game_id)]
+    stockfish.set_skill_level(skill_level)
     stockfish.set_fen_position(board.fen())
     move = stockfish.get_best_move_time(100)
     board.push(chess.Move.from_uci(move))

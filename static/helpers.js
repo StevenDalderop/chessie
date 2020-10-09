@@ -102,7 +102,7 @@ function Sidebar(props) {
       React.createElement(
         "div",
         { id: "timer" },
-        React.createElement(Timer, { seconds: props["times"][time_above] })
+        React.createElement(Timer, { id: "time_above", seconds: props["times"][time_above] })
       )
     ),
     React.createElement(
@@ -138,7 +138,7 @@ function Sidebar(props) {
       { id: "buttons" },
       React.createElement(
         "button",
-        { id: "button", name: "new_game", disabled: props.display === "humanOther" ? true : false, onClick: e => props.onClick(e), className: "btn btn-primary" },
+        { id: "button_new_game", name: "new_game", disabled: props.display === "humanOther" ? true : false, onClick: e => props.onClick(e), className: "btn btn-primary" },
         " New game "
       )
     ),
@@ -155,7 +155,7 @@ function Sidebar(props) {
       React.createElement(
         "div",
         { id: "timer2" },
-        React.createElement(Timer, { seconds: props["times"][time_below] })
+        React.createElement(Timer, { id: "time_below", seconds: props["times"][time_below] })
       )
     )
   );
@@ -181,7 +181,7 @@ function Timer(props) {
   }
   return React.createElement(
     "h3",
-    { className: "times" },
+    { id: props.id, className: "times" },
     " ",
     minutes + ":" + seconds,
     " "

@@ -1,7 +1,8 @@
 import os
 import unittest
-from application import app
+from application import app, socketio
 from flask import template_rendered
+from flask_socketio import SocketIO
 from contextlib import contextmanager
 import chess
 from  unittest.mock import patch
@@ -98,7 +99,89 @@ class Tests(unittest.TestCase):
         r = self.app.get("/check_promotion_valid/0/1/7/0/7")
         self.assertEqual(r.get_json()["validated"], "false") 
     
+    def test_validate_move_true(self):
+        application.boards = {"0": chess.Board()}
+        application.game_id_last = 0
+        r = self.app.get("/validated_move_info/0/6/4/4/4")
+        self.assertEqual(r.get_json()["validated"], "true")
 
- 
+    def test_validate_move_false(self):
+        application.boards = {"0": chess.Board()}
+        application.game_id_last = 0
+        r = self.app.get("/validated_move_info/0/6/4/3/4")
+        self.assertEqual(r.get_json()["validated"], "false")
+    
+    def test_validate_move_match(self):
+        application.boards = {"0": chess.Board()}
+        application.game_id_last = 0
+        r = self.app.get("/validated_move_info/0/6/4/4/4")
+        r = self.app.get("/validated_move_info/0/1/4/3/4")
+        r = self.app.get("/validated_move_info/0/7/3/3/7")
+        r = self.app.get("/validated_move_info/0/1/0/2/0")
+        r = self.app.get("/validated_move_info/0/7/5/4/2")
+        r = self.app.get("/validated_move_info/0/2/0/3/0")
+        r = self.app.get("/validated_move_info/0/3/7/1/5")
+        self.assertEqual(r.get_json()["result"], "1-0")
+        self.assertEqual(r.get_json()["fen"].split(" ")[0], "rnbqkbnr/1ppp1Qpp/8/p3p3/2B1P3/8/PPPP1PPP/RNB1K1NR")
+        self.assertEqual(r.get_json()["moves_san"], "1. e4 e5 2. Qh5 a6 3. Bc4 a5 4. Qxf7#")
+        self.assertEqual(r.get_json()["last_move"], 0)
+
+    def test_validate_move_score(self):
+        application.boards = {"0": chess.Board()}
+        application.game_id_last = 0
+        r = self.app.get("/validated_move_info/0/6/4/4/4")
+        self.assertGreater(r.get_json()["score"], 0)
+    
+    def test_validate_move_score_negative(self):
+        application.boards = {"0": chess.Board()}
+        application.game_id_last = 0
+        r = self.app.get("/validated_move_info/0/6/7/4/7")
+        self.assertLess(r.get_json()["score"], 0)
+
+    def test_new_game(self):
+        application.boards = {"0": chess.Board()}
+        application.game_id_last = 0
+        r = self.app.get("/new_game")
+        self.assertEqual(r.get_json()["new_game"], "true")
+        self.assertEqual(r.get_json()["game_id"], 1)
+        self.assertEqual(application.boards, {"0": chess.Board(), "1": chess.Board()})
+        self.assertEqual(application.game_id_last, 1)
+
+    def test_move_pc(self):
+        application.boards = {"0": chess.Board()}
+        r = self.app.get("/get_pc_move/0/5")
+        data = r.get_json()
+        self.assertGreater(len(r.get_json()["fen"]), 7)
+        self.assertIn("1. ", r.get_json()["moves_san"])
+        self.assertEqual(data["last_move"], 0)
+        self.assertGreater(data["score"], -100)
+        self.assertEqual(data["result"], None)
+        
+    def test_match_pc(self):
+        application.boards = {"0": chess.Board()}
+        result = None
+        while not result:
+            r = self.app.get("/get_pc_move/0/5")
+            data = r.get_json()
+            result = data["result"]
+        self.assertIn(result, ["1-0", "0-1", "1/2-1/2"])
+
+class TestSocketIO(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_socketio(self):
+        client = socketio.test_client(app)
+        r = client.get_received()
+        client.emit("add user online", {"username": "test_username", "time": "test_time"})
+        r = client.get_received()
+        self.assertEqual(len(r), 1)
+        self.assertEqual(r[0]['args'][0]['users_online'][0]["username"], 'test_username')
+        self.assertEqual(r[0]['args'][0]['users_online'][0]["last_seen"], 'test_time')
+
+
 if __name__ == "__main__":
     unittest.main()

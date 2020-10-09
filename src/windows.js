@@ -14,7 +14,7 @@ function Promotion(props) {
   }
 }
 
-function Message(props) {
+function Result(props) {
   if (!props["text"]) {
     return null
   } else {
@@ -28,7 +28,7 @@ function Message(props) {
   }
 }
 
-function StartScreen(props) {
+function Choose_game(props) {
   if (!(props["display"] === "welcomeScreen1")) {
     return null
   } else {
@@ -43,21 +43,21 @@ function StartScreen(props) {
           <h2> New Game </h2>
           <div className="row mr-0 ml-0 mt-3">
             <div className="col no_padding_mobile">
-              <div className="time" onClick={() => createInput("human")}>
+              <div id="vs_human" className="time" onClick={() => createInput("human")}>
                 <div className="centered_container no_click">
                   <h5> vs Human Offline </h5>
                 </div> 
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div className="time" onClick={() => createInput("human_other")}> 
+              <div id="online" className="time" onClick={() => createInput("human_other")}> 
                 <div className="centered_container no_click">
                   <h5> vs Human Online </h5> 
                 </div>
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div className="time" onClick={() => createInput("pc")}>
+              <div id="vs_pc" className="time" onClick={() => createInput("pc")}>
                 <div className="centered_container no_click"> 
                   <h5> vs PC </h5>
                 </div> 
@@ -73,7 +73,7 @@ function StartScreen(props) {
   }
 }
 
-function WelcomeHuman(props) {
+function Choose_time(props) {
   if (!(props["display"] === "welcomeScreen2")) {
     return null
   } else {
@@ -84,28 +84,28 @@ function WelcomeHuman(props) {
         <h2> Time </h2>
         <div className="row ml-0 mr-0 mt-3">
             <div className="col no_padding_mobile"> 
-              <div data-value={60} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+              <div id="time_60" data-value={60} name="time" className="time" onClick={(e) => props.onClick(e)}> 
                 <div className="centered_container no_click">
                   <h5> 1 minute </h5> 
                 </div>
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div data-value={180} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+              <div id="time_180" data-value={180} name="time" className="time" onClick={(e) => props.onClick(e)}> 
                 <div className="centered_container no_click">
                   <h5> 3 minutes </h5> 
                 </div> 
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div data-value={300} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+              <div id="time_300" data-value={300} name="time" className="time" onClick={(e) => props.onClick(e)}> 
                 <div className="centered_container no_click">
                   <h5> 5 minutes </h5> 
                 </div> 
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div data-value={600} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+              <div id="time_600" data-value={600} name="time" className="time" onClick={(e) => props.onClick(e)}> 
                 <div className="centered_container no_click">
                   <h5> 10 minutes </h5> 
                 </div> 
@@ -141,7 +141,7 @@ function GetUsername(props) {
   )
 }}
 
-function UsersOnline(props) {
+function Online_game(props) {
   let users = []
   let i = 0
   let u
@@ -207,7 +207,7 @@ function UsersOnline(props) {
   )
 }}
 
-function WelcomePC(props) {
+function VS_PC(props) {
   if (!(props["display"] === "welcomeScreenPC")) {
     return null
   } else {

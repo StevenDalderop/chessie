@@ -59,7 +59,7 @@ function Sidebar(props) {
       <div id="timer1_div">
         <h5> {props["username2"]} </h5>
         <div id="timer">
-          <Timer seconds={props["times"][time_above]} />
+          <Timer id="time_above" seconds={props["times"][time_above]} />
         </div>
       </div>
       <div id="history">
@@ -75,12 +75,12 @@ function Sidebar(props) {
         </div>
       </div>
       <div id="buttons">
-        <button id="button" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onClick(e)} className="btn btn-primary"> New game </button>
+        <button id="button_new_game" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onClick(e)} className="btn btn-primary"> New game </button>
       </div>
       <div id="timer2_div">
         <h5 id="username_below"> {props.username} </h5>
         <div id="timer2">
-          <Timer seconds={props["times"][time_below]} />
+          <Timer id="time_below" seconds={props["times"][time_below]} />
         </div>
       </div>
     </div>
@@ -104,7 +104,7 @@ function Timer(props) {
     seconds = "0" + seconds.toString()
   }
   return (
-    <h3 className="times"> { minutes + ":" + seconds  } </h3>
+    <h3 id={props.id} className="times"> { minutes + ":" + seconds  } </h3>
   )
 }
 

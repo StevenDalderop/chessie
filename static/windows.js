@@ -34,7 +34,7 @@ function Promotion(props) {
   }
 }
 
-function Message(props) {
+function Result(props) {
   if (!props["text"]) {
     return null;
   } else {
@@ -62,7 +62,7 @@ function Message(props) {
   }
 }
 
-function StartScreen(props) {
+function Choose_game(props) {
   if (!(props["display"] === "welcomeScreen1")) {
     return null;
   } else {
@@ -94,7 +94,7 @@ function StartScreen(props) {
             { className: "col no_padding_mobile" },
             React.createElement(
               "div",
-              { className: "time", onClick: () => createInput("human") },
+              { id: "vs_human", className: "time", onClick: () => createInput("human") },
               React.createElement(
                 "div",
                 { className: "centered_container no_click" },
@@ -111,7 +111,7 @@ function StartScreen(props) {
             { className: "col no_padding_mobile" },
             React.createElement(
               "div",
-              { className: "time", onClick: () => createInput("human_other") },
+              { id: "online", className: "time", onClick: () => createInput("human_other") },
               React.createElement(
                 "div",
                 { className: "centered_container no_click" },
@@ -128,7 +128,7 @@ function StartScreen(props) {
             { className: "col no_padding_mobile" },
             React.createElement(
               "div",
-              { className: "time", onClick: () => createInput("pc") },
+              { id: "vs_pc", className: "time", onClick: () => createInput("pc") },
               React.createElement(
                 "div",
                 { className: "centered_container no_click" },
@@ -151,7 +151,7 @@ function StartScreen(props) {
   }
 }
 
-function WelcomeHuman(props) {
+function Choose_time(props) {
   if (!(props["display"] === "welcomeScreen2")) {
     return null;
   } else {
@@ -179,7 +179,7 @@ function WelcomeHuman(props) {
             { className: "col no_padding_mobile" },
             React.createElement(
               "div",
-              { "data-value": 60, name: "time", className: "time", onClick: e => props.onClick(e) },
+              { id: "time_60", "data-value": 60, name: "time", className: "time", onClick: e => props.onClick(e) },
               React.createElement(
                 "div",
                 { className: "centered_container no_click" },
@@ -196,7 +196,7 @@ function WelcomeHuman(props) {
             { className: "col no_padding_mobile" },
             React.createElement(
               "div",
-              { "data-value": 180, name: "time", className: "time", onClick: e => props.onClick(e) },
+              { id: "time_180", "data-value": 180, name: "time", className: "time", onClick: e => props.onClick(e) },
               React.createElement(
                 "div",
                 { className: "centered_container no_click" },
@@ -213,7 +213,7 @@ function WelcomeHuman(props) {
             { className: "col no_padding_mobile" },
             React.createElement(
               "div",
-              { "data-value": 300, name: "time", className: "time", onClick: e => props.onClick(e) },
+              { id: "time_300", "data-value": 300, name: "time", className: "time", onClick: e => props.onClick(e) },
               React.createElement(
                 "div",
                 { className: "centered_container no_click" },
@@ -230,7 +230,7 @@ function WelcomeHuman(props) {
             { className: "col no_padding_mobile" },
             React.createElement(
               "div",
-              { "data-value": 600, name: "time", className: "time", onClick: e => props.onClick(e) },
+              { id: "time_600", "data-value": 600, name: "time", className: "time", onClick: e => props.onClick(e) },
               React.createElement(
                 "div",
                 { className: "centered_container no_click" },
@@ -297,7 +297,7 @@ function GetUsername(props) {
   }
 }
 
-function UsersOnline(props) {
+function Online_game(props) {
   let users = [];
   let i = 0;
   let u;
@@ -438,7 +438,7 @@ function UsersOnline(props) {
   }
 }
 
-function WelcomePC(props) {
+function VS_PC(props) {
   if (!(props["display"] === "welcomeScreenPC")) {
     return null;
   } else {

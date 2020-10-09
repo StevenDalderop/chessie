@@ -97,7 +97,7 @@ class Game extends React.Component {
      }
 
     if (this.state.vs === "pc" && data["validated"] === "true") {
-      fetch(`${baseURL}get_pc_move/${this.state.game_id}`)
+      fetch(`${baseURL}get_pc_move/${this.state.game_id}/${this.state.skill_level_pc}`)
       .then(response => response.json())
       .then((data) => {
         this.setState((state) => ({
@@ -130,7 +130,6 @@ class Game extends React.Component {
     } else if (e.target.name === "usersOnline") {
       this.setState({"display": "welcomeScreen2"})
     } else if (e.target.name === "pc_strength") {
-      fetch(`${baseURL}configure/${this.state.skill_level_pc}`)
       this.setState((state) => ({"display": "welcomeScreen2", "username2": "Stockfish (" + state.skill_level_pc + ")"}))
     } else if (e.target.getAttribute('name') === "time") {
       let time = e.target.getAttribute('data-value')
@@ -253,13 +252,13 @@ class Game extends React.Component {
         <Header display={this.state.display} onclick={(e) => this.handleClick(e)} />
 
         <div className="container-fluid">
-          <StartScreen display={this.state.display} onClick={(e) => this.handleClick(e)} />
-          <WelcomeHuman display={this.state.display} onClick={(e) => this.handleClick(e)} />
+          <Choose_game display={this.state.display} onClick={(e) => this.handleClick(e)} />
+          <Choose_time display={this.state.display} onClick={(e) => this.handleClick(e)} />
           <GetUsername display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
-          <WelcomePC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={(e) => this.handleClick(e)} />
+          <VS_PC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={(e) => this.handleClick(e)} />
           <Promotion promotion={this.state.promotion} onClick={(e) => this.handleClick(e)} />
-          <Message text={this.state.result} onClick={() => {this.setState({"result": null})}} />
-          <UsersOnline display={this.state.display} usernames={this.state.users_online} username={this.state.username} games={this.state.games_available} onClick={(e) => this.handleClick(e)} />
+          <Result text={this.state.result} onClick={() => {this.setState({"result": null})}} />
+          <Online_game display={this.state.display} usernames={this.state.users_online} username={this.state.username} games={this.state.games_available} onClick={(e) => this.handleClick(e)} />
 
           <Container 
             col_left={<BoardContainer 

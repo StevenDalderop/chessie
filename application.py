@@ -109,6 +109,7 @@ def pc_move(game_id, skill_level):
     fen = board.fen()
     return {
         "fen": fen,
+        "uci": move,
         "moves_san": moves_san,
         "last_move": last_move,
         "score": score,
@@ -183,4 +184,4 @@ def join_game(data):
 
 @socketio.on("make move")
 def make_move(data):
-    socketio.emit("announce move", {"fen": data["fen"], "moves_san": data["moves_san"], "step": data["step"], "last_move": data["last_move"] , "score": data["score"], "times": data["times"], "result": data["result"]}, room=data["room"])
+    socketio.emit("announce move", {"fen": data["fen"], "moved_squares": data["moved_squares"], "moves_san": data["moves_san"], "step": data["step"], "last_move": data["last_move"] , "score": data["score"], "times": data["times"], "result": data["result"]}, room=data["room"])

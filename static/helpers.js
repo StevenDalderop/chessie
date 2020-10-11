@@ -168,7 +168,13 @@ function BoardContainer(props) {
     React.createElement(
       "div",
       { id: "board_container" },
-      React.createElement(Board, { pieces: props.pieces, selected_square: props.selected_square, onClick: (row, column) => props.onClick(row, column), mirrored: props.mirrored })
+      React.createElement(Board, {
+        pieces: props.pieces,
+        selected_square: props.selected_square,
+        moved_squares: props.moved_squares,
+        onClick: (row, column) => props.onClick(row, column),
+        mirrored: props.mirrored
+      })
     )
   );
 }
@@ -272,4 +278,12 @@ function fen_to_history(fen) {
     out2.push(out2_row);
   }
   return out2;
+}
+
+function uci_to_row_column(uci) {
+  let col_start = parseInt(uci[0], 36) - 10;
+  let col_end = parseInt(uci[2], 36) - 10;
+  let row_start = 8 - uci[1];
+  let row_end = 8 - uci[3];
+  return [[row_start, col_start], [row_end, col_end]];
 }

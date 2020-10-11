@@ -156,6 +156,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(data["last_move"], 0)
         self.assertGreater(data["score"], -100)
         self.assertEqual(data["result"], None)
+        self.assertIn(data["uci"][0], ["a", "b", "c", "d", "e", "f", "g", "h"])
         
     def test_match_pc(self):
         application.boards = {"0": chess.Board()}

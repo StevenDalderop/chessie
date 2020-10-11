@@ -40,6 +40,10 @@
     background-color: yellow;
   }
 
+    .color-square-gray {
+    background-color: gray;
+  }
+
   .row_number {
     position: absolute;
     left: 2px;

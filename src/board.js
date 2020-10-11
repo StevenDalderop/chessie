@@ -49,9 +49,15 @@ class Board extends React.Component {
     } else {
       square_color = "black"
     }
+    
     if (this.props.selected_square && this.props.selected_square[0] === row_new && this.props.selected_square[1] === col_new) {
       square_color = "yellow"
     }
+
+    if (this.props.moved_squares && this.props.moved_squares[1][0] === row_new && this.props.moved_squares[1][1] === col_new) {
+      square_color = "gray"
+    }
+
     return (
       <Square id={id} row={row_number} col={col_letter} square_color={square_color} piece={this.props.pieces[row_new][col_new]} onClick={() => this.props.onClick(row_new, col_new)} key={row_new * 8 + col_new} />
     )

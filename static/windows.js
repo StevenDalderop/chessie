@@ -35,9 +35,7 @@ function Promotion(props) {
 }
 
 function Result(props) {
-  if (!props["text"]) {
-    return null;
-  } else {
+  if (props.result) {
     return React.createElement(
       "div",
       { id: "message", className: "welcomeScreen" },
@@ -50,7 +48,7 @@ function Result(props) {
         "p",
         null,
         " ",
-        props.text,
+        props.result,
         " "
       ),
       React.createElement(
@@ -59,6 +57,69 @@ function Result(props) {
         " Close "
       )
     );
+  } else {
+    return null;
+  }
+}
+
+function Draw_offered(props) {
+  if (props.draw_offered && props.draw_offered !== props.username) {
+    return React.createElement(
+      "div",
+      { id: "draw_offered", className: "welcomeScreen" },
+      React.createElement(
+        "div",
+        { className: "container_div" },
+        React.createElement(
+          "h1",
+          null,
+          " Draw offered "
+        ),
+        React.createElement(
+          "p",
+          null,
+          " ",
+          props.draw_offered,
+          " offered a draw "
+        ),
+        React.createElement(
+          "button",
+          { name: "accept_draw", className: "btn btn-success", onClick: props.onClick },
+          " Accept "
+        ),
+        React.createElement(
+          "button",
+          { name: "decline_draw", className: "btn btn-danger ml-3", onClick: props.onClick },
+          " Decline "
+        )
+      )
+    );
+  } else if (props.draw_offered === props.username) {
+    return React.createElement(
+      "div",
+      { id: "draw_offered", className: "welcomeScreen" },
+      React.createElement(
+        "div",
+        { className: "container_div" },
+        React.createElement(
+          "h1",
+          null,
+          " Draw offered "
+        ),
+        React.createElement(
+          "p",
+          null,
+          " You offered a draw "
+        ),
+        React.createElement(
+          "p",
+          null,
+          " Waiting for decision "
+        )
+      )
+    );
+  } else {
+    return null;
   }
 }
 
@@ -83,7 +144,7 @@ function Choose_game(props) {
         ),
         React.createElement(
           "h2",
-          null,
+          { id: "title_new_game" },
           " New Game "
         ),
         React.createElement(

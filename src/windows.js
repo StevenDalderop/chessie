@@ -15,16 +15,43 @@ function Promotion(props) {
 }
 
 function Result(props) {
-  if (!props["text"]) {
-    return null
-  } else {
+  if (props.result) {
     return (
       <div id="message" className="welcomeScreen">
         <h1> Result </h1>
-        <p> {props.text} </p>
+        <p> {props.result} </p>
         <button className="btn btn-primary" onClick={props.onClick}> Close </button>
       </div>
     )
+  } else {
+    return null
+  }
+}
+
+function Draw_offered(props) {
+  if (props.draw_offered && props.draw_offered !== props.username) {
+    return (
+      <div id="draw_offered" className="welcomeScreen">
+        <div className="container_div">
+          <h1> Draw offered </h1>
+          <p> {props.draw_offered} offered a draw </p>
+          <button name="accept_draw" className="btn btn-success" onClick={props.onClick}> Accept </button>
+          <button name="decline_draw" className="btn btn-danger ml-3" onClick={props.onClick}> Decline </button>
+        </div>
+      </div>
+    )
+  } else if (props.draw_offered === props.username) {
+    return (
+      <div id="draw_offered" className="welcomeScreen">
+        <div className="container_div">
+          <h1> Draw offered </h1>
+          <p> You offered a draw </p>
+          <p> Waiting for decision </p>
+        </div>
+      </div>
+    )
+  } else {
+    return null
   }
 }
 
@@ -40,7 +67,7 @@ function Choose_game(props) {
       <div id="welcomeScreen1" className="welcomeScreen">
         <div className="container_div">
           <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
-          <h2> New Game </h2>
+          <h2 id="title_new_game"> New Game </h2>
           <div className="row mr-0 ml-0 mt-3">
             <div className="col no_padding_mobile">
               <div id="vs_human" className="time" onClick={() => createInput("human")}>

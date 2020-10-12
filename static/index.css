@@ -2,6 +2,12 @@
   color: white;
 }
 
+#main_container {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+}
+
 #footer {
   position: absolute;
   bottom: 0px;
@@ -122,6 +128,11 @@ body {
 }
 
 #button_new_game {
+  margin-left: 15px;
+  margin-top: 15px;
+}
+
+.buttons {
   margin-left: 15px;
   margin-top: 15px;
 }
@@ -309,10 +320,6 @@ svg {
   overflow: hidden;
 }
 
-.mobile {
-  display: none;
-}
-
 .content_box {
   box-sizing: content-box;
   width: 100%;
@@ -322,7 +329,36 @@ svg {
   display: none;
 }
 
-@media screen and (max-width: 767px) {
+.mobile {
+  display: none;
+}
+
+@media screen and (max-width: 767px) and (orientation: portrait) { 
+  #mobile_bar_row {
+    margin-top: -15px;
+  }
+
+  .mobile { 
+    display: initial;
+  }
+
+  #title_new_game {
+    text-align: left;
+    padding-left: 15px;
+  }
+
+  #button_resign_mobile {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  }
+
+  #button_draw_mobile {
+    position: absolute;
+    top: 5px;
+    right: 85px;
+  }
+
   #button_mobile {
     display: initial; 
     position: absolute;
@@ -422,6 +458,32 @@ svg {
 
   #games_available_div {
     position: initial;
+  }
+}
+
+@media screen and (max-height: 767px) and (orientation: landscape) {
+  .board {
+    width: 80vh;
+    height: 80vh;
+    padding-bottom: 30px;
+  }
+
+  #history, #evaluation {
+    display: none;
+  }
+
+  .chess_row {
+    width: 100%;
+    height: 12.5%;
+  }
+
+  .square {
+    width: 12.5%;
+  }
+
+  .piece_icon {
+    width: 12.5vh;
+    height: 12.5vh;
   }
 }
 

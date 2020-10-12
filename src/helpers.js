@@ -33,7 +33,7 @@ function Mobile_bar(props) {
   let time_left = !props.mirrored ? 0 : 1
   
   return(
-    <div className="row">
+    <div id="mobile_bar_row" className="row">
       <div className="col" id="timer1_div">
         <h5 className="overflow_hiddden"> {props["username"]} </h5>
         <div id="timer">
@@ -53,6 +53,16 @@ function Mobile_bar(props) {
 function Sidebar(props) {
   let time_above = !props.mirrored ? 1 : 0
   let time_below = !props.mirrored ? 0 : 1
+
+  if (props.game_state === "started" && props.vs === "human_other") {
+    let button_resign = <button key="resign" id="button_resign" name="resign" className="btn btn-danger buttons" onClick={(e) => props.onClick(e)}> Resign </button>
+    let button_draw = <button key="draw" id="button_draw" name="offer_draw" className="btn btn-warning buttons" onClick={(e) => props.onClick(e)}> Offer draw </button>
+    var buttons = [button_resign, button_draw]
+  } else if (props.game_state === "started" && props.vs === "pc") {
+    var buttons = <button key="resign" id="button_resign" name="resign" className="btn btn-danger buttons" onClick={(e) => props.onClick(e)}> Resign </button>
+  } else {
+    var buttons = <button id="button_new_game" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onClick(e)} className="btn btn-primary buttons"> New game </button>
+  }
 
   return (
     <div>
@@ -75,7 +85,7 @@ function Sidebar(props) {
         </div>
       </div>
       <div id="buttons">
-        <button id="button_new_game" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onClick(e)} className="btn btn-primary"> New game </button>
+        {buttons}
       </div>
       <div id="timer2_div">
         <h5 id="username_below"> {props.username} </h5>
@@ -128,10 +138,20 @@ function ScoreEvaluationBar(props) {
 }
 
 function Header(props) {
+  if (props.game_state === "started" && props.vs === "human_other") {
+    let button_resign = <button key="resign" id="button_resign_mobile" name="resign" className="btn btn-danger mobile" onClick={(e) => props.onClick(e)}> Resign </button>
+    let button_draw = <button key="draw" id="button_draw_mobile" name="offer_draw" className="btn btn-warning mobile" onClick={(e) => props.onClick(e)}> Draw </button>
+    var buttons = [button_resign, button_draw]
+  } else if (props.game_state === "started" && props.vs === "pc") {
+    var buttons = <button key="resign" id="button_resign_mobile" name="resign" className="btn btn-danger mobile" onClick={(e) => props.onClick(e)}> Resign </button>
+  } else {
+    var buttons = <button id="button_mobile" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onClick(e)} className="btn btn-primary mobile"> New game </button>
+  }
+
   return (
     <div className="container-fluid bg-black-main">
       <h1 id="title" className="center"> Chessie </h1>
-      <button id="button_mobile" className="btn btn-primary" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onclick(e)} > New game </button>
+      {buttons}
   </div>
   )
 }

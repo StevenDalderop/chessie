@@ -29,7 +29,8 @@ class Game extends React.Component {
       "display": "humanOther",
       "game_state": null,
       "username_already_exists": null,
-      "color": null // 0 is white 1 is black 
+      "color": null, // 0 is white 1 is black 
+      "draw_offered": null
     };
   }
 
@@ -111,7 +112,6 @@ class Game extends React.Component {
 
     if (this.state.result) {
       this.setState({ "game_state": "finished", "selected_square": null });
-      clearInterval(this.interval);
     }
   }
 
@@ -145,7 +145,6 @@ class Game extends React.Component {
       }
       this.setState({ "vs": e.target.value });
     } else if (e.target.name === "new_game") {
-      clearInterval(this.interval);
       this.setState({ "selected_square": null,
         "moved_squares": null,
         "last_move": 1,
@@ -173,6 +172,18 @@ class Game extends React.Component {
       console.log("join game " + this.state.username + " " + game_id);
     } else if (e.target.name === "refresh") {
       socket.emit("refresh");
+    } else if (e.target.name === "resign") {
+      if (this.state.vs === "pc") {
+        this.setState(state => ({ "result": state.username + " resigned", "game_state": "resigned" }));
+      } else if (this.state.vs === "human_other") {
+        socket.emit("resign", { "username": this.state.username, "room": this.state.room });
+      }
+    } else if (e.target.name === "offer_draw") {
+      socket.emit("offer draw", { "username": this.state.username, "room": this.state.room });
+    } else if (e.target.name === "accept_draw") {
+      socket.emit("draw", { "accepted": "true", "room": this.state.room });
+    } else if (e.target.name === "decline_draw") {
+      socket.emit("draw", { "accepted": "false", "room": this.state.room });
     }
   }
 
@@ -183,8 +194,10 @@ class Game extends React.Component {
       if (seconds === 0) {
         this.setState(state => ({ "result": !state.last_move ? "1-0" : "0-1", "game_state": "finished", "selected_square": null }));
         clearInterval(this.interval);
-      } else {
+      } else if (this.state.game_state === "started") {
         this.setState(state => ({ "times": state.last_move === 0 ? [state.times[0], state.times[1] - 1] : [state.times[0] - 1, state.times[1]] }));
+      } else {
+        clearInterval(this.interval);
       }
     }, 1000);
   }
@@ -237,6 +250,22 @@ class Game extends React.Component {
       }));
       this.startTimer();
     });
+
+    socket.on("announce resign", data => {
+      this.setState({ "result": data["username"] + " resigned", "game_state": "resigned", "draw_offered": null, "selected_square": null, "moved_squares": null });
+    });
+
+    socket.on("announce draw offered", data => {
+      this.setState({ "draw_offered": data["username"] });
+    });
+
+    socket.on("announce draw decision", data => {
+      if (data["accepted"] === "true") {
+        this.setState({ "result": "Draw", "draw_offered": null, "selected_square": null, "moved_squares": null, "game_state": "draw" });
+      } else if (data["accepted"] === "false") {
+        this.setState({ "draw_offered": null });
+      }
+    });
   }
 
   componentWillUnmount() {
@@ -247,8 +276,15 @@ class Game extends React.Component {
   render() {
     return React.createElement(
       "div",
-      null,
-      React.createElement(Header, { display: this.state.display, onclick: e => this.handleClick(e) }),
+      { id: "main_container" },
+      React.createElement(Header, { display: this.state.display,
+        onClick: e => this.handleClick(e),
+        game_state: this.state.game_state,
+        vs: this.state.vs,
+        onClick: e => {
+          this.handleClick(e);
+        }
+      }),
       React.createElement(
         "div",
         { className: "container-fluid" },
@@ -257,10 +293,11 @@ class Game extends React.Component {
         React.createElement(GetUsername, { display: this.state.display, message: this.state.username_already_exists, onChange: e => this.setState({ "username": e.target.value, "username_already_exists": null }), username: this.state.username, onSubmit: e => this.handleClick(e) }),
         React.createElement(VS_PC, { display: this.state.display, onChange: e => this.setState({ "skill_level_pc": e.target.value }), skill_level_pc: this.state.skill_level_pc, onSubmit: e => this.handleClick(e) }),
         React.createElement(Promotion, { promotion: this.state.promotion, onClick: e => this.handleClick(e) }),
-        React.createElement(Result, { text: this.state.result, onClick: () => {
+        React.createElement(Result, { result: this.state.result, onClick: () => {
             this.setState({ "result": null });
           } }),
         React.createElement(Online_game, { display: this.state.display, usernames: this.state.users_online, username: this.state.username, games: this.state.games_available, onClick: e => this.handleClick(e) }),
+        React.createElement(Draw_offered, { draw_offered: this.state.draw_offered, username: this.state.username, onClick: e => this.handleClick(e) }),
         React.createElement(Container, {
           col_left: React.createElement(BoardContainer, {
             pieces: this.state.history[this.state.step].pieces,
@@ -277,6 +314,8 @@ class Game extends React.Component {
             san: this.state.san,
             score: this.state.score,
             mirrored: this.state.mirrored,
+            game_state: this.state.game_state,
+            vs: this.state.vs,
             onClick: e => {
               this.handleClick(e);
             }
@@ -287,6 +326,7 @@ class Game extends React.Component {
             pieces: this.state.history[this.state.step].pieces,
             mirrored: this.state.mirrored,
             selected_square: this.state.selected_square,
+            moved_squares: this.state.moved_squares,
             onClick: (row, col) => this.handleClickBoard(row, col)
           }),
           mobile_bar: React.createElement(Mobile_bar, {

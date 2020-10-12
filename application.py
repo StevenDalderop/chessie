@@ -185,3 +185,15 @@ def join_game(data):
 @socketio.on("make move")
 def make_move(data):
     socketio.emit("announce move", {"fen": data["fen"], "moved_squares": data["moved_squares"], "moves_san": data["moves_san"], "step": data["step"], "last_move": data["last_move"] , "score": data["score"], "times": data["times"], "result": data["result"]}, room=data["room"])
+
+@socketio.on("resign")
+def resign(data): 
+    socketio.emit("announce resign", {"username": data["username"]}, room=data["room"])
+
+@socketio.on("offer draw")
+def offer_draw(data): 
+    socketio.emit("announce draw offered", {"username": data["username"]}, room=data["room"])
+
+@socketio.on("draw")
+def draw(data): 
+    socketio.emit("announce draw decision", {"accepted": data["accepted"]}, room=data["room"])

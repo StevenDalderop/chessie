@@ -46,7 +46,7 @@ function Mobile_bar(props) {
 
   return React.createElement(
     "div",
-    { className: "row" },
+    { id: "mobile_bar_row", className: "row" },
     React.createElement(
       "div",
       { className: "col", id: "timer1_div" },
@@ -85,6 +85,32 @@ function Mobile_bar(props) {
 function Sidebar(props) {
   let time_above = !props.mirrored ? 1 : 0;
   let time_below = !props.mirrored ? 0 : 1;
+
+  if (props.game_state === "started" && props.vs === "human_other") {
+    let button_resign = React.createElement(
+      "button",
+      { key: "resign", id: "button_resign", name: "resign", className: "btn btn-danger buttons", onClick: e => props.onClick(e) },
+      " Resign "
+    );
+    let button_draw = React.createElement(
+      "button",
+      { key: "draw", id: "button_draw", name: "offer_draw", className: "btn btn-warning buttons", onClick: e => props.onClick(e) },
+      " Offer draw "
+    );
+    var buttons = [button_resign, button_draw];
+  } else if (props.game_state === "started" && props.vs === "pc") {
+    var buttons = React.createElement(
+      "button",
+      { key: "resign", id: "button_resign", name: "resign", className: "btn btn-danger buttons", onClick: e => props.onClick(e) },
+      " Resign "
+    );
+  } else {
+    var buttons = React.createElement(
+      "button",
+      { id: "button_new_game", name: "new_game", disabled: props.display === "humanOther" ? true : false, onClick: e => props.onClick(e), className: "btn btn-primary buttons" },
+      " New game "
+    );
+  }
 
   return React.createElement(
     "div",
@@ -136,11 +162,7 @@ function Sidebar(props) {
     React.createElement(
       "div",
       { id: "buttons" },
-      React.createElement(
-        "button",
-        { id: "button_new_game", name: "new_game", disabled: props.display === "humanOther" ? true : false, onClick: e => props.onClick(e), className: "btn btn-primary" },
-        " New game "
-      )
+      buttons
     ),
     React.createElement(
       "div",
@@ -214,6 +236,32 @@ function ScoreEvaluationBar(props) {
 }
 
 function Header(props) {
+  if (props.game_state === "started" && props.vs === "human_other") {
+    let button_resign = React.createElement(
+      "button",
+      { key: "resign", id: "button_resign_mobile", name: "resign", className: "btn btn-danger mobile", onClick: e => props.onClick(e) },
+      " Resign "
+    );
+    let button_draw = React.createElement(
+      "button",
+      { key: "draw", id: "button_draw_mobile", name: "offer_draw", className: "btn btn-warning mobile", onClick: e => props.onClick(e) },
+      " Draw "
+    );
+    var buttons = [button_resign, button_draw];
+  } else if (props.game_state === "started" && props.vs === "pc") {
+    var buttons = React.createElement(
+      "button",
+      { key: "resign", id: "button_resign_mobile", name: "resign", className: "btn btn-danger mobile", onClick: e => props.onClick(e) },
+      " Resign "
+    );
+  } else {
+    var buttons = React.createElement(
+      "button",
+      { id: "button_mobile", name: "new_game", disabled: props.display === "humanOther" ? true : false, onClick: e => props.onClick(e), className: "btn btn-primary mobile" },
+      " New game "
+    );
+  }
+
   return React.createElement(
     "div",
     { className: "container-fluid bg-black-main" },
@@ -222,11 +270,7 @@ function Header(props) {
       { id: "title", className: "center" },
       " Chessie "
     ),
-    React.createElement(
-      "button",
-      { id: "button_mobile", className: "btn btn-primary", name: "new_game", disabled: props.display === "humanOther" ? true : false, onClick: e => props.onclick(e) },
-      " New game "
-    )
+    buttons
   );
 }
 

@@ -1,10 +1,10 @@
 function Container(props) {
   return React.createElement(
     "div",
-    { className: "container-fluid no-padding not_mobile" },
+    { id: "content", className: "container-fluid no-padding not_mobile" },
     React.createElement(
       "div",
-      { className: "row" },
+      { id: "content_row", className: "row" },
       React.createElement(
         "div",
         { className: "col" },
@@ -22,7 +22,7 @@ function Container(props) {
 function Container_mobile(props) {
   return React.createElement(
     "div",
-    { className: "container-fluid no-padding mobile" },
+    { id: "content_mobile", className: "container-fluid no-padding mobile" },
     React.createElement(
       "div",
       { className: "row" },
@@ -264,7 +264,7 @@ function Header(props) {
 
   return React.createElement(
     "div",
-    { className: "container-fluid bg-black-main" },
+    { id: "header", className: "container-fluid bg-black-main" },
     React.createElement(
       "h1",
       { id: "title", className: "center" },

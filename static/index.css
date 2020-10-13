@@ -2,6 +2,8 @@
   color: white;
 }
 
+html,body { height:100%; }
+
 #main_container {
   position: absolute;
   width: 100vw;
@@ -463,9 +465,8 @@ svg {
 
 @media screen and (max-height: 767px) and (orientation: landscape) {
   .board {
-    width: 80vh;
-    height: 80vh;
-    padding-bottom: 30px;
+    width: 100%;
+    height: 100%;
   }
 
   #history, #evaluation {
@@ -481,9 +482,75 @@ svg {
     width: 12.5%;
   }
 
+  .row_number {
+    display: none;
+  }
+
+  .col_letter {
+    display: none;
+  }
+
+  #button_resign_mobile {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: initial;
+  }
+
+  #button_draw_mobile {
+    position: absolute;
+    top: 5px;
+    right: 85px;
+    display: initial;
+  }
+
+  #col_right {
+    width: 200px;
+  }
+
+  #button_mobile {
+    display: initial; 
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
+
   .piece_icon {
-    width: 12.5vh;
-    height: 12.5vh;
+    width: 10vh;
+    height: 10vh;
+  }
+
+  #content_row {
+    height: 100%;
+  }
+
+  #usersOnline {
+    top: 0px;
+  }
+
+  .welcomeScreen {
+    left: 0px;
+    width: 100%;
+    top: 20%;
+  }
+
+  #buttons {
+    display: none;
+  }
+
+  #timer2_div {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin-right: 15px;
+    width: initial;
+    margin-bottom: 8px;
+  }
+
+  .board { 
+    padding-left: 8px;
+    padding-bottom: 8px;
   }
 }
 

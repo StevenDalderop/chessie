@@ -1,7 +1,7 @@
 function Container(props) {
   return (
-    <div className="container-fluid no-padding not_mobile">
-      <div className="row">
+    <div id="content" className="container-fluid no-padding not_mobile">
+      <div id="content_row" className="row">
         <div className="col">
           {props.col_left}
         </div>
@@ -15,7 +15,7 @@ function Container(props) {
 
 function Container_mobile(props) {
   return (
-    <div className="container-fluid no-padding mobile">
+    <div id="content_mobile" className="container-fluid no-padding mobile">
       <div className="row">
         <div className="col">
           <div className="content_box">
@@ -149,7 +149,7 @@ function Header(props) {
   }
 
   return (
-    <div className="container-fluid bg-black-main">
+    <div id="header" className="container-fluid bg-black-main">
       <h1 id="title" className="center"> Chessie </h1>
       {buttons}
   </div>

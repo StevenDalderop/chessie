@@ -343,3 +343,29 @@ class Game extends React.Component {
 
 const domContainer = document.querySelector('#chess_board_container');
 ReactDOM.render(React.createElement(Game, null), domContainer);
+
+var change_layout = function () {
+  if (window.matchMedia("(orientation: landscape)").matches && window.innerHeight <= 767) {
+    document.querySelector("#content").style.height = window.innerHeight - 56 + "px";
+
+    // you're in LANDSCAPE mode on mobile device
+    let board_container = document.querySelector("#board_container");
+    board_container.style.height = "100%";
+    let height = board_container.clientHeight;
+    board_container.style.width = height + "px";
+  }
+};
+
+change_layout();
+
+window.addEventListener('orientationchange', function () {
+  // After orientationchange, add a one-time resize event
+  var afterOrientationChange = function () {
+    // YOUR POST-ORIENTATION CODE HERE
+    // Remove the resize event listener after it has executed
+    change_layout();
+
+    window.removeEventListener('resize', afterOrientationChange);
+  };
+  window.addEventListener('resize', afterOrientationChange);
+});

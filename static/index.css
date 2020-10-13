@@ -372,8 +372,14 @@ svg {
     display: initial;
   }
 
+  .content_box {
+    max-width: 500px;
+    margin: auto;
+  }
+
   .board {
     height: 100vw;
+    max-height: 500px;
     padding-bottom: 30px;
   }
 
@@ -393,6 +399,8 @@ svg {
   .piece_icon {
     width: 12.5vw;
     height: 12.5vw;
+    max-width: 62.5px;
+    max-height: 62.5px;
   }
 
   .row_number {
@@ -554,7 +562,7 @@ svg {
   }
 }
 
-@media screen and (min-width: 768px) and (max-width: 1024px) {
+@media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
   /* For tablets: */
   #history {
     height: 200px;

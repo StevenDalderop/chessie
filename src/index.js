@@ -348,6 +348,7 @@ ReactDOM.render(<Game />, domContainer);
 
 var change_layout = function() {
   if (window.matchMedia("(orientation: landscape)").matches && window.innerHeight <= 767) {
+    console.log("test3")
     document.querySelector("#content").style.height = window.innerHeight - 56 + "px"
   
     // you're in LANDSCAPE mode on mobile device
@@ -360,15 +361,17 @@ var change_layout = function() {
 
 change_layout()
 
-window.addEventListener('orientationchange', function() {
-  // After orientationchange, add a one-time resize event
-  var afterOrientationChange = function() {
-      // YOUR POST-ORIENTATION CODE HERE
-      // Remove the resize event listener after it has executed
-      change_layout()
-
-      window.removeEventListener('resize', afterOrientationChange);
-  };
-  window.addEventListener('resize', afterOrientationChange);
-});
+window.addEventListener('resize', change_layout);
+// window.addEventListener('orientationchange', function() {
+//   // After orientationchange, add a one-time resize event
+//   console.log("test")
+//   var afterOrientationChange = function() {
+//       // YOUR POST-ORIENTATION CODE HERE
+//       // Remove the resize event listener after it has executed
+//       change_layout()
+//       console.log("test2")
+//       window.removeEventListener('resize', afterOrientationChange);
+//   };
+  
+// });
 

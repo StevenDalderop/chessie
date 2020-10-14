@@ -586,6 +586,10 @@ svg {
     width: 480px
   }
 
+  #content_row {
+    height: 480px;
+  }
+
   .chess_row {
     height: 12.5%;
     width: 100%;

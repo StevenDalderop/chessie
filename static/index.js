@@ -343,3 +343,11 @@ class Game extends React.Component {
 
 const domContainer = document.querySelector('#chess_board_container');
 ReactDOM.render(React.createElement(Game, null), domContainer);
+
+window.onresize = function () {
+  var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+
+  let viewport = document.querySelector("meta[name=viewport]");
+  viewport.setAttribute("content", "height=" + h + "px, width=" + w + "px, initial-scale=1.0");
+};

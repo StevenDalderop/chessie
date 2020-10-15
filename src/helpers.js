@@ -99,7 +99,7 @@ function Sidebar(props) {
 
 function BoardContainer(props) {
   return (
-    <div className="container_div">
+    <div id="board_container_2" className="container_div">
       <div id="board_container">
         <Board 
           pieces={props.pieces} 

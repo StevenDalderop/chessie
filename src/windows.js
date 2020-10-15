@@ -154,12 +154,36 @@ function GetUsername(props) {
       message = null
     }
   return (
-    <div id="humanOther" className="welcomeScreen">
+    <div id="humanOther" className="welcomeScreen display_not_mobile">
       <h2> Username </h2>
       <div>
         <form name="username" onSubmit={(e) => props.onSubmit(e)}>
           <label> What is your username? </label> <br></br>
-          <input id="username" name="username" type="text" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
+          <input id="username" name="username" type="text" minLength="1" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
+          {message}
+          <button id="submit_username_button" className="btn btn-primary mt-3"> Submit </button>
+        </form>
+      </div>
+    </div>
+  )
+}}
+
+function GetUsernameMobile(props) {
+  if (!(props["display"] === "humanOther")) {
+    return null
+  } else {
+    if (props["message"]){
+      message = (<p> Username already exists </p>) 
+    } else {
+      message = null
+    }
+  return (
+    <div id="humanOtherMobile" className="welcomeScreen display_mobile">
+      <h2> Username </h2>
+      <div>
+        <form name="username" onSubmit={(e) => props.onSubmit(e)}>
+          <label> What is your username? </label> <br></br>
+          <input id="username" name="username" type="text" minLength="1" maxLength="15" placeholder="username" onClick={() => {document.querySelector("#humanOtherMobile").style.top = "0px"; document.querySelector("#humanOtherMobile").style.bottom = "0px"}} value={props.username} onChange={props.onChange} /> <br></br>
           {message}
           <button id="submit_username_button" className="btn btn-primary mt-3"> Submit </button>
         </form>

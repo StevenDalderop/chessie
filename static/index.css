@@ -4,6 +4,10 @@
 
 html,body { height:100%; }
 
+body {
+  position: relative;
+}
+
 #main_container {
   position: absolute;
   width: 100vw;
@@ -335,6 +339,10 @@ svg {
   display: none;
 }
 
+.display_mobile {
+  display: none;
+}
+
 @media screen and (max-width: 767px) and (orientation: portrait) { 
   #mobile_bar_row {
     margin-top: -15px;
@@ -342,6 +350,14 @@ svg {
 
   .mobile { 
     display: initial;
+  }
+
+  .display_mobile {
+    display: initial;
+  }
+
+  .display_not_mobile {
+    display: none;
   }
 
   #title_new_game {
@@ -481,6 +497,14 @@ svg {
     height: 70vh;
   }
 
+  .display_mobile {
+    display: initial;
+  }
+
+  .display_not_mobile {
+    display: none;
+  }
+
   #history, #evaluation {
     display: none;
   }
@@ -587,7 +611,7 @@ svg {
   }
 
   #content_row {
-    height: 480px;
+    min-height: 480px;
   }
 
   .chess_row {

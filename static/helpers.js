@@ -186,7 +186,7 @@ function Sidebar(props) {
 function BoardContainer(props) {
   return React.createElement(
     "div",
-    { className: "container_div" },
+    { id: "board_container_2", className: "container_div" },
     React.createElement(
       "div",
       { id: "board_container" },

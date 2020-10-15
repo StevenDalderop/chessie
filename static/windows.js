@@ -324,7 +324,7 @@ function GetUsername(props) {
     }
     return React.createElement(
       "div",
-      { id: "humanOther", className: "welcomeScreen" },
+      { id: "humanOther", className: "welcomeScreen display_not_mobile" },
       React.createElement(
         "h2",
         null,
@@ -343,7 +343,58 @@ function GetUsername(props) {
           ),
           " ",
           React.createElement("br", null),
-          React.createElement("input", { id: "username", name: "username", type: "text", maxLength: "15", placeholder: "username", value: props.username, onChange: props.onChange }),
+          React.createElement("input", { id: "username", name: "username", type: "text", minLength: "1", maxLength: "15", placeholder: "username", value: props.username, onChange: props.onChange }),
+          " ",
+          React.createElement("br", null),
+          message,
+          React.createElement(
+            "button",
+            { id: "submit_username_button", className: "btn btn-primary mt-3" },
+            " Submit "
+          )
+        )
+      )
+    );
+  }
+}
+
+function GetUsernameMobile(props) {
+  if (!(props["display"] === "humanOther")) {
+    return null;
+  } else {
+    if (props["message"]) {
+      message = React.createElement(
+        "p",
+        null,
+        " Username already exists "
+      );
+    } else {
+      message = null;
+    }
+    return React.createElement(
+      "div",
+      { id: "humanOtherMobile", className: "welcomeScreen display_mobile" },
+      React.createElement(
+        "h2",
+        null,
+        " Username "
+      ),
+      React.createElement(
+        "div",
+        null,
+        React.createElement(
+          "form",
+          { name: "username", onSubmit: e => props.onSubmit(e) },
+          React.createElement(
+            "label",
+            null,
+            " What is your username? "
+          ),
+          " ",
+          React.createElement("br", null),
+          React.createElement("input", { id: "username", name: "username", type: "text", minLength: "1", maxLength: "15", placeholder: "username", onClick: () => {
+              document.querySelector("#humanOtherMobile").style.top = "0px";document.querySelector("#humanOtherMobile").style.bottom = "0px";
+            }, value: props.username, onChange: props.onChange }),
           " ",
           React.createElement("br", null),
           message,

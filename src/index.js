@@ -294,6 +294,7 @@ class Game extends React.Component {
           <Choose_game display={this.state.display} onClick={(e) => this.handleClick(e)} />
           <Choose_time display={this.state.display} onClick={(e) => this.handleClick(e)} />
           <GetUsername display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
+          <GetUsernameMobile display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
           <VS_PC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={(e) => this.handleClick(e)} />
           <Promotion promotion={this.state.promotion} onClick={(e) => this.handleClick(e)} />
           <Result result={this.state.result} onClick={() => {this.setState({"result": null})}} />
@@ -346,10 +347,10 @@ class Game extends React.Component {
 const domContainer = document.querySelector('#chess_board_container');
 ReactDOM.render(<Game />, domContainer);
 
-window.onresize = function() {
-  var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-  var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+// window.onresize = function() {
+//   var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+//   var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
-  let viewport = document.querySelector("meta[name=viewport]")
-  viewport.setAttribute("content", "height=" + h + "px, width=" + w + "px, initial-scale=1.0");
-}
+//   let viewport = document.querySelector("meta[name=viewport]")
+//   viewport.setAttribute("content", "height=" + h + "px, width=" + w + "px, initial-scale=1.0");
+// }

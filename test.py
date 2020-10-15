@@ -174,7 +174,13 @@ class TestSocketIO(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_socketio(self):
+    def test_connect(self):
+        client = socketio.test_client(app)
+        r = client.get_received()
+        self.assertEqual(r[0]['name'], 'announce games available')
+        self.assertEqual(r[1]['name'], 'announce user')
+
+    def test_user_online(self):
         client = socketio.test_client(app)
         r = client.get_received()
         client.emit("add user online", {"username": "test_username", "time": "test_time"})
@@ -183,6 +189,13 @@ class TestSocketIO(unittest.TestCase):
         self.assertEqual(r[0]['args'][0]['users_online'][0]["username"], 'test_username')
         self.assertEqual(r[0]['args'][0]['users_online'][0]["last_seen"], 'test_time')
 
+    # def test_new_game(self): 
+    #     application.room = 5
+    #     with captured_templates(app) as templates:
+    #         client = socketio.test_client(app)
+    #         client.emit("new game", {"username": "test_username", "game_id": "0", "time": "180"})
+    #         r = client.get_received()
+    #         self.assertEqual(r[0]['args'][0]['games_available'][0], {"game_id": "0", "room": 6, "time": "180", "username": "test_username"})
 
 if __name__ == "__main__":
     unittest.main()

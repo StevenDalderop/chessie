@@ -343,7 +343,7 @@ function GetUsername(props) {
           ),
           " ",
           React.createElement("br", null),
-          React.createElement("input", { id: "username", name: "username", type: "text", minLength: "1", maxLength: "15", placeholder: "username", value: props.username, onChange: props.onChange }),
+          React.createElement("input", { id: "username", name: "username", type: "text", maxLength: "15", placeholder: "username", value: props.username, onChange: props.onChange }),
           " ",
           React.createElement("br", null),
           message,
@@ -392,7 +392,7 @@ function GetUsernameMobile(props) {
           ),
           " ",
           React.createElement("br", null),
-          React.createElement("input", { id: "username", name: "username", type: "text", minLength: "1", maxLength: "15", placeholder: "username", onClick: () => {
+          React.createElement("input", { id: "username", name: "username", type: "text", maxLength: "15", placeholder: "username", onClick: () => {
               document.querySelector("#humanOtherMobile").style.top = "0px";document.querySelector("#humanOtherMobile").style.bottom = "0px";
             }, value: props.username, onChange: props.onChange }),
           " ",

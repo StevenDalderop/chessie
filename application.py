@@ -6,6 +6,8 @@ import os
 import stat
 from stockfish import Stockfish
 import datetime
+from chessie.constants import *
+import sqlite3
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -14,42 +16,57 @@ if __name__ == '__main__':
     socketio.run(app, debug = True)
 
 if sys.platform == "linux":
-    os.chmod("./stockfish_20011801_x64", stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-    stockfish = Stockfish("./stockfish_20011801_x64")
+    os.chmod(STOCKFISH_LINUX, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    stockfish = Stockfish(STOCKFISH_LINUX)
 else:
-    stockfish = Stockfish("./stockfish_20011801_x64.exe")
+    stockfish = Stockfish(STOCKFISH_WINDOWS)
+
 
 boards = {}
-game_id_last = 0
 users_online = []
 rooms = 0
 games_available = []
 
 @app.route("/")
 def index():
+    return render_template("index.html")
+"""
     global boards, game_id_last
     game_id_last += 1
-    if (game_id_last == 100): # Keep only 100 boards in memory then overwrite first.
+    if (game_id_last == INT_MAX_BOARDS):
         game_id_last = 0
-    boards[str(game_id_last)] =  chess.Board() # Reset board
+    boards[str(game_id_last)] =  chess.Board() 
     fen = boards[str(game_id_last)].fen()
     return render_template("index.html", board = fen, game_id = game_id_last)
+"""
 
-@app.route("/check_promotion_valid/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>")
-def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
-    board = boards[str(game_id)] # Reference not copy
-    promotion = chess.QUEEN
-    human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
-    if (human_move in board.legal_moves):
-        return {"validated": "true"}
-    else:
-        return {"validated": "false"}
+
+@app.route("/new_game")
+def new_game():
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO games (fen) VALUES (?)", (FEN_INITIAL,))
+    game_id = cursor.execute(f"SELECT MAX(id) FROM GAMES").fetchone()[0]
+    print(game_id)
+    db.commit()   
+    return {"game_id": game_id}
+
+"""
+    global boards, game_id_last
+    game_id_last += 1
+    if (game_id_last == INT_MAX_BOARDS): 
+        game_id_last = 0
+    boards[str(game_id_last)] = chess.Board()
+"""
 
 @app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>", defaults={'promotion': None})
 @app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>/<string:promotion>")
 def validated_move_info(game_id, row_start, col_start, row_end, col_end, promotion):
-    global boards
-    board = boards[str(game_id)] # Reference not copy
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    
+    fen = cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone()[1]
+    board = chess.Board(fen)    
 
     if (promotion):
         pieces = {"queen": chess.QUEEN, "bishop": chess.BISHOP, "knight": chess.KNIGHT, "rook": chess.ROOK}
@@ -76,15 +93,18 @@ def validated_move_info(game_id, row_start, col_start, row_end, col_end, promoti
         }
     else:
         return {"validated": "false"}
-
-@app.route("/new_game")
-def new_game():
-    global boards, game_id_last
-    game_id_last += 1
-    if (game_id_last == 100): # Keep only 100 boards in memory then overwrite first.
-        game_id_last = 0
-    boards[str(game_id_last)] = chess.Board()
-    return {"new_game": "true", "game_id": game_id_last}
+    #global boards
+    #board = boards[str(game_id)] 
+    
+@app.route("/check_promotion_valid/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>")
+def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
+    board = boards[str(game_id)] 
+    promotion = chess.QUEEN
+    human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
+    if (human_move in board.legal_moves):
+        return {"validated": "true"}
+    else:
+        return {"validated": "false"}
 
 @app.route("/get_pc_move/<int:game_id>/<int:skill_level>")
 def pc_move(game_id, skill_level):
@@ -111,10 +131,12 @@ def pc_move(game_id, skill_level):
         "result": result
     }
 
+
+
 @socketio.on("connect")
 @socketio.on("refresh")
 def connect():
-    global users_online, games_available # possible race condition
+    global users_online, games_available 
     for (index, dict) in enumerate(users_online):
         date = datetime.datetime.strptime(dict["last_seen"], "%a, %d %b %Y %H:%M:%S %Z")
         now = datetime.datetime.utcnow()

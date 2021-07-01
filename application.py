@@ -22,23 +22,9 @@ else:
     stockfish = Stockfish(STOCKFISH_WINDOWS)
 
 
-boards = {}
-users_online = []
-rooms = 0
-games_available = []
-
 @app.route("/")
 def index():
     return render_template("index.html")
-"""
-    global boards, game_id_last
-    game_id_last += 1
-    if (game_id_last == INT_MAX_BOARDS):
-        game_id_last = 0
-    boards[str(game_id_last)] =  chess.Board() 
-    fen = boards[str(game_id_last)].fen()
-    return render_template("index.html", board = fen, game_id = game_id_last)
-"""
 
 
 @app.route("/new_game")
@@ -47,17 +33,9 @@ def new_game():
     cursor = db.cursor()
     cursor.execute("INSERT INTO games (fen) VALUES (?)", (FEN_INITIAL,))
     game_id = cursor.execute(f"SELECT MAX(id) FROM GAMES").fetchone()[0]
-    print(game_id)
     db.commit()   
     return {"game_id": game_id}
-
-"""
-    global boards, game_id_last
-    game_id_last += 1
-    if (game_id_last == INT_MAX_BOARDS): 
-        game_id_last = 0
-    boards[str(game_id_last)] = chess.Board()
-"""
+    
 
 @app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>", defaults={'promotion': None})
 @app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>/<string:promotion>")
@@ -73,29 +51,34 @@ def validated_move_info(game_id, row_start, col_start, row_end, col_end, promoti
         promotion = pieces[promotion]
 
     human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
-    if (human_move in board.legal_moves):
-        board.push(human_move)
-        init_board = chess.Board()
-        moves_san = init_board.variation_san(board.move_stack)
-        last_move = 1 if board.turn else 0 #board.turn returns 1 if it is white's turn on client side we use opposite
-        stockfish.set_fen_position(board.fen())
-        info = stockfish.get_evaluation()
-        score = None if len(info) == 0 else None if info["type"] != "cp" else info["value"]
-        result = None if not board.is_game_over() else board.result()
-        fen = board.fen()
-        return {
-            "validated": "true",
-            "fen": fen,
-            "moves_san": moves_san,
-            "last_move": last_move,
-            "score": score,
-            "result": result
-        }
-    else:
-        return {"validated": "false"}
-    #global boards
-    #board = boards[str(game_id)] 
     
+    if not (human_move in board.legal_moves):
+        return {"validated": "false"}
+        
+    board.push(human_move)
+    
+    init_board = chess.Board()
+    moves_san = init_board.variation_san(board.move_stack)
+    
+    turn = board.turn 
+    
+    stockfish.set_fen_position(board.fen())
+    info = stockfish.get_evaluation()
+    score = None if len(info) == 0 else None if info["type"] != "cp" else info["value"]
+    
+    result = None if not board.is_game_over() else board.result()
+    fen = board.fen()
+    
+    return {
+        "validated": "true",
+        "fen": fen,
+        "moves_san": moves_san,
+        "turn": turn,
+        "score": score,
+        "result": result
+    }
+
+         
 @app.route("/check_promotion_valid/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>")
 def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
     board = boards[str(game_id)] 
@@ -150,12 +133,14 @@ def connect():
     socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
     socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
 
+
 @socketio.on("user online")
 def online(data):
     global users_online
     for dict in users_online:
         if dict["username"] == data["username"]:
             dict["last_seen"] = data["datetime"]
+
 
 @socketio.on("add user online")
 def user_online(data):
@@ -170,6 +155,7 @@ def user_online(data):
         users_online.append({"username": username, "last_seen": data["time"]})
         socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
 
+
 @socketio.on("new game")
 def new_game(data):
     global rooms, games_available
@@ -182,6 +168,7 @@ def new_game(data):
     join_room(room)
     rooms += 1
     socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
+
 
 @socketio.on("join game")
 def join_game(data):
@@ -198,6 +185,7 @@ def join_game(data):
             socketio.emit("announce game starts", {"username": username, "username2": username2, "time": time, "game_id": game_id, "room": room}, room=room)
             del games_available[index]
             socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
+
 
 @socketio.on("make move")
 def make_move(data):

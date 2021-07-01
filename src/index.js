@@ -7,18 +7,18 @@ class Game extends React.Component {
     super(props)
     this.state = {
       "history": [{"pieces":
-                  [[["rook", 1], ["knight", 1], ["bishop", 1], ["queen", 1], ["king", 1], ["bishop", 1], ["knight", 1], ["rook", 1]],
+				  [[["rook", 0], ["knight", 0], ["bishop", 0], ["queen", 0], ["king", 0], ["bishop", 0], ["knight", 0], ["rook", 0]],
+			      [["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0]],
+                  [null, null, null, null, null, null, null, null],
+                  [null, null, null, null, null, null, null, null],
+                  [null, null, null, null, null, null, null, null],
+                  [null, null, null, null, null, null, null, null],
                   [["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1]],
-                  [null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null],
-                  [["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0]],
-                  [["rook", 0], ["knight", 0], ["bishop", 0], ["queen", 0], ["king", 0], ["bishop", 0], ["knight", 0], ["rook", 0]]]
+                  [["rook", 1], ["knight", 1], ["bishop", 1], ["queen", 1], ["king", 1], ["bishop", 1], ["knight", 1], ["rook", 1]]]
                 }],
       "selected_square": null,
       "moved_squares": null,
-      "last_move": 1,
+      "turn": 1,
       "times": [60, 60],
       "step": 0,
       "promotion": false,
@@ -37,7 +37,7 @@ class Game extends React.Component {
       "display": "humanOther",
       "game_state": null, 
       "username_already_exists": null, 
-      "color": null, // 0 is white 1 is black 
+      "color": null, 
       "draw_offered": null
     }
   }
@@ -54,9 +54,9 @@ class Game extends React.Component {
 
     if ((this.state.vs === "pc" || this.state.vs === "human_other") && pieces[row][column] && pieces[row][column][1] === this.state.color) {
       this.setState({"selected_square": [row, column]})
-    } else if ((this.state.vs === "human") && (pieces[row][column] && pieces[row][column][1] !== this.state.last_move)) {
+    } else if ((this.state.vs === "human") && (pieces[row][column] && pieces[row][column][1] === this.state.turn)) {
       this.setState({"selected_square": [row, column]})
-    } else if ((selected_square && pieces[row][column] && pieces[row][column][1] === this.state.last_move) || (selected_square && !pieces[row][column])) { // Move or attack piece
+    } else if ((selected_square && pieces[row][column] && pieces[row][column][1] !== this.state.turn) || (selected_square && !pieces[row][column])) { // Move or attack piece
       let promotion = false
       this.make_moves(selected_square, row, column, promotion)
     }
@@ -88,7 +88,7 @@ class Game extends React.Component {
       this.setState((state) => ({
         "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
         "result": data["result"],
-        "last_move": data["last_move"],
+        "turn": data["turn"],
         "score": data["score"],
         "selected_square": null,
         "moved_squares": [state.selected_square, [row, column]],
@@ -106,7 +106,7 @@ class Game extends React.Component {
         this.setState((state) => ({
           "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
           "result": data["result"],
-          "last_move": data["last_move"],
+          "turn": data["turn"],
           "score": data["score"],
           "selected_square": null,
           "moved_squares": uci_to_row_column(data["uci"]),
@@ -116,7 +116,7 @@ class Game extends React.Component {
         }))
       })
     } else if (this.state.vs === "human_other" && data["validated"] === "true") {
-      socket.emit("make move", {"fen": data["fen"], "moved_squares": [selected_square, [row, column]], "moves_san": data["moves_san"], "step": step + 1, "last_move": data["last_move"] , "score": data["score"], "result": data["result"], "times": this.state.times, "room": this.state.room})
+      socket.emit("make move", {"fen": data["fen"], "moved_squares": [selected_square, [row, column]], "moves_san": data["moves_san"], "step": step + 1, "turn": data["turn"] , "score": data["score"], "result": data["result"], "times": this.state.times, "room": this.state.room})
     }
 
     if (this.state.result) {
@@ -156,7 +156,7 @@ class Game extends React.Component {
     } else if (e.target.name === "new_game") {
       this.setState({"selected_square": null,
                      "moved_squares": null, 
-                     "last_move": 1,
+                     "turn": 1,
                      "step": 0,
                      "history": this.state.history.slice(0,1),
                      "san": null,
@@ -199,12 +199,12 @@ class Game extends React.Component {
   startTimer() {
       clearInterval(this.interval)
       this.interval = setInterval(() => {
-      let seconds = this.state.times[this.state.last_move ? 0 : 1]
+      let seconds = this.state.times[this.state.turn]
       if (seconds === 0) {
-        this.setState((state)=> ({"result": !state.last_move ? "1-0" : "0-1", "game_state": "finished", "selected_square": null}))
+        this.setState((state)=> ({"result": state.turn ? "1-0" : "0-1", "game_state": "finished", "selected_square": null}))
         clearInterval(this.interval)
       } else if (this.state.game_state === "started") {
-        this.setState((state) => ({"times": state.last_move === 0 ? [state.times[0], state.times[1] - 1] : [state.times[0] - 1, state.times[1]]}))
+        this.setState((state) => ({"times": state.turn ? [state.times[0], state.times[1] - 1] : [state.times[0] - 1, state.times[1]]}))
       } else {
         clearInterval(this.interval)
       }
@@ -215,8 +215,8 @@ class Game extends React.Component {
     // this.setState({"history": [{"pieces": fen_to_history(board)}], "game_id": game_id}) // Copy board from server
 
     this.intervalOnline = setInterval(() => {
-      let d = new Date()
-      socket.emit("user online", {"username": this.state.username, "datetime": d.toUTCString()})
+      let date = new Date()
+      socket.emit("user online", {"username": this.state.username, "datetime": date.toUTCString()})
     }, 30000)
 
     socket.on("announce user", data => {
@@ -247,7 +247,7 @@ class Game extends React.Component {
         "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
         "moved_squares": data["moved_squares"],
         "result": data["result"],
-        "last_move": data["last_move"],
+        "turn": data["turn"],
         "score": data["score"],
         "selected_square": null,
         "san": data["moves_san"],

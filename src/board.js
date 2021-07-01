@@ -18,7 +18,7 @@ function Square(props) {
 
 function piece_icon(name) {
   if (name) {
-    if (name[1] === 0) {
+    if (name[1] === 1) {
       var color = "l";
     } else {
       var color = "d";

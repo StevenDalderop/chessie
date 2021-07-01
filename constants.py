@@ -2,4 +2,3 @@ STOCKFISH_WINDOWS = "./stockfish_20011801_x64.exe"
 STOCKFISH_LINUX = "./stockfish_20011801_x64"
 INT_MAX_BOARDS = 100 
 DATABASE = "chess.db"
-FEN_INITIAL = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

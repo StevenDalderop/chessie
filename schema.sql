@@ -9,6 +9,7 @@ CREATE TABLE users(
 CREATE TABLE games(
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     fen TEXT NOT NULL, 
+	moves TEXT
 "    time INTEGER NOT NULL, 
     player1 TEXT, 
     player2 TEXT,

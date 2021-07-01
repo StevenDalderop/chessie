@@ -62,52 +62,52 @@ class Game extends React.Component {
     if (possible_promotion && !this.state.promotion) {
       let check_promotion = await fetch(`${baseURL}check_promotion_valid/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
       let data = await check_promotion.json();
-      if (data["validated"] === "true") {
+      if (data["valid"] === "true") {
         this.setState({ "promotion": [row, column], "display": "promotion" });
         return;
       }
     }
 
     if (!promotion) {
-      var response = await fetch(`${baseURL}validated_move_info/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
+      var response = await fetch(`${baseURL}make_move/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`);
     } else {
-      var response = await fetch(`${baseURL}validated_move_info/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}/${promotion}`);
+      var response = await fetch(`${baseURL}make_move/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}/${promotion}`);
     }
     let data = await response.json();
     let step = this.state.step;
 
-    if (data["validated"] === "true" && this.state.vs !== "human_other") {
+    if (data["valid"] === "true" && this.state.vs !== "human_other") {
       console.log("move validated");
       this.setState(state => ({
         "history": state.history.concat([{ "pieces": fen_to_history(data["fen"]) }]),
         "result": data["result"],
         "turn": data["turn"],
-        "score": data["score"],
+        "score": data["evaluation"],
         "selected_square": null,
         "moved_squares": [state.selected_square, [row, column]],
-        "san": data["moves_san"],
+        "san": data["san"],
         "step": state.step + 1,
         "promotion": false
       }));
       this.startTimer();
     }
 
-    if (this.state.vs === "pc" && data["validated"] === "true") {
+    if (this.state.vs === "pc" && data["valid"] === "true") {
       fetch(`${baseURL}get_pc_move/${this.state.game_id}/${this.state.skill_level_pc}`).then(response => response.json()).then(data => {
         this.setState(state => ({
           "history": state.history.concat([{ "pieces": fen_to_history(data["fen"]) }]),
           "result": data["result"],
           "turn": data["turn"],
-          "score": data["score"],
+          "score": data["evaluation"],
           "selected_square": null,
           "moved_squares": uci_to_row_column(data["uci"]),
-          "san": data["moves_san"],
+          "san": data["san"],
           "step": state.step + 1,
           "promotion": false
         }));
       });
-    } else if (this.state.vs === "human_other" && data["validated"] === "true") {
-      socket.emit("make move", { "fen": data["fen"], "moved_squares": [selected_square, [row, column]], "moves_san": data["moves_san"], "step": step + 1, "turn": data["turn"], "score": data["score"], "result": data["result"], "times": this.state.times, "room": this.state.room });
+    } else if (this.state.vs === "human_other" && data["valid"] === "true") {
+      socket.emit("make move", { "fen": data["fen"], "moved_squares": [selected_square, [row, column]], "moves_san": data["san"], "step": step + 1, "turn": data["turn"], "score": data["evaluation"], "result": data["result"], "times": this.state.times, "room": this.state.room });
     }
 
     if (this.state.result) {
@@ -195,7 +195,7 @@ class Game extends React.Component {
         this.setState(state => ({ "result": state.turn ? "1-0" : "0-1", "game_state": "finished", "selected_square": null }));
         clearInterval(this.interval);
       } else if (this.state.game_state === "started") {
-        this.setState(state => ({ "times": state.turn ? [state.times[0], state.times[1] - 1] : [state.times[0] - 1, state.times[1]] }));
+        this.setState(state => ({ "times": state.turn ? [state.times[0] - 1, state.times[1]] : [state.times[0], state.times[1] - 1] }));
       } else {
         clearInterval(this.interval);
       }
@@ -241,9 +241,9 @@ class Game extends React.Component {
         "moved_squares": data["moved_squares"],
         "result": data["result"],
         "turn": data["turn"],
-        "score": data["score"],
+        "score": data["evaluation"],
         "selected_square": null,
-        "san": data["moves_san"],
+        "san": data["san"],
         "step": data["step"],
         "times": data["times"],
         "promotion": false

@@ -8,6 +8,7 @@ from stockfish import Stockfish
 import datetime
 from chessie.constants import *
 import sqlite3
+from chessie.utils import * 
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -21,6 +22,11 @@ if sys.platform == "linux":
 else:
     stockfish = Stockfish(STOCKFISH_WINDOWS)
 
+boards = {}
+game_id_last = 0
+users_online = []
+rooms = 0
+games_available = []
 
 @app.route("/")
 def index():
@@ -31,50 +37,51 @@ def index():
 def new_game():
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
-    cursor.execute("INSERT INTO games (fen) VALUES (?)", (FEN_INITIAL,))
+    cursor.execute("INSERT INTO games (fen) VALUES (?)", (chess.STARTING_FEN,))
     game_id = cursor.execute(f"SELECT MAX(id) FROM GAMES").fetchone()[0]
     db.commit()   
     return {"game_id": game_id}
     
 
-@app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>", defaults={'promotion': None})
-@app.route("/validated_move_info/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>/<string:promotion>")
-def validated_move_info(game_id, row_start, col_start, row_end, col_end, promotion):
+@app.route("/make_move/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>", defaults={'promotion': None})
+@app.route("/make_move/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>/<string:promotion>")
+def make_move(game_id, row_start, col_start, row_end, col_end, promotion):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     
-    fen = cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone()[1]
+    game_id, fen, moves = cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone()
+    
     board = chess.Board(fen)    
 
-    if (promotion):
-        pieces = {"queen": chess.QUEEN, "bishop": chess.BISHOP, "knight": chess.KNIGHT, "rook": chess.ROOK}
-        promotion = pieces[promotion]
-
-    human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
+    move = get_move(row_start, col_start, row_end, col_end, promotion)
+    uci = move.uci()
     
-    if not (human_move in board.legal_moves):
-        return {"validated": "false"}
+    if not (move in board.legal_moves):
+        return {"valid": "false"}
         
-    board.push(human_move)
-    
-    init_board = chess.Board()
-    moves_san = init_board.variation_san(board.move_stack)
-    
-    turn = board.turn 
-    
-    stockfish.set_fen_position(board.fen())
-    info = stockfish.get_evaluation()
-    score = None if len(info) == 0 else None if info["type"] != "cp" else info["value"]
-    
-    result = None if not board.is_game_over() else board.result()
+    if moves: 
+        moves = moves + " " + uci
+    else:
+        moves = uci
+        
+    board.push(move)
     fen = board.fen()
     
+    cursor.execute('''UPDATE games SET fen = ? , moves = ? WHERE id = ? ''', (fen, moves, game_id))
+    
+    db.commit()
+    
+    san = get_san(moves)
+    turn = int(board.turn) 
+    evaluation = get_evaluation(stockfish, fen)    
+    result = None if not board.is_game_over() else board.result()
+    
     return {
-        "validated": "true",
+        "valid": "true",
         "fen": fen,
-        "moves_san": moves_san,
+        "san": san,
         "turn": turn,
-        "score": score,
+        "evaluation": evaluation,
         "result": result
     }
 
@@ -86,8 +93,7 @@ def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
     human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
     if (human_move in board.legal_moves):
         return {"validated": "true"}
-    else:
-        return {"validated": "false"}
+    return {"validated": "false"}
 
 @app.route("/get_pc_move/<int:game_id>/<int:skill_level>")
 def pc_move(game_id, skill_level):

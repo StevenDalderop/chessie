@@ -88,12 +88,15 @@ def make_move(game_id, row_start, col_start, row_end, col_end, promotion):
          
 @app.route("/check_promotion_valid/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>")
 def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
-    board = boards[str(game_id)] 
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    game_id, fen, moves = cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone() 
+    board = chess.Board(fen) 
     promotion = chess.QUEEN
     human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
     if (human_move in board.legal_moves):
-        return {"validated": "true"}
-    return {"validated": "false"}
+        return {"valid": "true"}
+    return {"valid": "false"}
 
 @app.route("/get_pc_move/<int:game_id>/<int:skill_level>")
 def pc_move(game_id, skill_level):

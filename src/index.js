@@ -81,6 +81,7 @@ class Game extends React.Component {
     if (possible_promotion && !this.state.promotion) {
       let check_promotion = await fetch(`${baseURL}check_promotion_valid/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
       let data = await check_promotion.json()
+	  console.log(data)
       if (data["valid"] === "true") {
         this.setState({"promotion": [row, column], "display": "promotion"})
         return

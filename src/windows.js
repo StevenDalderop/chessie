@@ -37,8 +37,8 @@ export function Draw_offered(props) {
         <div className="container_div">
           <h1> Draw offered </h1>
           <p> {props.draw_offered} offered a draw </p>
-          <button name="accept_draw" className="btn btn-success" onClick={props.onClick}> Accept </button>
-          <button name="decline_draw" className="btn btn-danger ml-3" onClick={props.onClick}> Decline </button>
+          <button name="accept_draw" className="btn btn-success" onClick={props.onClickAccept}> Accept </button>
+          <button name="decline_draw" className="btn btn-danger ml-3" onClick={props.onClickDecline}> Decline </button>
         </div>
       </div>
     )
@@ -68,7 +68,7 @@ export function Choose_game(props) {
   return (
       <div id="welcomeScreen1" className="welcomeScreen">
         <div className="container_div">
-          <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
+          <button name="close" className="close_button btn btn-danger" onClick={() => props.onClose()}> Close </button>
           <h2 id="title_new_game"> New Game </h2>
           <div className="row mr-0 ml-0 mt-3">
             <div className="col no_padding_mobile">
@@ -109,7 +109,7 @@ export function Choose_time(props) {
   return (
     <div id="welcomeScreen2" className="welcomeScreen">
       <div className="container_div">
-      <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
+      <button name="close" className="close_button btn btn-danger" onClick={() => props.onClose()}> Close </button>
         <h2> Time </h2>
         <div className="row ml-0 mr-0 mt-3">
             <div className="col no_padding_mobile"> 
@@ -228,7 +228,7 @@ export function Online_game(props) {
   return (
     <div id="usersOnline" className="welcomeScreen">
       <div className="container_div">
-        <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onClick(e)}> Close </button>
+        <button name="close" className="close_button btn btn-danger" onClick={() => props.onClose()}> Close </button>
         <h2> {title} </h2>
         <div className="row_container mt-3">
           <div className="col_left">
@@ -253,7 +253,7 @@ export function Online_game(props) {
             </div>
           </div>
         </div>
-        <button name="usersOnline" className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>
+        <button name="newGame" className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>
         <button name="refresh" className="btn btn-primary ml-3" onClick={(e) => props.onClick(e)}> Refresh </button>
       </div>
     </div>
@@ -267,7 +267,7 @@ export function VS_PC(props) {
     return (
       <div id="welcomeScreenPC" className="welcomeScreen">
         <div className="container_div">
-          <button name="close" className="close_button btn btn-danger" onClick={(e) => props.onSubmit(e)}> Close </button>
+          <button name="close" className="close_button btn btn-danger" onClick={() => props.onClose()}> Close </button>
           <h2> PC strength </h2>
           <div className="mt-3">
             <form name="pc_strength" onSubmit={(e) => props.onSubmit(e)}>

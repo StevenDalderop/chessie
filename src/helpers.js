@@ -59,10 +59,10 @@ export function Sidebar(props) {
 
   if (props.game_state === "started" && props.vs === "human_other") {
     let button_resign = <button key="resign" id="button_resign" name="resign" className="btn btn-danger buttons" onClick={(e) => props.onClick(e)}> Resign </button>
-    let button_draw = <button key="draw" id="button_draw" name="offer_draw" className="btn btn-warning buttons" onClick={(e) => props.onClick(e)}> Offer draw </button>
+    let button_draw = <button key="draw" id="button_draw" name="offer_draw" className="btn btn-warning buttons" onClick={() => props.onClick3()}> Offer draw </button>
     var buttons = [button_resign, button_draw]
   } else if (props.game_state === "started" && props.vs === "pc") {
-    var buttons = <button key="resign" id="button_resign" name="resign" className="btn btn-danger buttons" onClick={(e) => props.onClick(e)}> Resign </button>
+    var buttons = <button key="resign" id="button_resign" name="resign" className="btn btn-danger buttons" onClick={() => props.onClick2()}> Resign </button>
   } else {
     var buttons = <button id="button_new_game" name="new_game" disabled={props.display === "humanOther" ? true : false} onClick={(e) => props.onClick(e)} className="btn btn-primary buttons"> New game </button>
   }

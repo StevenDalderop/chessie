@@ -144,14 +144,26 @@ class Game extends React.Component {
       socket.emit("add user online", {"username": this.state.username, "time": date.toUTCString()})
   }
   
-  handleClick (e) {
-    e.preventDefault()
-	if (e.target.name === "usersOnline") {
-      this.setState({"display": "welcomeScreen2"})
-    } else if (e.target.name === "pc_strength") {
-      this.setState((state) => ({"display": "welcomeScreen2", "username2": "Stockfish (" + state.skill_level_pc + ")"}))
-    } else if (e.target.getAttribute('name') === "time") {
-      let time = e.target.getAttribute('data-value')
+  handleOnlineGameClick(e) {
+	  if (e.target.name === "newGame") {
+		this.setState({"display": "welcomeScreen2"})
+	  } else if (e.target.name === "refresh") {
+        socket.emit("refresh") 
+	  } else if (e.target.name === "close") {
+		  this.setState({"display": null})
+	  } else if (e.target.name === "join_game") {
+      game_id = e.target.value
+      socket.emit("join game", {"username": this.state.username, "game_id": game_id})
+      console.log("join game " + this.state.username + " " + game_id)
+    } 
+  }
+  
+  handlePcStrengthSubmitted() {
+	  this.setState((state) => ({"display": "welcomeScreen2", "username2": "Stockfish (" + state.skill_level_pc + ")"}))
+  }
+  
+  handleTimeOptionPressed(e) {
+	  let time = e.target.getAttribute('data-value')
       this.setState({"display": null})
       this.setState({"times": [time, time]})
       if (this.state.vs === "human_other") {
@@ -160,8 +172,10 @@ class Game extends React.Component {
       } else {
         this.setState({"game_state": "started", "color": 1})
       }
-    } else if (e.target.name === "vs") {
-      if (e.target.value === "human") {
+  }	  
+  
+  handleGameTypePressed(e) {
+	  if (e.target.value === "human") {
         this.setState({"display": "welcomeScreen2", "username2": "Player2"})
       } else if (e.target.value == "human_other") {
         this.setState({"display": "usersOnline", "username2": "Player2"})
@@ -169,7 +183,9 @@ class Game extends React.Component {
         this.setState({"display": "welcomeScreenPC", "username2": "Stockfish"})
       }
       this.setState({"vs": e.target.value})
-    } else if (e.target.name === "new_game") {
+  }
+  
+  handleNewGameButtonPressed() {
       this.setState({"selected_square": null,
                      "moved_squares": null, 
                      "turn": 1,
@@ -183,34 +199,40 @@ class Game extends React.Component {
       fetch(`${baseURL}new_game`)
         .then(response => response.json())
         .then(data => {this.setState({"game_id": data["game_id"]})})
-    } else if (e.target.name === "promotion") {
-      let row = this.state.promotion[0]
+  }
+  
+  handlePromotionOptionPressed(e) {
+	  let row = this.state.promotion[0]
       let column = this.state.promotion[1]
       let selected_square = this.state.selected_square
       let piece = e.target.value
-      this.make_moves(selected_square, row, column, piece)
-    } else if (e.target.name === "close") {
-      this.setState({"display": null})
-    } else if (e.target.name === "join_game") {
-      game_id = e.target.value
-      socket.emit("join game", {"username": this.state.username, "game_id": game_id})
-      console.log("join game " + this.state.username + " " + game_id)
-    } else if (e.target.name === "refresh") {
-      socket.emit("refresh") 
-    } else if (e.target.name === "resign") {
-      if (this.state.vs === "pc") {
+      this.make_moves(selected_square, row, column, piece)	  
+  }
+  
+  handleCloseButtonPressed() {
+	  this.setState({"display": null})
+  }
+  
+  handleResignButtonPressed() {
+	  if (this.state.vs === "pc") {
         this.setState((state) => ({"result": state.username + " resigned", "game_state": "resigned"}))
       } else if (this.state.vs === "human_other") {
         socket.emit("resign", {"username": this.state.username, "room": this.state.room})
       }
-    } else if (e.target.name === "offer_draw") {
-        socket.emit("offer draw", {"username": this.state.username, "room": this.state.room})
-    } else if (e.target.name === "accept_draw") {
-        socket.emit("draw", {"accepted": "true", "room": this.state.room})
-    } else if (e.target.name === "decline_draw") {
-        socket.emit("draw", {"accepted": "false", "room": this.state.room})
-    }
   }
+  
+  handleOfferDrawButtonPressed() {
+	  socket.emit("offer draw", {"username": this.state.username, "room": this.state.room})
+  }
+  
+  handleAcceptDrawButtonPressed() {
+	  socket.emit("draw", {"accepted": "true", "room": this.state.room})
+  }
+  
+  handleDeclineDrawButtonPressed() {
+	  socket.emit("draw", {"accepted": "false", "room": this.state.room})
+  }
+  
 
   startTimer() {
       clearInterval(this.interval)
@@ -305,15 +327,15 @@ class Game extends React.Component {
         />
 
         <div className="container-fluid">
-          <Choose_game display={this.state.display} onClick={(e) => this.handleClick(e)} />
-          <Choose_time display={this.state.display} onClick={(e) => this.handleClick(e)} />
+          <Choose_game display={this.state.display} onClick={(e) => this.handleGameTypePressed(e)} onClose={() => this.handleCloseButtonPressed()} />
+          <Choose_time display={this.state.display} onClick={(e) => this.handleTimeOptionPressed(e)} onClose={() => this.handleCloseButtonPressed()} />
           <GetUsername display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={() => this.handleUserNameSubmitted()} />
-          <GetUsernameMobile display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
-          <VS_PC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={(e) => this.handleClick(e)} />
-          <Promotion promotion={this.state.promotion} onClick={(e) => this.handleClick(e)} />
+          <GetUsernameMobile display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={() => this.handleUserNameSubmitted()} />
+          <VS_PC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={() => this.handlePcStrengthSubmitted()} onClose={() => this.handleCloseButtonPressed()} />
+          <Promotion promotion={this.state.promotion} onClick={(e) => this.handlePromotionOptionPressed(e)} />
           <Result result={this.state.result} onClick={() => {this.setState({"result": null})}} />
-          <Online_game display={this.state.display} usernames={this.state.users_online} username={this.state.username} games={this.state.games_available} onClick={(e) => this.handleClick(e)} />
-          <Draw_offered draw_offered={this.state.draw_offered} username={this.state.username} onClick={(e) => this.handleClick(e)} /> 
+          <Online_game display={this.state.display} usernames={this.state.users_online} username={this.state.username} games={this.state.games_available} onClick={(e) => this.handleOnlineGameClick(e)} onClose={() => this.handleCloseButtonPressed()} />
+          <Draw_offered draw_offered={this.state.draw_offered} username={this.state.username} onClickAccept={() => this.handleAcceptDrawButtonPressed()} onClickDecline={() => this.handleDeclineDrawButtonPressed()} /> 
 
           <Container 
             col_left={<BoardContainer 
@@ -333,7 +355,9 @@ class Game extends React.Component {
               mirrored={this.state.mirrored}
               game_state={this.state.game_state}
               vs={this.state.vs}
-              onClick={(e) => {this.handleClick(e)}} 
+              onClick={() => {this.handleNewGameButtonPressed()}} 
+			  onClick2={() => this.handleResignButtonPressed()}
+			  onClick3={() => this.handleOfferDrawButtonPressed()}
               />}
           />
 

@@ -1,2 +1,3 @@
 *.pyc
-chess-venv 
+chess-venv
+node_modules/

@@ -1,4 +1,6 @@
-function Promotion(props) {
+import React from "react"
+
+export function Promotion(props) {
   if (!props["promotion"]) {
     return null
   } else {
@@ -14,7 +16,7 @@ function Promotion(props) {
   }
 }
 
-function Result(props) {
+export function Result(props) {
   if (props.result) {
     return (
       <div id="message" className="welcomeScreen">
@@ -28,7 +30,7 @@ function Result(props) {
   }
 }
 
-function Draw_offered(props) {
+export function Draw_offered(props) {
   if (props.draw_offered && props.draw_offered !== props.username) {
     return (
       <div id="draw_offered" className="welcomeScreen">
@@ -55,7 +57,7 @@ function Draw_offered(props) {
   }
 }
 
-function Choose_game(props) {
+export function Choose_game(props) {
   if (!(props["display"] === "welcomeScreen1")) {
     return null
   } else {
@@ -100,7 +102,7 @@ function Choose_game(props) {
   }
 }
 
-function Choose_time(props) {
+export function Choose_time(props) {
   if (!(props["display"] === "welcomeScreen2")) {
     return null
   } else {
@@ -144,14 +146,14 @@ function Choose_time(props) {
   )
 }}
 
-function GetUsername(props) {
+export function GetUsername(props) {
   if (!(props["display"] === "humanOther")) {
     return null
-  } else {
+  } 
     if (props["message"]){
-      message = (<p> Username already exists </p>) 
+      var message = (<p> Username already exists </p>) 
     } else {
-      message = null
+      var message = null
     }
   return (
     <div id="humanOther" className="welcomeScreen display_not_mobile">
@@ -166,16 +168,16 @@ function GetUsername(props) {
       </div>
     </div>
   )
-}}
+}
 
-function GetUsernameMobile(props) {
+export function GetUsernameMobile(props) {
   if (!(props["display"] === "humanOther")) {
     return null
-  } else {
+  } 
     if (props["message"]){
-      message = (<p> Username already exists </p>) 
+      var message = (<p> Username already exists </p>) 
     } else {
-      message = null
+      var message = null
     }
   return (
     <div id="humanOtherMobile" className="welcomeScreen display_mobile">
@@ -190,9 +192,9 @@ function GetUsernameMobile(props) {
       </div>
     </div>
   )
-}}
+}
 
-function Online_game(props) {
+export function Online_game(props) {
   let users = []
   let i = 0
   let u
@@ -258,7 +260,7 @@ function Online_game(props) {
   )
 }}
 
-function VS_PC(props) {
+export function VS_PC(props) {
   if (!(props["display"] === "welcomeScreenPC")) {
     return null
   } else {

@@ -1,3 +1,9 @@
+import React from "react"
+import { render } from "react-dom"
+import { Container, Container_mobile, Mobile_bar, Sidebar, BoardContainer, Timer, ScoreEvaluationBar, Header, fen_to_history, uci_to_row_column } from "./helpers"
+import Board from "./board"
+import { Promotion, Result, Draw_offered, Choose_game, Choose_time, GetUsername, GetUsernameMobile, Online_game, VS_PC } from "./windows"
+
 const baseURL = window.location.href
 
 var socket = io()
@@ -47,16 +53,22 @@ class Game extends React.Component {
       return
     }
 
-    let history = JSON.parse(JSON.stringify(this.state.history)) // Deep clone
+    let history = JSON.parse(JSON.stringify(this.state.history))
     let current = history[this.state.step]
     let pieces = current.pieces
     let selected_square = this.state.selected_square
 
-    if ((this.state.vs === "pc" || this.state.vs === "human_other") && pieces[row][column] && pieces[row][column][1] === this.state.color) {
+	var is_piece = pieces[row][column]
+	var is_my_color = is_piece && pieces[row][column][1] === this.state.color
+	var can_move = selected_square && !is_piece
+	var is_friend = is_piece && pieces[row][column][1] === this.state.turn
+	var can_attack = selected_square && is_piece && !is_friend
+
+    if ((this.state.vs === "pc" || this.state.vs === "human_other") && is_my_color) {
       this.setState({"selected_square": [row, column]})
-    } else if ((this.state.vs === "human") && (pieces[row][column] && pieces[row][column][1] === this.state.turn)) {
+    } else if ((this.state.vs === "human") && is_friend) {
       this.setState({"selected_square": [row, column]})
-    } else if ((selected_square && pieces[row][column] && pieces[row][column][1] !== this.state.turn) || (selected_square && !pieces[row][column])) { // Move or attack piece
+    } else if (can_attack || can_move) {
       let promotion = false
       this.make_moves(selected_square, row, column, promotion)
     }
@@ -80,6 +92,7 @@ class Game extends React.Component {
     } else {
       var response = await fetch(`${baseURL}make_move/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}/${promotion}`)
     }
+	
     let data = await response.json()
     let step = this.state.step
 
@@ -124,13 +137,15 @@ class Game extends React.Component {
     }
   }
 
+  handleUserNameSubmitted() {
+	  this.setState({"display": null})
+      let date = new Date()
+      socket.emit("add user online", {"username": this.state.username, "time": date.toUTCString()})
+  }
+  
   handleClick (e) {
     e.preventDefault()
-    if (e.target.name === "username") {
-      this.setState({"display": null})
-      let d = new Date()
-      socket.emit("add user online", {"username": this.state.username, "time": d.toUTCString()})
-    } else if (e.target.name === "usersOnline") {
+	if (e.target.name === "usersOnline") {
       this.setState({"display": "welcomeScreen2"})
     } else if (e.target.name === "pc_strength") {
       this.setState((state) => ({"display": "welcomeScreen2", "username2": "Stockfish (" + state.skill_level_pc + ")"}))
@@ -212,8 +227,6 @@ class Game extends React.Component {
   }
 
   componentDidMount() {
-    // this.setState({"history": [{"pieces": fen_to_history(board)}], "game_id": game_id}) // Copy board from server
-
     this.intervalOnline = setInterval(() => {
       let date = new Date()
       socket.emit("user online", {"username": this.state.username, "datetime": date.toUTCString()})
@@ -293,7 +306,7 @@ class Game extends React.Component {
         <div className="container-fluid">
           <Choose_game display={this.state.display} onClick={(e) => this.handleClick(e)} />
           <Choose_time display={this.state.display} onClick={(e) => this.handleClick(e)} />
-          <GetUsername display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
+          <GetUsername display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={() => this.handleUserNameSubmitted()} />
           <GetUsernameMobile display={this.state.display} message={this.state.username_already_exists} onChange={(e) => this.setState({"username": e.target.value, "username_already_exists": null})} username={this.state.username} onSubmit={(e) => this.handleClick(e)} />
           <VS_PC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={(e) => this.handleClick(e)} />
           <Promotion promotion={this.state.promotion} onClick={(e) => this.handleClick(e)} />
@@ -345,4 +358,4 @@ class Game extends React.Component {
 }
 
 const domContainer = document.querySelector('#chess_board_container');
-ReactDOM.render(<Game />, domContainer);
+render(<Game />, domContainer);

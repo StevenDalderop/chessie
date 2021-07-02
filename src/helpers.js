@@ -1,4 +1,7 @@
-function Container(props) {
+import React from "react"
+import Board from "./board"
+
+export function Container(props) {
   return (
     <div id="content" className="container-fluid no-padding not_mobile">
       <div id="content_row" className="row">
@@ -13,7 +16,7 @@ function Container(props) {
   )
 }
 
-function Container_mobile(props) {
+export function Container_mobile(props) {
   return (
     <div id="content_mobile" className="container-fluid no-padding mobile">
       <div className="row">
@@ -28,7 +31,7 @@ function Container_mobile(props) {
   )
 }
 
-function Mobile_bar(props) {
+export function Mobile_bar(props) {
   let time_right = !props.mirrored ? 1 : 0
   let time_left = !props.mirrored ? 0 : 1
   
@@ -50,7 +53,7 @@ function Mobile_bar(props) {
   )
 }
 
-function Sidebar(props) {
+export function Sidebar(props) {
   let time_above = !props.mirrored ? 1 : 0
   let time_below = !props.mirrored ? 0 : 1
 
@@ -97,7 +100,7 @@ function Sidebar(props) {
   )
 }
 
-function BoardContainer(props) {
+export function BoardContainer(props) {
   return (
     <div id="board_container_2" className="container_div">
       <div id="board_container">
@@ -113,7 +116,7 @@ function BoardContainer(props) {
   )
 }
 
-function Timer(props) {
+export function Timer(props) {
   let minutes = Math.floor(props.seconds / 60)
   let seconds = props.seconds - minutes * 60
   if (seconds.toString().length < 2) {
@@ -124,7 +127,7 @@ function Timer(props) {
   )
 }
 
-function ScoreEvaluationBar(props) {
+export function ScoreEvaluationBar(props) {
   function score_to_with(score) {
     return Math.E ** (score / 250) / (Math.E ** (score / 250) + 1) * 100
   }
@@ -137,7 +140,7 @@ function ScoreEvaluationBar(props) {
   )
 }
 
-function Header(props) {
+export function Header(props) {
   if (props.game_state === "started" && props.vs === "human_other") {
     let button_resign = <button key="resign" id="button_resign_mobile" name="resign" className="btn btn-danger mobile" onClick={(e) => props.onClick(e)}> Resign </button>
     let button_draw = <button key="draw" id="button_draw_mobile" name="offer_draw" className="btn btn-warning mobile" onClick={(e) => props.onClick(e)}> Draw </button>
@@ -156,7 +159,7 @@ function Header(props) {
   )
 }
 
-function fen_to_history(fen) {
+export function fen_to_history(fen) {
   let fen_board = fen.split(" ")[0]
   let list = fen_board.split("/")
   let out = []
@@ -206,7 +209,7 @@ function fen_to_history(fen) {
   return out2
 }
 
-function uci_to_row_column(uci) {
+export function uci_to_row_column(uci) {
   let col_start = parseInt(uci[0], 36) - 10
   let col_end = parseInt(uci[2], 36) - 10
   let row_start = 8 - uci[1]

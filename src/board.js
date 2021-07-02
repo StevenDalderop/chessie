@@ -1,4 +1,5 @@
 // Piece icons: By en:User:Cburnett - Own work  This W3C-unspecified vector image was created with Inkscape., CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=1499809
+import React from "react"
 
 function Square(props) {
   return (
@@ -29,7 +30,7 @@ function piece_icon(name) {
   }
 }
 
-class Board extends React.Component {
+export default class Board extends React.Component {
   renderSquare(row, column) {
     let square_color;
     if (this.props.mirrored) {

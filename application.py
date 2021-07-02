@@ -98,31 +98,42 @@ def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
         return {"valid": "true"}
     return {"valid": "false"}
 
+
 @app.route("/get_pc_move/<int:game_id>/<int:skill_level>")
 def pc_move(game_id, skill_level):
-    global boards
-    board = boards[str(game_id)]
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    game_id, fen, moves = cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone() 
+    
     stockfish.set_skill_level(skill_level)
-    stockfish.set_fen_position(board.fen())
-    move = stockfish.get_best_move_time(100)
-    board.push(chess.Move.from_uci(move))
-    init_board = chess.Board()
-    moves_san = init_board.variation_san(board.move_stack)
-    last_move = 1 if board.turn else 0 
-    stockfish.set_fen_position(board.fen())
-    info = stockfish.get_evaluation()
-    score = None if len(info) == 0 else None if info["type"] != "cp" else info["value"]
-    result = None if not board.is_game_over() else board.result()
+    stockfish.set_fen_position(fen)
+    uci = stockfish.get_best_move_time(STOCKFISH_TIME_MS)
+    
+    board = chess.Board(fen)
+    board.push(chess.Move.from_uci(uci))    
     fen = board.fen()
-    return {
+    
+    if moves: 
+        moves = moves + " " + uci
+    else:
+        moves = uci
+        
+    san = get_san(moves)
+    turn = board.turn 
+    evaluation = get_evaluation(stockfish, fen)
+    result = None if not board.is_game_over() else board.result()
+    
+    cursor.execute('''UPDATE games SET fen = ? , moves = ? WHERE id = ? ''', (fen, moves, game_id))
+    db.commit()
+    
+    return {        
+        "uci": uci,
         "fen": fen,
-        "uci": move,
-        "moves_san": moves_san,
-        "last_move": last_move,
-        "score": score,
+        "san": san,
+        "turn": turn,
+        "evaluation": evaluation,
         "result": result
     }
-
 
 
 @socketio.on("connect")

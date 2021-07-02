@@ -158,7 +158,7 @@ class Game extends React.Component {
         socket.emit("new game", {"game_id": this.state.game_id, "username": this.state.username, "time": time})
         this.setState({"display": "usersOnline"})
       } else {
-        this.setState({"game_state": "started", "color": 0})
+        this.setState({"game_state": "started", "color": 1})
       }
     } else if (e.target.name === "vs") {
       if (e.target.value === "human") {

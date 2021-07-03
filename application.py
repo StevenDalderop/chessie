@@ -34,7 +34,7 @@ def index():
 
 
 @app.route("/new_game")
-def new_game():
+def create_new_game():
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     cursor.execute("INSERT INTO games (fen) VALUES (?)", (chess.STARTING_FEN,))
@@ -100,7 +100,7 @@ def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
 
 
 @app.route("/get_pc_move/<int:game_id>/<int:skill_level>")
-def pc_move(game_id, skill_level):
+def get_pc_move(game_id, skill_level):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     game_id, fen, moves = cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone() 
@@ -153,6 +153,40 @@ def connect():
     socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
     socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
 
+@socketio.on("disconnect")
+def disconnect():
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    
+    sid = request.sid
+    cursor.execute("DELETE FROM users WHERE sid = ?", (sid,))
+    db.commit()
+
+
+@socketio.on("add user online")
+def add_user_online(data):
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    
+    username = data["username"]
+    sid = request.sid
+    
+    result = cursor.execute("SELECT * FROM users WHERE name = ?", (username,)).fetchone() 
+    
+    if result:
+        socketio.emit("user already exist", room=request.sid)
+        return 
+
+    cursor.execute("INSERT INTO users (name, sid) VALUES (?, ?)", (username, sid))
+    db.commit()
+    users_online = cursor.execute("SELECT name FROM users").fetchall()
+    socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
+
+
+
+
+
+
 
 @socketio.on("user online")
 def online(data):
@@ -160,21 +194,7 @@ def online(data):
     for dict in users_online:
         if dict["username"] == data["username"]:
             dict["last_seen"] = data["datetime"]
-
-
-@socketio.on("add user online")
-def user_online(data):
-    global users_online
-    username = data["username"]
-    usernames = []
-    for dict in users_online:
-        usernames.append(dict["username"])
-    if username in usernames:
-        socketio.emit("user already exist", room=request.sid)
-    else:
-        users_online.append({"username": username, "last_seen": data["time"]})
-        socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
-
+            
 
 @socketio.on("new game")
 def new_game(data):
@@ -220,5 +240,5 @@ def offer_draw(data):
     socketio.emit("announce draw offered", {"username": data["username"]}, room=data["room"])
 
 @socketio.on("draw")
-def draw(data): 
+def respond_to_draw_offer(data): 
     socketio.emit("announce draw decision", {"accepted": data["accepted"]}, room=data["room"])

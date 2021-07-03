@@ -140,8 +140,7 @@ class Game extends React.Component {
 
   handleUserNameSubmitted() {
 	  this.setState({"display": null})
-      let date = new Date()
-      socket.emit("add user online", {"username": this.state.username, "time": date.toUTCString()})
+      socket.emit("add user online", {"username": this.state.username})
   }
   
   handleOnlineGameClick(e) {
@@ -319,11 +318,10 @@ class Game extends React.Component {
   render () {
     return (
       <div id="main_container">
-        <Header display={this.state.display} 
-              onClick={(e) => this.handleClick(e)}               
+        <Header display={this.state.display}               
               game_state={this.state.game_state}
               vs={this.state.vs}
-              onClick={(e) => {this.handleClick(e)}}
+              onClick={() => {this.handleNewGameButtonPressed()}}
         />
 
         <div className="container-fluid">

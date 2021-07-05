@@ -37,7 +37,7 @@ def index():
 def create_new_game():
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
-    cursor.execute("INSERT INTO games (fen) VALUES (?)", (chess.STARTING_FEN,))
+    cursor.execute("INSERT INTO games (fen, is_online) VALUES (?, ?)", (chess.STARTING_FEN, False))
     game_id = cursor.execute(f"SELECT MAX(id) FROM GAMES").fetchone()[0]
     db.commit()   
     return {"game_id": game_id}
@@ -49,7 +49,7 @@ def make_move(game_id, row_start, col_start, row_end, col_end, promotion):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     
-    game_id, fen, moves = cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone()
+    game_id, fen, moves = cursor.execute("SELECT id, fen, moves FROM games WHERE id = ?", (game_id,)).fetchone()
     
     board = chess.Board(fen)    
 
@@ -90,7 +90,7 @@ def make_move(game_id, row_start, col_start, row_end, col_end, promotion):
 def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
-    game_id, fen, moves = cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone() 
+    game_id, fen, moves = cursor.execute("SELECT id, fen, moves FROM games WHERE id = ?", (game_id,)).fetchone() 
     board = chess.Board(fen) 
     promotion = chess.QUEEN
     human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
@@ -103,7 +103,7 @@ def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
 def get_pc_move(game_id, skill_level):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
-    game_id, fen, moves = cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone() 
+    game_id, fen, moves = cursor.execute("SELECT id, fen, moves FROM games WHERE id = ?", (game_id,)).fetchone() 
     
     stockfish.set_skill_level(skill_level)
     stockfish.set_fen_position(fen)
@@ -136,23 +136,6 @@ def get_pc_move(game_id, skill_level):
     }
 
 
-@socketio.on("connect")
-@socketio.on("refresh")
-def connect():
-    global users_online, games_available 
-    for (index, dict) in enumerate(users_online):
-        date = datetime.datetime.strptime(dict["last_seen"], "%a, %d %b %Y %H:%M:%S %Z")
-        now = datetime.datetime.utcnow()
-        diff = (now - date).total_seconds()
-        if diff > 30:
-            username = users_online[index]["username"]
-            del users_online[index]
-            for (index, dict) in enumerate(games_available):
-                if username == dict["username"]:
-                    del games_available[index]
-    socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
-    socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
-
 @socketio.on("disconnect")
 def disconnect():
     db = sqlite3.connect(DATABASE)
@@ -161,6 +144,9 @@ def disconnect():
     sid = request.sid
     cursor.execute("DELETE FROM users WHERE sid = ?", (sid,))
     db.commit()
+    
+    users_online = [user[0] for user in cursor.execute("SELECT name FROM users").fetchall()]
+    socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
 
 
 @socketio.on("add user online")
@@ -179,35 +165,40 @@ def add_user_online(data):
 
     cursor.execute("INSERT INTO users (name, sid) VALUES (?, ?)", (username, sid))
     db.commit()
-    users_online = cursor.execute("SELECT name FROM users").fetchall()
+    users_online = [user[0] for user in cursor.execute("SELECT name FROM users").fetchall()]
     socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
-
-
-
-
-
-
-
-@socketio.on("user online")
-def online(data):
-    global users_online
-    for dict in users_online:
-        if dict["username"] == data["username"]:
-            dict["last_seen"] = data["datetime"]
             
 
 @socketio.on("new game")
-def new_game(data):
-    global rooms, games_available
-    username = data["username"]
-    room = rooms
-    for (index, dict) in enumerate(games_available):
-        if dict["username"] == username:
-            del games_available[index]
-    games_available.append({"game_id": data["game_id"], "room": room, "username": username, "time": data["time"]})
-    join_room(room)
-    rooms += 1
+def new_online_game(data):
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+
+    fen = chess.STARTING_FEN
+    time = int(data["time"])
+    user_id_1 = get_user_id(db, data["username"])
+    
+    result = cursor.execute("SELECT id FROM games WHERE user_id_1 = ? OR user_id_2 = ?" ,(user_id_1, user_id_1)).fetchone()
+    if result:
+        room = result[0]
+        leave_room(room)
+    
+    cursor.execute("DELETE FROM games WHERE user_id_1 = ? OR user_id_2 = ?", (user_id_1, user_id_1))
+    
+    cursor.execute("INSERT INTO games (fen, time1, time2, user_id_1, is_online) VALUES (?,?,?,?,?)", (fen, time, time, user_id_1, True))
+    game_id = cursor.execute(f"SELECT MAX(id) FROM GAMES").fetchone()[0]
+    join_room(game_id)    
+    
+    games_available = []
+    for game in cursor.execute("SELECT id, user_id_1, time1, time2 FROM games WHERE is_online = 1").fetchall():
+        user_id = game[1]
+        username = get_username(db, user_id)
+        games_available.append({"game_id": game[0], "room": game[0], "username": username, "time": [game[2], game[3]]})
+        
+    db.commit()     
+       
     socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
+    socketio.emit("announce new game", {"game_id": game_id}, room=request.sid)
 
 
 @socketio.on("join game")
@@ -229,7 +220,17 @@ def join_game(data):
 
 @socketio.on("make move")
 def make_move(data):
-    socketio.emit("announce move", {"fen": data["fen"], "moved_squares": data["moved_squares"], "moves_san": data["moves_san"], "step": data["step"], "last_move": data["last_move"] , "score": data["score"], "times": data["times"], "result": data["result"]}, room=data["room"])
+    json = {
+        "fen": data["fen"], 
+        "moved_squares": data["moved_squares"], 
+        "moves_san": data["moves_san"], 
+        "step": data["step"], 
+        "last_move": data["last_move"] , 
+        "score": data["score"], 
+        "times": data["times"], 
+        "result": data["result"]
+    }
+    socketio.emit("announce move", json, room=data["room"])
 
 @socketio.on("resign")
 def resign(data): 

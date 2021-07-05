@@ -146,8 +146,6 @@ class Game extends React.Component {
   handleOnlineGameClick(e) {
 	  if (e.target.name === "newGame") {
 		this.setState({"display": "welcomeScreen2"})
-	  } else if (e.target.name === "refresh") {
-        socket.emit("refresh") 
 	  } else if (e.target.name === "close") {
 		  this.setState({"display": null})
 	  } else if (e.target.name === "join_game") {
@@ -166,7 +164,7 @@ class Game extends React.Component {
       this.setState({"display": null})
       this.setState({"times": [time, time]})
       if (this.state.vs === "human_other") {
-        socket.emit("new game", {"game_id": this.state.game_id, "username": this.state.username, "time": time})
+        socket.emit("new game", {"username": this.state.username, "time": time})
         this.setState({"display": "usersOnline"})
       } else {
         this.setState({"game_state": "started", "color": 1})
@@ -249,17 +247,14 @@ class Game extends React.Component {
   }
 
   componentDidMount() {
-    this.intervalOnline = setInterval(() => {
-      let date = new Date()
-      socket.emit("user online", {"username": this.state.username, "datetime": date.toUTCString()})
-    }, 30000)
-
     socket.on("announce user", data => {
       this.setState({"users_online": data["users_online"]})
     })
 
     socket.on("user already exist", () => { this.setState({"display": "humanOther", "username_already_exists": true}) })
-
+	
+	socket.on("announce new game", (data) => { this.setState({"game_id": data["game_id"]})})
+	
     socket.on("announce games available", data => {
       this.setState({"games_available": data["games_available"]})
     })
@@ -312,7 +307,6 @@ class Game extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this.interval)
-    clearInterval(this.intervalOnline)
   }
 
   render () {

@@ -10,13 +10,15 @@ CREATE TABLE users(
 CREATE TABLE games(
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     fen TEXT NOT NULL, 
-	moves TEXT
-"    time INTEGER NOT NULL, 
-    player1 TEXT, 
-    player2 TEXT,
-    FOREIGN KEY(player1) 
+	moves TEXT, 
+	time1 INTEGER,
+	time2 INTEGER,
+    user_id_1 INTEGER, 
+    user_id_2 INTEGER,
+	is_online BOOLEAN,
+    FOREIGN KEY(user_id_1) 
         REFERENCES users(id),
-    FOREIGN KEY(player2)
-        REFERENCES users(id)"
+    FOREIGN KEY(user_id_2)
+        REFERENCES users(id)
 );
 

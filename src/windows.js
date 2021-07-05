@@ -199,7 +199,7 @@ export function Online_game(props) {
   let i = 0
   let u
   for (u of props["usernames"]) {
-    users.push(<li key={i}> {u["username"]} </li>)
+    users.push(<li key={i}> {u} </li>)
     i++
   }
 
@@ -254,7 +254,6 @@ export function Online_game(props) {
           </div>
         </div>
         <button name="newGame" className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>
-        <button name="refresh" className="btn btn-primary ml-3" onClick={(e) => props.onClick(e)}> Refresh </button>
       </div>
     </div>
   )

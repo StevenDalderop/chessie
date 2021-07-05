@@ -22,3 +22,16 @@ def get_move(row_start, col_start, row_end, col_end, promotion):
 
     human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
     return human_move
+    
+def get_user_id(db, username):
+    cursor = db.cursor()
+    
+    user_id = cursor.execute("SELECT id FROM users WHERE name = ?", (username,)).fetchone()[0]
+    return user_id 
+    
+def get_username(db, index):
+    cursor = db.cursor()
+
+    username = cursor.execute("SELECT name FROM users WHERE id = ?", (index,)).fetchone()[0]
+    return username    
+    

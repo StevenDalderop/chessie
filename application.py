@@ -187,13 +187,10 @@ def new_online_game(data):
     
     cursor.execute("INSERT INTO games (fen, time1, time2, user_id_1, is_online) VALUES (?,?,?,?,?)", (fen, time, time, user_id_1, True))
     game_id = cursor.execute(f"SELECT MAX(id) FROM GAMES").fetchone()[0]
+
     join_room(game_id)    
     
-    games_available = []
-    for game in cursor.execute("SELECT id, user_id_1, time1, time2 FROM games WHERE is_online = 1").fetchall():
-        user_id = game[1]
-        username = get_username(db, user_id)
-        games_available.append({"game_id": game[0], "room": game[0], "username": username, "time": [game[2], game[3]]})
+    games_available = get_online_games_available(db)
         
     db.commit()     
        
@@ -203,29 +200,41 @@ def new_online_game(data):
 
 @socketio.on("join game")
 def join_game(data):
-    global boards, games_available
-    boards[str(data["game_id"])] = chess.Board()
-    game_id = data["game_id"]
-    username = data["username"]
-    for (index, dict) in enumerate(games_available):
-        if int(dict["game_id"]) == int(game_id):
-            username2 = dict["username"]
-            room = dict["room"]
-            time = dict["time"]
-            join_room(room)
-            socketio.emit("announce game starts", {"username": username, "username2": username2, "time": time, "game_id": game_id, "room": room}, room=room)
-            del games_available[index]
-            socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    
+    
+    game_id = int(data["game_id"])
 
+    join_room(game_id)
+    
+    username = data["username"]
+    user_id = get_user_id(db, username)
+    
+    cursor.execute("UPDATE games SET user_id_2 = ? WHERE id = ?", (user_id, game_id))
+    
+    user_id_1, time = cursor.execute("SELECT user_id_1, time1 FROM games WHERE id = ?", (game_id,)).fetchone()
+    username_1 = get_username(db, user_id_1)
+       
+    socketio.emit("announce game starts", {"username": username_1, "username2": username, "time": time, "game_id": game_id, "room": game_id}, room=game_id)
+
+    cursor.execute("DELETE FROM games WHERE user_id_1 = ?", (user_id,))
+    
+    games_available = get_online_games_available(db)
+    
+    db.commit()
+
+    socketio.emit("announce games available", {"games_available": games_available}, broadcast=True)
+    
 
 @socketio.on("make move")
 def make_move(data):
     json = {
         "fen": data["fen"], 
         "moved_squares": data["moved_squares"], 
-        "moves_san": data["moves_san"], 
+        "san": data["moves_san"], 
         "step": data["step"], 
-        "last_move": data["last_move"] , 
+        "turn": data["turn"] , 
         "score": data["score"], 
         "times": data["times"], 
         "result": data["result"]

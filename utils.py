@@ -26,12 +26,25 @@ def get_move(row_start, col_start, row_end, col_end, promotion):
 def get_user_id(db, username):
     cursor = db.cursor()
     
-    user_id = cursor.execute("SELECT id FROM users WHERE name = ?", (username,)).fetchone()[0]
+    user_id = cursor.execute("SELECT id FROM users WHERE name = ?", (username,)).fetchone()
+    if user_id:
+        return user_id[0]
     return user_id 
     
 def get_username(db, index):
     cursor = db.cursor()
-
-    username = cursor.execute("SELECT name FROM users WHERE id = ?", (index,)).fetchone()[0]
-    return username    
     
+    username = cursor.execute("SELECT name FROM users WHERE id = ?", (index,)).fetchone()
+    if username:
+        return username[0]
+    return username    
+
+def get_online_games_available(db):
+    cursor = db.cursor()
+    
+    games_available = []
+    for game in cursor.execute("SELECT id, user_id_1, time1, time2 FROM games WHERE is_online = 1").fetchall():
+        user_id = game[1]
+        username = get_username(db, user_id)
+        games_available.append({"game_id": game[0], "room": game[0], "username": username, "time": [game[2], game[3]]})
+    return games_available

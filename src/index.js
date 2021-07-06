@@ -150,6 +150,7 @@ class Game extends React.Component {
 		  this.setState({"display": null})
 	  } else if (e.target.name === "join_game") {
       game_id = e.target.value
+	  console.log(e.target)
       socket.emit("join game", {"username": this.state.username, "game_id": game_id})
       console.log("join game " + this.state.username + " " + game_id)
     } 
@@ -167,7 +168,7 @@ class Game extends React.Component {
         socket.emit("new game", {"username": this.state.username, "time": time})
         this.setState({"display": "usersOnline"})
       } else {
-        this.setState({"game_state": "started", "color": 1})
+        this.setState({"game_state": "started"})
       }
   }	  
   
@@ -253,7 +254,10 @@ class Game extends React.Component {
 
     socket.on("user already exist", () => { this.setState({"display": "humanOther", "username_already_exists": true}) })
 	
-	socket.on("announce new game", (data) => { this.setState({"game_id": data["game_id"]})})
+	socket.on("announce new game", (data) => { 
+		console.log(data["game_id"])
+		this.setState({"game_id": data["game_id"]})}
+	)
 	
     socket.on("announce games available", data => {
       this.setState({"games_available": data["games_available"]})
@@ -266,9 +270,9 @@ class Game extends React.Component {
         screen.style.display = "None"
       })
       if (data["username"] === this.state.username) {
-        this.setState({"username": data["username"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username2"], "room": data["room"], "color": 0, "game_state": "started"}) // Play as white
+        this.setState({"username": data["username"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username2"], "room": data["room"], "color": 1, "game_state": "started"})
       } else if (data["username2"] === this.state.username) {
-        this.setState({"username": data["username2"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username"], "room": data["room"], "color": 1, "mirrored": true, "game_state": "started"}) // Play as black
+        this.setState({"username": data["username2"], "game_id": data["game_id"], "times": [data["time"], data["time"]], "username2": data["username"], "room": data["room"], "color": 0, "mirrored": true, "game_state": "started"})
       }
     })
 

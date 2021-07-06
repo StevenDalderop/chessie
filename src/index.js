@@ -1,8 +1,14 @@
 import React from "react"
 import { render } from "react-dom"
-import { Container, Container_mobile, Mobile_bar, Sidebar, BoardContainer, Timer, ScoreEvaluationBar, Header, fen_to_history, uci_to_row_column, get_uci } from "./helpers"
-import Board from "./board"
-import { Promotion, Result, Draw_offered, Choose_game, Choose_time, GetUsername, GetUsernameMobile, Online_game, VS_PC } from "./windows"
+import Container from "./components/container"
+import Container_mobile from "./components/container_mobile"
+import Mobile_bar from "./components/mobile_bar"
+import Sidebar from "./components/sidebar"
+import BoardContainer from "./components/board_container"
+import Header from "./components/header"
+import { fen_to_history, uci_to_row_column, get_uci } from "./chess_notation"
+import Board from "./components/board"
+import { Promotion, Result, Draw_offered, Choose_game, Choose_time, GetUsername, GetUsernameMobile, Online_game, VS_PC } from "./components/windows"
 
 const baseURL = window.location.href
 
@@ -174,6 +180,9 @@ class Game extends React.Component {
         this.setState({"display": "welcomeScreen2", "username2": "Player2"})
       } else if (e.target.value == "human_other") {
         this.setState({"display": "usersOnline", "username2": "Player2"})
+		fetch(`${baseURL}get_games`)
+			.then(response => response.json())
+			.then(data => { this.setState({"games_available": data["games_available"]})})
       } else if (e.target.value === "pc") {
         this.setState({"display": "welcomeScreenPC", "username2": "Stockfish"})
       }
@@ -228,7 +237,6 @@ class Game extends React.Component {
 	  socket.emit("draw", {"accepted": "false", "room": this.state.room})
   }
   
-
   startTimer() {
       clearInterval(this.interval)
       this.interval = setInterval(() => {

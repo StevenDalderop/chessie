@@ -6,19 +6,12 @@
   <link rel="icon" type="image/png" sizes="16x16" href={{ url_for('static', filename='favicon-16x16.png') }}>
   <!-- CSS only -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-  <link rel="stylesheet" href={{ url_for('static', filename='board.css') }}>
   <link rel="stylesheet" href={{ url_for('static', filename='index.css') }}>
-  <script type="text/javascript">
-    var board = "{{ board }}"
-    var game_id = "{{ game_id }}"
-  </script>
 </head>
 <body>
   <div id="chess_board_container" >
   </div>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-
-
   <script type="application/javascript" src={{ url_for('static', filename='frontend/main.js') }}></script>
 </body>

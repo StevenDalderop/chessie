@@ -126,7 +126,15 @@ def get_pc_move(game_id, skill_level):
         "evaluation": evaluation,
         "result": result
     }
-
+    
+@app.route("/get_games")    
+def get_games_available():
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    
+    games_available = get_online_games_available(db)
+    return {"games_available": games_available}
+    
 
 @socketio.on("disconnect")
 def disconnect():

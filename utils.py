@@ -43,7 +43,7 @@ def get_online_games_available(db):
     cursor = db.cursor()
     
     games_available = []
-    for game in cursor.execute("SELECT id, user_id_1, time1, time2 FROM games WHERE is_online = 1").fetchall():
+    for game in cursor.execute("SELECT id, user_id_1, time1, time2 FROM games WHERE is_online = 1 AND user_id_2 IS NULL").fetchall():
         user_id = game[1]
         username = get_username(db, user_id)
         games_available.append({"game_id": game[0], "room": game[0], "username": username, "time": [game[2], game[3]]})

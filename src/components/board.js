@@ -1,5 +1,6 @@
 // Piece icons: By en:User:Cburnett - Own work  This W3C-unspecified vector image was created with Inkscape., CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=1499809
 import React from "react"
+import css from "./board.css";
 
 function Square(props) {
   return (
@@ -24,7 +25,7 @@ function piece_icon(name) {
     } else {
       var color = "d";
     }
-    return (<img className="piece_icon" src={"/static/Chess_" + name[0] + color + "t45.svg"}></img>)
+    return (<img className="piece_icon" src={"/static/chess_pieces_svg/Chess_" + name[0] + color + "t45.svg"}></img>)
   } else {
     return null
   }

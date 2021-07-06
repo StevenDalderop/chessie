@@ -235,9 +235,9 @@ class Game extends React.Component {
   startTimer() {
       clearInterval(this.interval)
       this.interval = setInterval(() => {
-      let seconds = this.state.times[this.state.turn]
+      let seconds = this.state.turn ? this.state.times[0] : this.state.times[1]
       if (seconds === 0) {
-        this.setState((state)=> ({"result": state.turn ? "1-0" : "0-1", "game_state": "finished", "selected_square": null}))
+        this.setState((state)=> ({"result": state.turn ? "0-1" : "1-0", "game_state": "finished", "selected_square": null}))
         clearInterval(this.interval)
       } else if (this.state.game_state === "started") {
         this.setState((state) => ({"times": state.turn ? [state.times[0] - 1, state.times[1]] : [state.times[0], state.times[1] - 1]}))
@@ -320,6 +320,8 @@ class Game extends React.Component {
               game_state={this.state.game_state}
               vs={this.state.vs}
               onClick={() => {this.handleNewGameButtonPressed()}}
+			  onClick2={() => this.handleResignButtonPressed()}
+			  onClick3={() => this.handleOfferDrawButtonPressed()}
         />
 
         <div className="container-fluid">

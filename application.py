@@ -22,11 +22,6 @@ if sys.platform == "linux":
 else:
     stockfish = Stockfish(STOCKFISH_WINDOWS)
 
-boards = {}
-game_id_last = 0
-users_online = []
-rooms = 0
-games_available = []
 
 @app.route("/")
 def index():
@@ -235,20 +230,24 @@ def make_move(data):
         "san": data["moves_san"], 
         "step": data["step"], 
         "turn": data["turn"] , 
-        "score": data["score"], 
+        "evaluation": data["score"], 
         "times": data["times"], 
         "result": data["result"]
     }
     socketio.emit("announce move", json, room=data["room"])
 
+
 @socketio.on("resign")
 def resign(data): 
     socketio.emit("announce resign", {"username": data["username"]}, room=data["room"])
+
 
 @socketio.on("offer draw")
 def offer_draw(data): 
     socketio.emit("announce draw offered", {"username": data["username"]}, room=data["room"])
 
+
 @socketio.on("draw")
 def respond_to_draw_offer(data): 
     socketio.emit("announce draw decision", {"accepted": data["accepted"]}, room=data["room"])
+    

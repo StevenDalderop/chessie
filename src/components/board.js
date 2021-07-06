@@ -18,14 +18,23 @@ function Square(props) {
   )
 }
 
-function piece_icon(name) {
-  if (name) {
-    if (name[1] === 1) {
+function piece_icon(props) {
+  if (props) {
+    if (props.color === 1) {
       var color = "l";
     } else {
       var color = "d";
     }
-    return (<img className="piece_icon" src={"/static/chess_pieces_svg/Chess_" + name[0] + color + "t45.svg"}></img>)
+	var types = {
+		"q": "queen",
+		"r": "rook",
+		"k": "king",
+		"b": "bishop",
+		"n": "knight",
+		"p": "pawn"
+	}
+	var type = types[props.type]
+    return (<img className="piece_icon" src={"/static/chess_pieces_svg/Chess_" + type + color + "t45.svg"}></img>)
   } else {
     return null
   }

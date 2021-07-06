@@ -1,4 +1,4 @@
-export function fen_to_history(fen) {
+export function get_board(fen) {
   let fen_board = fen.split(" ")[0]
   let list = fen_board.split("/")
   let out = []
@@ -18,29 +18,29 @@ export function fen_to_history(fen) {
           out2_row.push(null)
         }
       } else if ( e === "R") {
-        out2_row.push(["rook", 1])
+        out2_row.push({"type": "r", "color": 1})
       } else if ( e === "N") {
-        out2_row.push(["knight", 1])
+        out2_row.push({"type": "n", "color": 1})
       } else if ( e === "B") {
-        out2_row.push(["bishop", 1])
+        out2_row.push({"type": "b", "color": 1})
       } else if ( e === "K") {
-        out2_row.push(["king", 1])
+        out2_row.push({"type": "k", "color": 1})
       } else if ( e === "Q") {
-        out2_row.push(["queen", 1])
+        out2_row.push({"type": "q", "color": 1})
       } else if ( e === "P") {
-        out2_row.push(["pawn", 1])
+        out2_row.push({"type": "p", "color": 1})
       } else if ( e === "r") {
-        out2_row.push(["rook", 0])
+        out2_row.push({"type": "r", "color": 0})
       } else if ( e === "n") {
-        out2_row.push(["knight", 0])
+        out2_row.push({"type": "n", "color": 0})
       } else if ( e === "b") {
-        out2_row.push(["bishop", 0])
+        out2_row.push({"type": "b", "color": 0})
       } else if ( e === "k") {
-        out2_row.push(["king", 0])
+        out2_row.push({"type": "k", "color": 0})
       } else if ( e === "q") {
-        out2_row.push(["queen", 0])
+        out2_row.push({"type": "q", "color": 0})
       } else if ( e === "p") {
-        out2_row.push(["pawn", 0])
+        out2_row.push({"type": "p", "color": 0})
       }
     }
   out2.push(out2_row)

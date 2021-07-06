@@ -6,7 +6,7 @@ import Mobile_bar from "./components/mobile_bar"
 import Sidebar from "./components/sidebar"
 import BoardContainer from "./components/board_container"
 import Header from "./components/header"
-import { fen_to_history, uci_to_row_column, get_uci } from "./chess_notation"
+import { get_board, uci_to_row_column, get_uci } from "./chess_notation"
 import Board from "./components/board"
 import { Promotion, Result, Draw_offered, Choose_game, Choose_time, GetUsername, GetUsernameMobile, Online_game, VS_PC } from "./components/windows"
 
@@ -18,16 +18,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      "history": [{"pieces":
-				  [[["rook", 0], ["knight", 0], ["bishop", 0], ["queen", 0], ["king", 0], ["bishop", 0], ["knight", 0], ["rook", 0]],
-			      [["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0], ["pawn", 0]],
-                  [null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null],
-                  [null, null, null, null, null, null, null, null],
-                  [["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1], ["pawn", 1]],
-                  [["rook", 1], ["knight", 1], ["bishop", 1], ["queen", 1], ["king", 1], ["bishop", 1], ["knight", 1], ["rook", 1]]]
-                }],
+	  "fen": 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
       "selected_square": null,
       "moved_squares": null,
       "turn": 1,
@@ -59,9 +50,7 @@ class Game extends React.Component {
       return
     }
 
-    let history = JSON.parse(JSON.stringify(this.state.history))
-    let current = history[this.state.step]
-    let pieces = current.pieces
+    let pieces = get_board(this.state.fen)
     let selected_square = this.state.selected_square
 
 	var is_piece = pieces[row][column]
@@ -82,7 +71,7 @@ class Game extends React.Component {
 
   async make_moves(selected_square, row, column, promotion) {
 	let uci = get_uci(selected_square, row, column, promotion)
-    let pieces = this.state.history[this.state.step].pieces
+    let pieces = get_board(this.state.fen)
     let possible_promotion = pieces[selected_square[0]][selected_square[1]][0] === "pawn" && (row === 0 || row === 7)
     
     if (possible_promotion && !this.state.promotion) {
@@ -103,7 +92,7 @@ class Game extends React.Component {
     if (data["valid"] === "true" && this.state.vs !== "human_other") {
       console.log("move validated")
       this.setState((state) => ({
-        "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
+        "fen": data["fen"],
         "result": data["result"],
         "turn": data["turn"],
         "score": data["evaluation"],
@@ -121,7 +110,7 @@ class Game extends React.Component {
       .then(response => response.json())
       .then((data) => {
         this.setState((state) => ({
-          "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
+          "fen": data["fen"],
           "result": data["result"],
           "turn": data["turn"],
           "score": data["evaluation"],
@@ -194,7 +183,7 @@ class Game extends React.Component {
                      "moved_squares": null, 
                      "turn": 1,
                      "step": 0,
-                     "history": this.state.history.slice(0,1),
+                     "fen": 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
                      "san": null,
                      "score": 0,
                      "mirrored": false,
@@ -283,7 +272,7 @@ class Game extends React.Component {
 
     socket.on("announce move", data => {
       this.setState((state) => ({
-        "history": state.history.concat([{"pieces": fen_to_history(data["fen"])}]),
+        "fen": data["fen"],
         "moved_squares": data["moved_squares"],
         "result": data["result"],
         "turn": data["turn"],
@@ -342,7 +331,7 @@ class Game extends React.Component {
 
           <Container 
             col_left={<BoardContainer 
-              pieces={this.state.history[this.state.step].pieces} 
+              pieces={get_board(this.state.fen)} 
               mirrored={this.state.mirrored}
               selected_square={this.state.selected_square}
               moved_squares={this.state.moved_squares} 
@@ -366,7 +355,7 @@ class Game extends React.Component {
 
           <Container_mobile 
             board={<Board
-              pieces={this.state.history[this.state.step].pieces} 
+              pieces={get_board(this.state.fen)} 
               mirrored={this.state.mirrored}
               selected_square={this.state.selected_square} 
               moved_squares={this.state.moved_squares}

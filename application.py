@@ -38,9 +38,8 @@ def create_new_game():
     return {"game_id": game_id}
     
 
-@app.route("/make_move/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>", defaults={'promotion': None})
-@app.route("/make_move/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>/<string:promotion>")
-def make_move(game_id, row_start, col_start, row_end, col_end, promotion):
+@app.route("/make_move/<int:game_id>/<string:uci>")
+def make_move(game_id, uci):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     
@@ -48,8 +47,7 @@ def make_move(game_id, row_start, col_start, row_end, col_end, promotion):
     
     board = chess.Board(fen)    
 
-    move = get_move(row_start, col_start, row_end, col_end, promotion)
-    uci = move.uci()
+    move = chess.Move.from_uci(uci)
     
     if not (move in board.legal_moves):
         return {"valid": "false"}
@@ -81,14 +79,13 @@ def make_move(game_id, row_start, col_start, row_end, col_end, promotion):
     }
 
          
-@app.route("/check_promotion_valid/<int:game_id>/<int:row_start>/<int:col_start>/<int:row_end>/<int:col_end>")
-def check_promotion_valid(game_id, row_start, col_start, row_end, col_end):
+@app.route("/check_promotion_valid/<int:game_id>/<string:uci>")
+def check_promotion_valid(game_id, uci):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     game_id, fen, moves = cursor.execute("SELECT id, fen, moves FROM games WHERE id = ?", (game_id,)).fetchone() 
     board = chess.Board(fen) 
-    promotion = chess.QUEEN
-    human_move = chess.Move(chess.square(col_start, 7 - row_start), chess.square(col_end, 7 - row_end), promotion)
+    human_move = chess.Move.from_uci(uci)
     if (human_move in board.legal_moves):
         return {"valid": "true"}
     return {"valid": "false"}

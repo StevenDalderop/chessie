@@ -1,6 +1,6 @@
 import React from "react"
 import { render } from "react-dom"
-import { Container, Container_mobile, Mobile_bar, Sidebar, BoardContainer, Timer, ScoreEvaluationBar, Header, fen_to_history, uci_to_row_column } from "./helpers"
+import { Container, Container_mobile, Mobile_bar, Sidebar, BoardContainer, Timer, ScoreEvaluationBar, Header, fen_to_history, uci_to_row_column, get_uci } from "./helpers"
 import Board from "./board"
 import { Promotion, Result, Draw_offered, Choose_game, Choose_time, GetUsername, GetUsernameMobile, Online_game, VS_PC } from "./windows"
 
@@ -74,12 +74,14 @@ class Game extends React.Component {
     }
   }
 
-  async make_moves(selected_square, row, column, promotion) { 
+  async make_moves(selected_square, row, column, promotion) {
+	let uci = get_uci(selected_square, row, column, promotion)
     let pieces = this.state.history[this.state.step].pieces
     let possible_promotion = pieces[selected_square[0]][selected_square[1]][0] === "pawn" && (row === 0 || row === 7)
     
     if (possible_promotion && !this.state.promotion) {
-      let check_promotion = await fetch(`${baseURL}check_promotion_valid/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
+	  let uci_promotion = uci + "q"
+      let check_promotion = await fetch(`${baseURL}check_promotion_valid/${this.state.game_id}/${uci_promotion}`)
       let data = await check_promotion.json()
 	  console.log(data)
       if (data["valid"] === "true") {
@@ -87,13 +89,8 @@ class Game extends React.Component {
         return
       }
     }
-
-    if (!promotion) {
-      var response = await fetch(`${baseURL}make_move/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}`)
-    } else {
-      var response = await fetch(`${baseURL}make_move/${this.state.game_id}/${selected_square[0]}/${selected_square[1]}/${row}/${column}/${promotion}`)
-    }
-	
+ 
+    var response = await fetch(`${baseURL}make_move/${this.state.game_id}/${uci}`)	
     let data = await response.json()
     let step = this.state.step
 

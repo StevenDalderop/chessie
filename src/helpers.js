@@ -216,3 +216,29 @@ export function uci_to_row_column(uci) {
   let row_end = 8 - uci[3]
   return [[row_start, col_start], [row_end, col_end]]
 }
+
+export function get_uci(selected_square, row, column, promotion) {
+	if (promotion) {
+		var promotion_letter = promotion[0]
+	} else {
+		var promotion_letter = ""
+	}
+	
+	var row_start = parseInt(selected_square[0])
+	var col_start = parseInt(selected_square[1])
+	
+	var alphabet = {
+		0: "a",
+		1: "b",
+		2: "c",
+		3: "d",
+		4: "e",
+		5: "f",
+		6: "g",
+		7: "h"		
+	}
+	
+	var uci = alphabet[col_start] + (8 - row_start).toString() + alphabet[column] + (8 - parseInt(row)).toString() + promotion_letter	
+	
+	return uci
+}

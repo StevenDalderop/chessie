@@ -6,7 +6,7 @@ import Mobile_bar from "./components/mobile_bar"
 import Sidebar from "./components/sidebar"
 import BoardContainer from "./components/board_container"
 import Header from "./components/header"
-import { get_board, uci_to_row_column, get_uci } from "./chess_notation"
+import { get_board, uci_to_row_column, get_uci, get_piece } from "./chess_notation"
 import Board from "./components/board"
 import { Promotion, Result, Draw_offered, Choose_game, Choose_time, GetUsername, GetUsernameMobile, Online_game, VS_PC } from "./components/windows"
 
@@ -44,51 +44,52 @@ class Game extends React.Component {
     }
   }
 
-  handleClickBoard(row, column) {
+  handleClickBoard(square) {
     if (this.state.game_state !== "started") {
       return
     }
 
-    let pieces = get_board(this.state.fen)
+    let board = get_board(this.state.fen)
     let selected_square = this.state.selected_square
 
-	var is_piece = pieces[row][column]
-	var is_my_color = is_piece && pieces[row][column].color === this.state.color
-	var can_move = selected_square && !is_piece
-	var is_friend = is_piece && pieces[row][column].color === this.state.turn
-	var can_attack = selected_square && is_piece && !is_friend
+	var piece = get_piece(board, square)
+	var is_my_color = piece && piece.color === this.state.color
+	var can_move = selected_square && !piece
+	var is_friend = piece && piece.color === this.state.turn
+	var can_attack = selected_square && piece && !is_friend
 
     if ((this.state.vs === "pc" || this.state.vs === "human_other") && is_my_color) {
-      this.setState({"selected_square": [row, column]})
+      this.setState({"selected_square": square})
     } else if ((this.state.vs === "human") && is_friend) {
-      this.setState({"selected_square": [row, column]})
+      this.setState({"selected_square": square})
     } else if (can_attack || can_move) {
-      let promotion = false
-      this.make_moves(selected_square, row, column, promotion)
+      let move = {"from": selected_square, "to": square, "uci": selected_square + square, "promotion": false}
+      this.make_moves(move)
     }
   }
 
-  async make_moves(selected_square, row, column, promotion) {
-	let uci = get_uci(selected_square, row, column, promotion)
-    let pieces = get_board(this.state.fen)
-    let possible_promotion = pieces[selected_square[0]][selected_square[1]][0] === "pawn" && (row === 0 || row === 7)
-    
+  async make_moves(move) {
+    let board = get_board(this.state.fen)
+	let piece = get_piece(board, move.from)
+
+	let possible_promotion = piece && piece.type === "p" && move.to[1] === "1" || move.to[1] === "8"
+	
     if (possible_promotion && !this.state.promotion) {
-	  let uci_promotion = uci + "q"
+	  let uci_promotion = move.uci + "q"
       let check_promotion = await fetch(`${baseURL}check_promotion_valid/${this.state.game_id}/${uci_promotion}`)
       let data = await check_promotion.json()
       if (data["valid"] === "true") {
-        this.setState({"promotion": [row, column], "display": "promotion"})
+        this.setState({"promotion": move.to, "display": "promotion"})
         return
       }
     }
 	
-	let is_valid_move = await this.make_move(this.state.game_id, uci)
+	let is_valid_move = await this.make_move(this.state.game_id, move.uci)
 
     if (this.state.vs === "pc" && is_valid_move) {
 		this.get_pc_move()
     } else if (this.state.vs === "human_other" && is_valid_move) {
-      socket.emit("make move", {"fen": data["fen"], "moved_squares": [selected_square, [row, column]], "moves_san": data["san"], "turn": data["turn"] , "score": data["evaluation"], "result": data["result"], "times": this.state.times, "room": this.state.room})
+      socket.emit("make move", {"fen": data["fen"], "moved_squares": move.uci, "moves_san": data["san"], "turn": data["turn"] , "score": data["evaluation"], "result": data["result"], "times": this.state.times, "room": this.state.room})
     }
 
     if (this.state.result) {
@@ -128,7 +129,7 @@ class Game extends React.Component {
           "turn": data["turn"],
           "score": data["evaluation"],
           "selected_square": null,
-          "moved_squares": uci_to_row_column(data["uci"]),
+          "moved_squares": data["uci"],
           "san": data["san"],
           "promotion": false
         }))
@@ -198,12 +199,19 @@ class Game extends React.Component {
         .then(data => {this.setState({"game_id": data["game_id"]})})
   }
   
-  handlePromotionOptionPressed(e) {
-	  let row = this.state.promotion[0]
-      let column = this.state.promotion[1]
+  handlePromotionOptionPressed(e) {	  
       let selected_square = this.state.selected_square
-      let piece = e.target.value
-      this.make_moves(selected_square, row, column, piece)	  
+	  let promotion_square = this.state.promotion
+	  let pieces = {
+		  "rook": "r", 
+		  "queen": "q", 
+		  "knight": "n", 
+		  "bishop": "b"
+	  }
+      let piece = pieces[e.target.value]
+	  let uci = selected_square + promotion_square + piece
+	  let move = {"from": selected_square, "to": promotion_square, "uci": uci, "promotion": piece}
+      this.make_moves(move)	  
   }
   
   handleCloseButtonPressed() {
@@ -338,7 +346,7 @@ class Game extends React.Component {
               mirrored={this.state.mirrored}
               selected_square={this.state.selected_square}
               moved_squares={this.state.moved_squares} 
-              onClick={(row, col) => this.handleClickBoard(row, col)} 
+              onClick={(square) => this.handleClickBoard(square)} 
               />}
             sidebar_right={<Sidebar 
               times={this.state.times} 
@@ -362,7 +370,7 @@ class Game extends React.Component {
               mirrored={this.state.mirrored}
               selected_square={this.state.selected_square} 
               moved_squares={this.state.moved_squares}
-              onClick={(row, col) => this.handleClickBoard(row, col)} 
+              onClick={(square) => this.handleClickBoard(square)} 
               />} 
             mobile_bar={<Mobile_bar 
               mirrored={this.state.mirrored}

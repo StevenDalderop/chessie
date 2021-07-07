@@ -56,6 +56,24 @@ export function uci_to_row_column(uci) {
   return [[row_start, col_start], [row_end, col_end]]
 }
 
+
+export function get_square(row, col) {
+	return "abcdefgh".substring(col, col + 1) + (8 - parseInt(row)).toString()	
+}
+
+function get_row_col(square) {
+	var col = parseInt(square[0], 36) - 10
+	var row = 8 - parseInt(square[1])
+	return [row, col]
+}
+
+export function get_piece(board, square) {
+	var [row, col] = get_row_col(square)
+	var piece = board[row][col]
+	return piece
+}
+
+
 export function get_uci(selected_square, row, column, promotion) {
 	if (promotion) {
 		var promotion_letters = {

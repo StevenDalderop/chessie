@@ -1,10 +1,11 @@
 // Piece icons: By en:User:Cburnett - Own work  This W3C-unspecified vector image was created with Inkscape., CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=1499809
 import React from "react"
 import css from "./board.css";
+import { get_square } from "../chess_notation"
 
 function Square(props) {
   return (
-    <div id={props.id} className={"square color-square-" + props.square_color} onClick={() => {props.onClick()}}>
+    <div className={"square color-square-" + props.square_color} onClick={() => {props.onClick()}}>
       <div className={"row_number"}>
         {props.row} 
       </div>
@@ -50,10 +51,10 @@ export default class Board extends React.Component {
       var row_new = row
       var col_new = column
     }
-    let row_number = column === 0 ? 8 - row_new : null
-    let col_letter = row === 7 ? String.fromCharCode(col_new + 1 + 64) : null
-
-    let id = String.fromCharCode(col_new + 1 + 64) + String(8 - row_new)
+	
+	var square = get_square(row_new, col_new)
+	let col_letter = row === 7 ? square[0] : null
+    let row_number = column === 0 ? square[1] : null
     
     if ((row_new + col_new) % 2 === 0) {
       square_color = "white"
@@ -61,16 +62,23 @@ export default class Board extends React.Component {
       square_color = "black"
     }
     
-    if (this.props.selected_square && this.props.selected_square[0] === row_new && this.props.selected_square[1] === col_new) {
+    if (this.props.selected_square === square) {
       square_color = "yellow"
     }
 
-    if (this.props.moved_squares && this.props.moved_squares[1][0] === row_new && this.props.moved_squares[1][1] === col_new) {
+    if (this.props.moved_squares && this.props.moved_squares.slice(2,4) === square) {
       square_color = "gray"
-    }
-
+    }	
+	
     return (
-      <Square id={id} row={row_number} col={col_letter} square_color={square_color} piece={this.props.pieces[row_new][col_new]} onClick={() => this.props.onClick(row_new, col_new)} key={row_new * 8 + col_new} />
+      <Square 
+		row={row_number} 
+		col={col_letter} 
+		square_color={square_color} 
+		piece={this.props.pieces[row_new][col_new]} 
+		onClick={() => this.props.onClick(square)} 
+		key={row_new * 8 + col_new} 
+	  />
     )
   }
 

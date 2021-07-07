@@ -23,7 +23,6 @@ class Game extends React.Component {
       "moved_squares": null,
       "turn": 1,
       "times": [60, 60],
-      "step": 0,
       "promotion": false,
       "vs": null,
       "score": 0,
@@ -54,9 +53,9 @@ class Game extends React.Component {
     let selected_square = this.state.selected_square
 
 	var is_piece = pieces[row][column]
-	var is_my_color = is_piece && pieces[row][column][1] === this.state.color
+	var is_my_color = is_piece && pieces[row][column].color === this.state.color
 	var can_move = selected_square && !is_piece
-	var is_friend = is_piece && pieces[row][column][1] === this.state.turn
+	var is_friend = is_piece && pieces[row][column].color === this.state.turn
 	var can_attack = selected_square && is_piece && !is_friend
 
     if ((this.state.vs === "pc" || this.state.vs === "human_other") && is_my_color) {
@@ -78,35 +77,49 @@ class Game extends React.Component {
 	  let uci_promotion = uci + "q"
       let check_promotion = await fetch(`${baseURL}check_promotion_valid/${this.state.game_id}/${uci_promotion}`)
       let data = await check_promotion.json()
-	  console.log(data)
       if (data["valid"] === "true") {
         this.setState({"promotion": [row, column], "display": "promotion"})
         return
       }
     }
- 
-    var response = await fetch(`${baseURL}make_move/${this.state.game_id}/${uci}`)	
-    let data = await response.json()
-    let step = this.state.step
+	
+	let is_valid_move = await this.make_move(this.state.game_id, uci)
 
-    if (data["valid"] === "true" && this.state.vs !== "human_other") {
-      console.log("move validated")
-      this.setState((state) => ({
-        "fen": data["fen"],
-        "result": data["result"],
-        "turn": data["turn"],
-        "score": data["evaluation"],
-        "selected_square": null,
-        "moved_squares": [state.selected_square, [row, column]],
-        "san": data["san"],
-        "step": state.step + 1,
-        "promotion": false
-       }))
-      this.startTimer()
-     }
+    if (this.state.vs === "pc" && is_valid_move) {
+		this.get_pc_move()
+    } else if (this.state.vs === "human_other" && is_valid_move) {
+      socket.emit("make move", {"fen": data["fen"], "moved_squares": [selected_square, [row, column]], "moves_san": data["san"], "turn": data["turn"] , "score": data["evaluation"], "result": data["result"], "times": this.state.times, "room": this.state.room})
+    }
 
-    if (this.state.vs === "pc" && data["valid"] === "true") {
-      fetch(`${baseURL}get_pc_move/${this.state.game_id}/${this.state.skill_level_pc}`)
+    if (this.state.result) {
+      this.setState({"game_state": "finished", "selected_square": null})
+    }
+  }
+  
+  make_move(game_id, uci) {
+    var is_valid = fetch(`${baseURL}make_move/${this.state.game_id}/${uci}`)	
+		.then(res => res.json())
+		.then(data => {
+			if (data["valid"] === "true" && this.state.vs !== "human_other") {
+			  this.setState((state) => ({
+				"fen": data["fen"],
+				"result": data["result"],
+				"turn": data["turn"],
+				"score": data["evaluation"],
+				"selected_square": null,
+				"moved_squares": uci,
+				"san": data["san"],
+				"promotion": false
+			   }))
+			  this.startTimer()
+			}
+			return data["valid"]
+		})
+	return is_valid
+  }
+  
+  get_pc_move() {
+	fetch(`${baseURL}get_pc_move/${this.state.game_id}/${this.state.skill_level_pc}`)
       .then(response => response.json())
       .then((data) => {
         this.setState((state) => ({
@@ -117,17 +130,9 @@ class Game extends React.Component {
           "selected_square": null,
           "moved_squares": uci_to_row_column(data["uci"]),
           "san": data["san"],
-          "step": state.step + 1,
           "promotion": false
         }))
       })
-    } else if (this.state.vs === "human_other" && data["valid"] === "true") {
-      socket.emit("make move", {"fen": data["fen"], "moved_squares": [selected_square, [row, column]], "moves_san": data["san"], "step": step + 1, "turn": data["turn"] , "score": data["evaluation"], "result": data["result"], "times": this.state.times, "room": this.state.room})
-    }
-
-    if (this.state.result) {
-      this.setState({"game_state": "finished", "selected_square": null})
-    }
   }
 
   handleUserNameSubmitted() {
@@ -142,7 +147,6 @@ class Game extends React.Component {
 		  this.setState({"display": null})
 	  } else if (e.target.name === "join_game") {
       game_id = e.target.value
-	  console.log(e.target)
       socket.emit("join game", {"username": this.state.username, "game_id": game_id})
       console.log("join game " + this.state.username + " " + game_id)
     } 
@@ -182,10 +186,10 @@ class Game extends React.Component {
       this.setState({"selected_square": null,
                      "moved_squares": null, 
                      "turn": 1,
-                     "step": 0,
                      "fen": 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
                      "san": null,
                      "score": 0,
+					 "color": 1,
                      "mirrored": false,
                      "display": "welcomeScreen1",
                      "game_state": null})
@@ -279,7 +283,6 @@ class Game extends React.Component {
         "score": data["evaluation"],
         "selected_square": null,
         "san": data["san"],
-        "step": data["step"],
         "times": data["times"],
         "promotion": false
       }))

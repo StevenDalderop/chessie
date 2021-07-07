@@ -233,7 +233,6 @@ def make_move(data):
         "fen": data["fen"], 
         "moved_squares": data["moved_squares"], 
         "san": data["moves_san"], 
-        "step": data["step"], 
         "turn": data["turn"] , 
         "evaluation": data["score"], 
         "times": data["times"], 

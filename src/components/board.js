@@ -4,7 +4,7 @@ import css from "./board.css";
 
 function Square(props) {
   return (
-    <div id={props.id} className={"square color-square-" + props.square_color} onClick={() => props.onClick()}>
+    <div id={props.id} className={"square color-square-" + props.square_color} onClick={() => {props.onClick()}}>
       <div className={"row_number"}>
         {props.row} 
       </div>

@@ -27,8 +27,11 @@ else:
 def index():
     return render_template("index.html")
 
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("index.html")
 
-@app.route("/new_game")
+@app.route("/api/new_game")
 def create_new_game():
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
@@ -38,7 +41,7 @@ def create_new_game():
     return {"game_id": game_id}
     
 
-@app.route("/make_move/<int:game_id>/<string:uci>")
+@app.route("/api/make_move/<int:game_id>/<string:uci>")
 def make_move(game_id, uci):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
@@ -79,7 +82,7 @@ def make_move(game_id, uci):
     }
 
          
-@app.route("/check_promotion_valid/<int:game_id>/<string:uci>")
+@app.route("/api/check_promotion_valid/<int:game_id>/<string:uci>")
 def check_promotion_valid(game_id, uci):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
@@ -91,7 +94,7 @@ def check_promotion_valid(game_id, uci):
     return {"valid": "false"}
 
 
-@app.route("/get_pc_move/<int:game_id>/<int:skill_level>")
+@app.route("/api/get_pc_move/<int:game_id>/<int:skill_level>")
 def get_pc_move(game_id, skill_level):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
@@ -111,7 +114,7 @@ def get_pc_move(game_id, skill_level):
         moves = uci
         
     san = get_san(moves)
-    turn = board.turn 
+    turn = int(board.turn) 
     evaluation = get_evaluation(stockfish, fen)
     result = None if not board.is_game_over() else board.result()
     
@@ -127,14 +130,39 @@ def get_pc_move(game_id, skill_level):
         "result": result
     }
     
-@app.route("/get_games")    
+@app.route("/api/get_games")    
 def get_games_available():
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     
     games_available = get_online_games_available(db)
     return {"games_available": games_available}
+
+
+@app.route("/api/create_new_user", methods=["POST"])
+def create_new_user():
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
     
+    username = request.json["username"]
+    
+    result = cursor.execute("SELECT * FROM users WHERE name = ?", (username,)).fetchone()
+    if result:
+        return {"valid_username": False}
+
+    cursor.execute("INSERT INTO users (name) VALUES (?)", (username,))
+    db.commit()    
+    return {"valid_username": True}
+
+
+@app.route("/api/get_users")
+def get_users():
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+    
+    users_online = [user[0] for user in cursor.execute("SELECT name FROM users").fetchall()]
+    return {"users_online": users_online}
+
 
 @socketio.on("disconnect")
 def disconnect():
@@ -165,11 +193,12 @@ def add_user_online(data):
 
     cursor.execute("INSERT INTO users (name, sid) VALUES (?, ?)", (username, sid))
     db.commit()
+    
     users_online = [user[0] for user in cursor.execute("SELECT name FROM users").fetchall()]
-    socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
-            
+    socketio.emit("announce users online", {"users_online": users_online}, broadcast=True)
+    
 
-@socketio.on("new game")
+@socketio.on("new online game")
 def new_online_game(data):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
@@ -202,8 +231,7 @@ def new_online_game(data):
 def join_game(data):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
-    
-    
+       
     game_id = int(data["game_id"])
 
     join_room(game_id)
@@ -231,10 +259,10 @@ def join_game(data):
 def make_move(data):
     json = {
         "fen": data["fen"], 
-        "moved_squares": data["moved_squares"], 
+        "uci": data["uci"], 
         "san": data["moves_san"], 
         "turn": data["turn"] , 
-        "evaluation": data["score"], 
+        "evaluation": data["evaluation"], 
         "times": data["times"], 
         "result": data["result"]
     }

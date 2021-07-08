@@ -7,9 +7,9 @@ function ScoreEvaluationBar(props) {
   }
   return (
     <svg>
-      <rect id="rect_left" width={String(score_to_with(props["score"]))+"%"}/>
-      <rect id="rect_right" x={String(score_to_with(props["score"]))+"%"} width={String(100 - score_to_with(props["score"]))+"%"}/>
-      <text id="text" x="15" y="18"> Centipawns: {props["score"]} </text>
+      <rect id="rect_left" width={String(score_to_with(props["evaluation"]))+"%"}/>
+      <rect id="rect_right" x={String(score_to_with(props["evaluation"]))+"%"} width={String(100 - score_to_with(props["evaluation"]))+"%"}/>
+      <text id="text" x="15" y="18"> Centipawns: {props["evaluation"]} </text>
     </svg>
   )
 }
@@ -45,7 +45,7 @@ export default function Sidebar(props) {
       <div id="evaluation">
         <h5> Chess engine </h5>
         <div id="evaluation_figure">
-          <ScoreEvaluationBar score={props["score"]} />
+          <ScoreEvaluationBar evaluation={props["evaluation"]} />
         </div>
       </div>
       <div id="buttons">

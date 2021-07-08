@@ -147,14 +147,12 @@ export function Choose_time(props) {
 }}
 
 export function GetUsername(props) {
-  if (!(props["display"] === "humanOther")) {
-    return null
-  } 
-    if (props["message"]){
-      var message = (<p> Username already exists </p>) 
-    } else {
-      var message = null
-    }
+
+	if (props["message"]){
+	  var message = (<p> Username already exists </p>) 
+	} else {
+	  var message = null
+	}
   return (
     <div id="humanOther" className="welcomeScreen display_not_mobile">
       <h2> Username </h2>
@@ -171,9 +169,6 @@ export function GetUsername(props) {
 }
 
 export function GetUsernameMobile(props) {
-  if (!(props["display"] === "humanOther")) {
-    return null
-  } 
     if (props["message"]){
       var message = (<p> Username already exists </p>) 
     } else {

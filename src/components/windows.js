@@ -1,4 +1,5 @@
 import React from "react"
+import { useHistory } from "react-router-dom"
 
 export function Promotion(props) {
   if (!props["promotion"]) {
@@ -57,55 +58,41 @@ export function Draw_offered(props) {
   }
 }
 
-export function Choose_game(props) {
-  if (!(props["display"] === "welcomeScreen1")) {
-    return null
-  } else {
-    function createInput(value) {
-      document.querySelector("#hidden_input").setAttribute("value", value)
-      document.querySelector("#hidden_input").click()
-    }
+export function ChooseGame(props) {
   return (
       <div id="welcomeScreen1" className="welcomeScreen">
         <div className="container_div">
-          <button name="close" className="close_button btn btn-danger" onClick={() => props.onClose()}> Close </button>
           <h2 id="title_new_game"> New Game </h2>
           <div className="row mr-0 ml-0 mt-3">
             <div className="col no_padding_mobile">
-              <div id="vs_human" className="time" onClick={() => createInput("human")}>
+              <div id="vs_human" className="time" onClick={() => props.onClick("human")}>
                 <div className="centered_container no_click">
                   <h5> vs Human Offline </h5>
                 </div> 
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div id="online" className="time" onClick={() => createInput("human_other")}> 
+              <div id="online" className="time" onClick={() => props.onClick("online")}> 
                 <div className="centered_container no_click">
                   <h5> vs Human Online </h5> 
                 </div>
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div id="vs_pc" className="time" onClick={() => createInput("pc")}>
+              <div id="vs_pc" className="time" onClick={() => props.onClick("pc")}>
                 <div className="centered_container no_click"> 
                   <h5> vs PC </h5>
                 </div> 
               </div>
             </div>
-            <form>
-              <input id="hidden_input" name="vs" type="hidden" value="" onClick={(e) => props.onClick(e)}></input>
-            </form>
           </div>
         </div>
       </div>
     )
-  }
 }
 
-export function Choose_time(props) {
-  if (!(props["display"] === "welcomeScreen2")) {
-    return null
-  } else {
+
+export function ChooseTime(props) { 
   return (
     <div id="welcomeScreen2" className="welcomeScreen">
       <div className="container_div">
@@ -113,28 +100,28 @@ export function Choose_time(props) {
         <h2> Time </h2>
         <div className="row ml-0 mr-0 mt-3">
             <div className="col no_padding_mobile"> 
-              <div id="time_60" data-value={60} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+              <div id="time_60" data-value={60} name="time" className="time" onClick={() => props.onClick(60)}> 
                 <div className="centered_container no_click">
                   <h5> 1 minute </h5> 
                 </div>
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div id="time_180" data-value={180} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+              <div id="time_180" data-value={180} name="time" className="time" onClick={() => props.onClick(180)}> 
                 <div className="centered_container no_click">
                   <h5> 3 minutes </h5> 
                 </div> 
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div id="time_300" data-value={300} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+              <div id="time_300" data-value={300} name="time" className="time" onClick={() => props.onClick(300)}> 
                 <div className="centered_container no_click">
                   <h5> 5 minutes </h5> 
                 </div> 
               </div>
             </div>
             <div className="col no_padding_mobile">
-              <div id="time_600" data-value={600} name="time" className="time" onClick={(e) => props.onClick(e)}> 
+              <div id="time_600" data-value={600} name="time" className="time" onClick={() => props.onClick(600)}> 
                 <div className="centered_container no_click">
                   <h5> 10 minutes </h5> 
                 </div> 
@@ -144,7 +131,7 @@ export function Choose_time(props) {
       </div>
     </div>
   )
-}}
+}
 
 export function GetUsername(props) {
 
@@ -254,24 +241,19 @@ export function Online_game(props) {
   )
 }}
 
-export function VS_PC(props) {
-  if (!(props["display"] === "welcomeScreenPC")) {
-    return null
-  } else {
+export function PcSkillLevelForm(props) {
     return (
       <div id="welcomeScreenPC" className="welcomeScreen">
         <div className="container_div">
-          <button name="close" className="close_button btn btn-danger" onClick={() => props.onClose()}> Close </button>
           <h2> PC strength </h2>
           <div className="mt-3">
-            <form name="pc_strength" onSubmit={(e) => props.onSubmit(e)}>
+            <form name="pcSkillLevel" onSubmit={() => props.onSubmit()}>
               <label> Skill level (0-20): </label> <br></br>
-              <input id="elo" type="number" min="0" max="20" value={props.skill_level_pc} onChange={props.onChange} /> <br></br>
+              <input id="elo" type="number" min="0" max="20" name="pcSkillLevel" value={props.skill_level_pc} onChange={props.onChange} /> <br></br>
               <button className="btn btn-primary mt-3"> Submit </button>
             </form>
           </div>
         </div>
       </div>
     )
-  }
 }

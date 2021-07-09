@@ -1,13 +1,13 @@
 import React from "react"
-import Container from "./components/container"
-import Container_mobile from "./components/container_mobile"
-import Mobile_bar from "./components/mobile_bar"
-import Sidebar from "./components/sidebar"
-import BoardContainer from "./components/board_container"
-import GameHeader from "./components/game_header"
-import { get_board, uci_to_row_column, get_uci, get_piece } from "./chess_notation"
-import Board from "./components/board"
-import { Promotion, Result, Draw_offered, Choose_game, Choose_time, GetUsername, GetUsernameMobile, Online_game, VS_PC } from "./components/windows"
+import Container from "./container"
+import Container_mobile from "./container_mobile"
+import Mobile_bar from "./mobile_bar"
+import Sidebar from "./sidebar"
+import BoardContainer from "./board_container"
+import GameHeader from "./game_header"
+import { get_board, uci_to_row_column, get_uci, get_piece } from "../chess_notation"
+import Board from "./board"
+import { Promotion, Result, Draw_offered, GetUsername, GetUsernameMobile, Online_game } from "./windows"
 
 const baseURL = window.location.origin
 
@@ -19,13 +19,11 @@ export default class Game extends React.Component {
     this.state = {
       "game_id": null,
       "game_state": null, 
-      "vs": null,
 	  "fen": 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
       "selected_square": null,
       "uci": null,
       "san": null,
       "turn": 1,
-      "color": null, 
       "promotion": false,
       "times": [60, 60],
       "evaluation": 0,
@@ -50,14 +48,14 @@ export default class Game extends React.Component {
     let selected_square = this.state.selected_square
 
 	var piece = get_piece(board, square)
-	var is_my_color = piece && piece.color === this.state.color
+	var is_my_color = piece && piece.color === this.props.color
 	var can_move = selected_square && !piece
 	var is_friend = piece && piece.color === this.state.turn
 	var can_attack = selected_square && piece && !is_friend
 
-    if ((this.state.vs === "pc" || this.state.vs === "human_other") && is_my_color) {
+    if ((this.props.vs === "pc" || this.props.vs === "human_other") && is_my_color) {
       this.setState({"selected_square": square})
-    } else if ((this.state.vs === "human") && is_friend) {
+    } else if ((this.props.vs === "human") && is_friend) {
       this.setState({"selected_square": square})
     } else if (can_attack || can_move) {
       let move = {"from": selected_square, "to": square, "uci": selected_square + square, "promotion": false}
@@ -148,7 +146,7 @@ export default class Game extends React.Component {
   handleTimeOptionPressed(e) {
 	  let time = e.target.getAttribute('data-value')
 
-      if (this.state.vs === "human_other") {
+      if (this.props.vs === "human_other") {
         socket.emit("new online game", {"username": this.props.username, "time": time})
         this.setState({"display": "usersOnline", "times": [time, time]})
       } else {
@@ -210,9 +208,9 @@ export default class Game extends React.Component {
   }
   
   handleResignButtonPressed() {
-	  if (this.state.vs === "pc") {
+	  if (this.props.vs === "pc") {
         this.setState((state) => ({"result": this.props.username + " resigned", "game_state": "resigned"}))
-      } else if (this.state.vs === "human_other") {
+      } else if (this.props.vs === "human_other") {
         socket.emit("resign", {"username": this.props.username, "room": this.state.room})
       }
   }
@@ -245,6 +243,12 @@ export default class Game extends React.Component {
   }
 
   componentDidMount() {	
+    fetch(`${baseURL}/api/new_game`)
+        .then(response => response.json())
+        .then(data => {
+			this.setState({"game_id": data["game_id"], "game_state": "started"})			
+		}) 
+  
 	socket.on("announce new game", (data) => { 
 		console.log(data["game_id"])
 		this.setState({"game_id": data["game_id"]})
@@ -306,9 +310,9 @@ export default class Game extends React.Component {
   
   componentDidUpdate(prevProps, prevState) {
 	if (prevState.fen !== this.state.fen) {
-		if (this.state.vs === "pc" && prevState.turn === 1) {
+		if (this.props.vs === "pc" && prevState.turn === 1) {
 		  this.get_pc_move()
-		} else if (this.state.vs === "human_other" && prevState.turn === prevState.color) {
+		} else if (this.props.vs === "human_other" && prevState.turn === prevProps.color) {
 			var json = {
 				"fen": this.state.fen, 
 				"uci": this.state.uci, 
@@ -333,14 +337,11 @@ export default class Game extends React.Component {
   }
 
 
-  render () {
+  render () {  
     return (
       <div id="main_container">
         <div className="container-fluid">
-          <Choose_game display={this.state.display} onClick={(e) => this.handleGameTypePressed(e)} onClose={() => this.handleCloseButtonPressed()} />
-          <Choose_time display={this.state.display} onClick={(e) => this.handleTimeOptionPressed(e)} onClose={() => this.handleCloseButtonPressed()} />
           <Online_game display={this.state.display} usernames={this.state.users_online} username={this.props.username} games={this.state.games_available} onClick={(e) => this.handleOnlineGameClick(e)} onClose={() => this.handleCloseButtonPressed()} />
-		  <VS_PC display={this.state.display} onChange={(e) => this.setState({"skill_level_pc": e.target.value})} skill_level_pc={this.state.skill_level_pc} onSubmit={() => this.handlePcStrengthSubmitted()} onClose={() => this.handleCloseButtonPressed()} />
           <Promotion promotion={this.state.promotion} onClick={(e) => this.handlePromotionOptionPressed(e)} />
           <Result result={this.state.result} onClick={() => {this.setState({"result": null})}} />
           <Draw_offered draw_offered={this.state.draw_offered} username={this.props.username} onClickAccept={() => this.handleAcceptDrawButtonPressed()} onClickDecline={() => this.handleDeclineDrawButtonPressed()} /> 
@@ -362,7 +363,7 @@ export default class Game extends React.Component {
               evaluation={this.state.evaluation} 
               mirrored={this.state.mirrored}
               game_state={this.state.game_state}
-              vs={this.state.vs}
+              vs={this.props.vs}
               onClick={() => {this.handleNewGameButtonPressed()}} 
 			  onClick2={() => this.handleResignButtonPressed()}
 			  onClick3={() => this.handleOfferDrawButtonPressed()}

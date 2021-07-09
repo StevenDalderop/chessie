@@ -96,7 +96,6 @@ export function ChooseTime(props) {
   return (
     <div id="welcomeScreen2" className="welcomeScreen">
       <div className="container_div">
-      <button name="close" className="close_button btn btn-danger" onClick={() => props.onClose()}> Close </button>
         <h2> Time </h2>
         <div className="row ml-0 mr-0 mt-3">
             <div className="col no_padding_mobile"> 
@@ -176,70 +175,6 @@ export function GetUsernameMobile(props) {
   )
 }
 
-export function Online_game(props) {
-  let users = []
-  let i = 0
-  let u
-  for (u of props["usernames"]) {
-    users.push(<li key={i}> {u} </li>)
-    i++
-  }
-
-  let games = []
-  let j = 0
-  let g
-  for (g of props["games"]) {
-    if (props["username"] !== g["username"]) {
-      games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) <a className="color_blue" name="join_game" value={g["game_id"]} onClick={() => click(g["game_id"])}> Join game </a> </li>)
-    } else {
-      games.push(<li key={j}> {g["username"]} ({g["time"]} seconds) </li>)   
-    }
-    j++
-  }
-
-  function click(value) {
-    document.getElementById("hidden_input").value = value;
-    document.getElementById("hidden_input").click()
-  }
-
-  let title = window.innerWidth < 768 ? "Games" : "Online"
-
-  if (!(props["display"] === "usersOnline")) {
-    return null
-  } else {
-  return (
-    <div id="usersOnline" className="welcomeScreen">
-      <div className="container_div">
-        <button name="close" className="close_button btn btn-danger" onClick={() => props.onClose()}> Close </button>
-        <h2> {title} </h2>
-        <div className="row_container mt-3">
-          <div className="col_left">
-            <div className="relative">
-              <h5> Users online </h5>
-              <div id="users_online_div" className="align-left scrollable_y">
-                <ul>
-                  {users}
-                </ul>
-                <input id="hidden_input" type="hidden" name="join_game" onClick={(e) => props.onClick(e)}></input>
-              </div>
-            </div>
-          </div>
-          <div className="col_right">
-            <div className="relative"> 
-              <h5 id="users_online_subtitle"> Games available </h5>
-              <div id="games_available_div" className="align-left scrollable_y">
-                <ul>
-                  {games}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button name="newGame" className="btn btn-primary" onClick={(e) => props.onClick(e)}> Create new game </button>
-      </div>
-    </div>
-  )
-}}
 
 export function PcSkillLevelForm(props) {
     return (

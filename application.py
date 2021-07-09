@@ -244,7 +244,7 @@ def join_game(data):
     user_id_1, time = cursor.execute("SELECT user_id_1, time1 FROM games WHERE id = ?", (game_id,)).fetchone()
     username_1 = get_username(db, user_id_1)
        
-    socketio.emit("announce game starts", {"username": username_1, "username2": username, "time": time, "game_id": game_id, "room": game_id}, room=game_id)
+    socketio.emit("announce game starts", {"username": username_1, "username2": username, "time": time, "game_id": game_id}, room=game_id)
 
     cursor.execute("DELETE FROM games WHERE user_id_1 = ?", (user_id,))
     

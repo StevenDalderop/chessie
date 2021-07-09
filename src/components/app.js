@@ -7,7 +7,8 @@ import Header from "./header"
 import { ChooseGame } from "./windows"
 import GameSetting from "./game_settings"
 
-var socket = io()
+export var socket = io()
+
 const baseURL = window.location.origin
 
 export default function App() {
@@ -16,11 +17,11 @@ export default function App() {
 	const [loggedIn, setLoggedIn] = useState(false)
 	const history = useHistory()
 	
-/*  	useEffect(() => {
+	useEffect(() => {
 		if (!loggedIn) {
 			history.push("/login")
 		}
-	})   */
+	})   
 			
 	function handleChange(e) {
 		e.preventDefault()

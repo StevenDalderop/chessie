@@ -1,0 +1,31 @@
+.option {
+  background-color: rgb(200,200,200);
+  color: black;
+  height: 100px;
+  width: 100px;
+  text-align: center;
+  margin: auto;
+  position: relative;
+  border: 3px solid black;
+  margin-bottom: 15px;
+}
+
+.option:hover {
+  background-color: rgb(150,150,150);
+}
+
+.centered_div {
+  position: absolute;
+  margin: 0;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+@media screen and (max-width: 767px) and (orientation: portrait) { 
+  .no_padding_mobile {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+}

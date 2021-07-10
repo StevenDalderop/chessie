@@ -2,12 +2,6 @@ import React, { useState, useEffect } from "react"
 import { socket } from "./app"
 
 const baseURL = window.location.origin
-
-  // handleUserNameSubmitted() {
-	  // this.setState({"display": null})
-      // socket.emit("add user online", {"username_self": this.props.username})
-	  // socket.emit("get users online")
-  // }
   							
 export default function OnlineGame(props) {
 	const [gamesAvailable, setGamesAvailable] = useState([])

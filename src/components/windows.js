@@ -1,5 +1,7 @@
-import React from "react"
+import React, {useState} from "react"
 import { useHistory } from "react-router-dom"
+import Dialog from "./dialog"
+import { Option, OptionMenu } from "./option_menu"
 
 export function Promotion(props) {
   if (!props["promotion"]) {
@@ -20,7 +22,7 @@ export function Promotion(props) {
 export function Result(props) {
   if (props.result) {
     return (
-      <div id="message" className="welcomeScreen">
+      <div className="welcomeScreen">
         <h1> Result </h1>
         <p> {props.result} </p>
         <button className="btn btn-primary" onClick={props.onClick}> Close </button>
@@ -60,85 +62,40 @@ export function Draw_offered(props) {
 
 export function ChooseGame(props) {
   return (
-      <div id="welcomeScreen1" className="welcomeScreen">
-        <div className="container_div">
-          <h2 id="title_new_game"> New Game </h2>
-          <div className="row mr-0 ml-0 mt-3">
-            <div className="col no_padding_mobile">
-              <div id="vs_human" className="time" onClick={() => props.onClick("human")}>
-                <div className="centered_container no_click">
-                  <h5> vs Human Offline </h5>
-                </div> 
-              </div>
-            </div>
-            <div className="col no_padding_mobile">
-              <div id="online" className="time" onClick={() => props.onClick("online")}> 
-                <div className="centered_container no_click">
-                  <h5> vs Human Online </h5> 
-                </div>
-              </div>
-            </div>
-            <div className="col no_padding_mobile">
-              <div id="vs_pc" className="time" onClick={() => props.onClick("pc")}>
-                <div className="centered_container no_click"> 
-                  <h5> vs PC </h5>
-                </div> 
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+	  <Dialog title="New game">
+		<OptionMenu>
+			<Option text="vs Human Offline" onClick={() => props.onClick("human")} />
+			<Option text="vs Human Online" onClick={() => props.onClick("online")} />
+			<Option text="vs PC" onClick={() => props.onClick("pc")} />
+        </OptionMenu>
+	  </Dialog>
     )
 }
 
 
 export function ChooseTime(props) { 
   return (
-    <div id="welcomeScreen2" className="welcomeScreen">
-      <div className="container_div">
-        <h2> Time </h2>
-        <div className="row ml-0 mr-0 mt-3">
-            <div className="col no_padding_mobile"> 
-              <div id="time_60" data-value={60} name="time" className="time" onClick={() => props.onClick(60)}> 
-                <div className="centered_container no_click">
-                  <h5> 1 minute </h5> 
-                </div>
-              </div>
-            </div>
-            <div className="col no_padding_mobile">
-              <div id="time_180" data-value={180} name="time" className="time" onClick={() => props.onClick(180)}> 
-                <div className="centered_container no_click">
-                  <h5> 3 minutes </h5> 
-                </div> 
-              </div>
-            </div>
-            <div className="col no_padding_mobile">
-              <div id="time_300" data-value={300} name="time" className="time" onClick={() => props.onClick(300)}> 
-                <div className="centered_container no_click">
-                  <h5> 5 minutes </h5> 
-                </div> 
-              </div>
-            </div>
-            <div className="col no_padding_mobile">
-              <div id="time_600" data-value={600} name="time" className="time" onClick={() => props.onClick(600)}> 
-                <div className="centered_container no_click">
-                  <h5> 10 minutes </h5> 
-                </div> 
-              </div>
-            </div>
-        </div>
-      </div>
-    </div>
+	<Dialog title="Time">
+		<OptionMenu>
+			<Option text="1 minute" onClick={() => props.onClick(60)} />
+			<Option text="3 minutes" onClick={() => props.onClick(180)} />
+			<Option text="5 minutes" onClick={() => props.onClick(300)} />
+			<Option text="10 minutes" onClick={() => props.onClick(600)} />
+		</OptionMenu>
+	</Dialog>
   )
 }
 
-export function GetUsername(props) {
-
-	if (props["message"]){
-	  var message = (<p> Username already exists </p>) 
-	} else {
-	  var message = null
+function MessageBanner(props) {
+	if (!props.message) {
+		return null
 	}
+	return (
+		<p> Username already exists </p>
+	)
+}
+
+export function GetUsername(props) {
   return (
     <div id="humanOther" className="welcomeScreen display_not_mobile">
       <h2> Username </h2>
@@ -146,7 +103,7 @@ export function GetUsername(props) {
         <form name="username" onSubmit={(e) => props.onSubmit(e)}>
           <label> What is your username? </label> <br></br>
           <input id="username" name="username" type="text" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
-          {message}
+          <MessageBanner message={props.message} />
           <button id="submit_username_button" className="btn btn-primary mt-3"> Submit </button>
         </form>
       </div>
@@ -155,11 +112,6 @@ export function GetUsername(props) {
 }
 
 export function GetUsernameMobile(props) {
-    if (props["message"]){
-      var message = (<p> Username already exists </p>) 
-    } else {
-      var message = null
-    }
   return (
     <div id="humanOtherMobile" className="welcomeScreen display_mobile">
       <h2> Username </h2>
@@ -167,7 +119,7 @@ export function GetUsernameMobile(props) {
         <form name="username" onSubmit={(e) => props.onSubmit(e)}>
           <label> What is your username? </label> <br></br>
           <input id="username" name="username" type="text" maxLength="15" placeholder="username" onClick={() => {document.querySelector("#humanOtherMobile").style.top = "0px"; document.querySelector("#humanOtherMobile").style.bottom = "0px"}} value={props.username} onChange={props.onChange} /> <br></br>
-          {message}
+          <MessageBanner message={props.message} />
           <button id="submit_username_button" className="btn btn-primary mt-3"> Submit </button>
         </form>
       </div>
@@ -178,17 +130,12 @@ export function GetUsernameMobile(props) {
 
 export function PcSkillLevelForm(props) {
     return (
-      <div id="welcomeScreenPC" className="welcomeScreen">
-        <div className="container_div">
-          <h2> PC strength </h2>
-          <div className="mt-3">
-            <form name="pcSkillLevel" onSubmit={() => props.onSubmit()}>
-              <label> Skill level (0-20): </label> <br></br>
-              <input id="elo" type="number" min="0" max="20" name="pcSkillLevel" value={props.skill_level_pc} onChange={props.onChange} /> <br></br>
-              <button className="btn btn-primary mt-3"> Submit </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    )
+	  <Dialog title="PC strength">
+		<form name="pcSkillLevel" onSubmit={() => props.onSubmit()}>
+		  <label> Skill level (0-20): </label> <br></br>
+		  <input id="elo" type="number" min="0" max="20" name="pcSkillLevel" value={props.skill_level_pc} onChange={props.onChange} /> <br></br>
+		  <button className="btn btn-primary mt-3"> Submit </button>
+		</form>	  
+	  </Dialog>
+	)
 }

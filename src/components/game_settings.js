@@ -101,6 +101,10 @@ export default function GameSettings(props) {
 		}
 	}
 	
+	const handleNewGameClick = () => {
+		setShowPage(pages.vs)
+	}
+	
 	const handleChange = (e) => {
 		var name = e.target.name
 		var skillLevel = e.target.value
@@ -125,7 +129,8 @@ export default function GameSettings(props) {
 							color={color}
 							usernameOpponent={usernameOpponent}
 							skill_level={pcSkillLevel}
-							gameId={gameId} />
+							gameId={gameId}
+							onClick={() => handleNewGameClick()} />
 			case pages.pc:
 				return <PcSkillLevelForm 
 							skill_level_pc={pcSkillLevel} 
@@ -139,8 +144,8 @@ export default function GameSettings(props) {
 	} 
 
 	return (
-		<div>
+		<>
 			{ pageSwitch(showPage) }		
-		</div>
+		</>
 	)
 }

@@ -1,5 +1,5 @@
 import React from "react"
-import Container from "./container"
+import SplitPane from "./splitpane"
 import Container_mobile from "./container_mobile"
 import Mobile_bar from "./mobile_bar"
 import Sidebar from "./sidebar"
@@ -36,7 +36,7 @@ export default class Game extends React.Component {
   }
 
   handleClickBoard(square) {
-	if (is_finished) {
+	if (this.state.is_finished) {
 		return 
 	}
 	
@@ -116,10 +116,6 @@ export default class Game extends React.Component {
         }))
       })
   }  
-  
-  handleNewGameButtonPressed() {
-	console.log("new game")
-  }
   
   handlePromotionOptionPressed(e) {	  
       let selected_square = this.state.selected_square
@@ -234,10 +230,31 @@ export default class Game extends React.Component {
   }
 
 
-  render () {  
+  render () { 
+	const sidebar = <Sidebar 
+              times={this.state.times} 
+              username={this.props.username} 
+              username2={this.props.usernameOpponent} 
+              san={this.state.san} 
+              evaluation={this.state.evaluation} 
+              mirrored={this.props.color === 0}
+              vs={this.props.vs}
+			  is_finished={this.state.is_finished}
+              onClick={() => {this.props.onClick()}} 
+			  onClick2={() => this.handleResignButtonPressed()}
+			  onClick3={() => this.handleOfferDrawButtonPressed()}
+              />
+			  
+	const board = <BoardContainer 
+              pieces={get_board(this.state.fen)} 
+              mirrored={this.props.color === 0}
+              selected_square={this.state.selected_square}
+              uci={this.state.uci} 
+              onClick={(square) => this.handleClickBoard(square)} 
+              />
+			  
     return (
       <div id="main_container">
-        <div className="container-fluid">
           <Promotion 
 			promotion={this.state.promotion} 
 			onClick={(e) => this.handlePromotionOptionPressed(e)} />
@@ -250,26 +267,10 @@ export default class Game extends React.Component {
 			onClickAccept={() => this.handleAcceptDrawButtonPressed()} 
 			onClickDecline={() => this.handleDeclineDrawButtonPressed()} /> 
 
-          <Container 
-            col_left={<BoardContainer 
-              pieces={get_board(this.state.fen)} 
-              mirrored={this.props.color === 0}
-              selected_square={this.state.selected_square}
-              uci={this.state.uci} 
-              onClick={(square) => this.handleClickBoard(square)} 
-              />}
-            sidebar_right={<Sidebar 
-              times={this.state.times} 
-              username={this.props.username} 
-              username2={this.props.username_opponent} 
-              san={this.state.san} 
-              evaluation={this.state.evaluation} 
-              mirrored={this.props.color === 0}
-              vs={this.props.vs}
-              onClick={() => {this.handleNewGameButtonPressed()}} 
-			  onClick2={() => this.handleResignButtonPressed()}
-			  onClick3={() => this.handleOfferDrawButtonPressed()}
-              />}
+          <SplitPane
+		    className="show_on_tablet_and_pc"
+            left={board}
+            right={sidebar}
           />
 
           <Container_mobile 
@@ -284,10 +285,9 @@ export default class Game extends React.Component {
               mirrored={this.state.mirrored}
               times={this.state.times}
               username={this.props.username} 
-              username2={this.props.username_opponent} 
+              username2={this.props.usernameOpponent} 
               />}
           />
-        </div>
       </div>
     );
   }

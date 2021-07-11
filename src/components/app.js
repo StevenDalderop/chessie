@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react"
 import { BrowserRouter as Router, Route, Link, Switch, useHistory } from "react-router-dom"
 import Game from "./game"
-import Login from "./login"
 import HomePage from "./homepage"
 import Header from "./header"
-import { ChooseGame } from "./windows"
-import GameSetting from "./game_settings"
+import { ChooseGame, GetUsername } from "./windows"
+import GameSettings from "./game_settings"
+
 
 export var socket = io()
 
@@ -45,8 +45,7 @@ export default function App() {
 				if (data.valid_username) {
 					setUsernameExists(false)
 					setLoggedIn(true)
-					history.push("/")
-					
+					history.push("/play")					
 				} else {
 					setUsernameExists(true)
 					setLoggedIn(false)
@@ -55,21 +54,20 @@ export default function App() {
 	}
 
 	return (
-		<div>
+		<>
 			<Header />
 			<Switch>
 				<Route exact path="/login">
-					<Login 
-						onChange={(e) => handleChange(e)}
-						onSubmit={(e) => handleUserNameSubmitted(e)} 
-						username={username}
-						usernameExists={usernameExists}								
-					/>
+					<GetUsername 
+						message={usernameExists} 
+						onChange={(e) => handleChange(e)} 
+						username={username} 
+						onSubmit={(e) => handleUserNameSubmitted(e)} />							
 				</Route>
 				<Route path="/">
-					<HomePage username={username} />
+					<GameSettings username={username} />
 				</Route>				
 			</Switch>
-		</div>
+		</>
 	)
 }

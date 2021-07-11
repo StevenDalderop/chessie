@@ -1,25 +1,33 @@
 .chess_row {
     padding: 0px;
     margin: 0px;
-    height: 70px;
-    width: 560px;
+    height: 12.5%;
+    width: 100%;
     position: relative;
     overflow: visible;
 }
   
 .board {
-	margin: auto;
-	position: relative;
+	width: 560px;
+	height: 560px;
 }
 
 .piece_icon {
-    height: 60px;
-    width: 60px;
+	position: absolute;
+    height: 80%;
+    width: 80%;
+	left: 10%;
+	top: 10%;
+}
+
+.piece_container {
+	width: 100%;
+	height: 100%;
 }
 
 .square {
 	height: 100%;
-	width: 70px;
+	width: 12.5%;
 	border: 0px;
 	padding: 0px;
 	margin: 0px;
@@ -56,4 +64,13 @@ position: absolute;
 left: 40%;
 bottom: -25px;
 color: white;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
+  /* For tablets: */
+ .board {
+	width: 480px;
+	height: 480px;
+} 
+  
 }

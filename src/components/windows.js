@@ -22,11 +22,10 @@ export function Promotion(props) {
 export function Result(props) {
   if (props.result) {
     return (
-      <div className="welcomeScreen">
-        <h1> Result </h1>
-        <p> {props.result} </p>
-        <button className="btn btn-primary" onClick={props.onClick}> Close </button>
-      </div>
+		<Dialog title="Result">
+          <p> {props.result} </p>
+          <button className="btn btn-primary" onClick={props.onClick}> Close </button>
+	    </Dialog>
     )
   } else {
     return null
@@ -60,6 +59,7 @@ export function Draw_offered(props) {
   }
 }
 
+
 export function ChooseGame(props) {
   return (
 	  <Dialog title="New game">
@@ -86,6 +86,7 @@ export function ChooseTime(props) {
   )
 }
 
+
 function MessageBanner(props) {
 	if (!props.message) {
 		return null
@@ -95,35 +96,17 @@ function MessageBanner(props) {
 	)
 }
 
+
 export function GetUsername(props) {
   return (
-    <div id="humanOther" className="welcomeScreen display_not_mobile">
-      <h2> Username </h2>
-      <div>
+    <Dialog title="Username">
         <form name="username" onSubmit={(e) => props.onSubmit(e)}>
           <label> What is your username? </label> <br></br>
           <input id="username" name="username" type="text" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
           <MessageBanner message={props.message} />
           <button id="submit_username_button" className="btn btn-primary mt-3"> Submit </button>
         </form>
-      </div>
-    </div>
-  )
-}
-
-export function GetUsernameMobile(props) {
-  return (
-    <div id="humanOtherMobile" className="welcomeScreen display_mobile">
-      <h2> Username </h2>
-      <div>
-        <form name="username" onSubmit={(e) => props.onSubmit(e)}>
-          <label> What is your username? </label> <br></br>
-          <input id="username" name="username" type="text" maxLength="15" placeholder="username" onClick={() => {document.querySelector("#humanOtherMobile").style.top = "0px"; document.querySelector("#humanOtherMobile").style.bottom = "0px"}} value={props.username} onChange={props.onChange} /> <br></br>
-          <MessageBanner message={props.message} />
-          <button id="submit_username_button" className="btn btn-primary mt-3"> Submit </button>
-        </form>
-      </div>
-    </div>
+	</Dialog>
   )
 }
 

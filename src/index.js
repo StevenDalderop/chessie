@@ -11,5 +11,5 @@ function Index() {
 	)
 }
 
-const domContainer = document.querySelector('#chess_board_container');
+const domContainer = document.querySelector('#app');
 render(<Index />, domContainer);

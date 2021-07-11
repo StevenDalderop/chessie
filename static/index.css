@@ -2,17 +2,35 @@
   color: white;
 }
 
-html,body { height:100%; }
+#app {
+	height: 100vh;
+	width: 100vw;
+	background-color: rgb(60,60,60);	
+}
 
-body {
-  position: relative;
+#header {
+	position: fixed;
 }
 
 #main_container {
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
+	padding-top: 70px;
+	height: 100%;
 }
+
+.sidebar {
+  color: white;
+  background-color: rgb(60, 60, 60);
+  padding: 16px;
+  width: 300px;
+  right: 0px;
+}
+
+
+
+
+
+
+
 
 #footer {
   position: absolute;
@@ -229,13 +247,6 @@ body {
   transform: translate(-50%, -50%);
 }
 
-#col_right {
-  color: white;
-  background-color: rgb(60, 60, 60);
-  padding-left: 0px;
-  width: 250px;
-  right: 0px;
-}
 
 #timer {
   color: black;
@@ -336,6 +347,10 @@ svg {
 }
 
 @media screen and (max-width: 767px) and (orientation: portrait) { 
+.show_on_tablet_and_pc {
+	display: none;
+}
+
   #mobile_bar_row {
     margin-top: -15px;
   }
@@ -346,10 +361,6 @@ svg {
 
   .display_mobile {
     display: initial;
-  }
-
-  .display_not_mobile {
-    display: none;
   }
 
   #title_new_game {
@@ -480,6 +491,10 @@ svg {
 }
 
 @media screen and (max-height: 767px) and (orientation: landscape) {
+	.show_on_tablet_and_pc {
+		display: none;
+	}
+
   #content {
     height: 70vh;
   }
@@ -491,10 +506,6 @@ svg {
 
   .display_mobile {
     display: initial;
-  }
-
-  .display_not_mobile {
-    display: none;
   }
 
   #history, #evaluation {
@@ -584,6 +595,14 @@ svg {
 
 @media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
   /* For tablets: */
+.sidebar {
+  color: white;
+  background-color: rgb(60, 60, 60);
+  padding: 16px;
+  width: 200px;
+  right: 0px;
+}
+  
   #history {
     height: 200px;
   }

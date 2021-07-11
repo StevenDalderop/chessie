@@ -12,7 +12,7 @@ function Square(props) {
       <div className={"col_letter"}>
         {props.col}
       </div>
-      <div className="centered_container">
+      <div className="piece_container">
         {piece_icon(props.piece)}
       </div>
     </div>

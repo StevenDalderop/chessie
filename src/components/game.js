@@ -2,19 +2,35 @@ import React from "react"
 import SplitPane from "./splitpane"
 import Container_mobile from "./container_mobile"
 import Mobile_bar from "./mobile_bar"
-import Sidebar from "./sidebar"
+import Sidebar, {GameOptionButtons} from "./sidebar"
 import BoardContainer from "./board_container"
 import GameHeader from "./game_header"
 import { get_board, uci_to_row_column, get_uci, get_piece } from "../chess_notation"
 import Board from "./board"
 import { Promotion, Result, Draw_offered, GetUsername, GetUsernameMobile, Online_game } from "./windows"
 import { socket } from "./app"
+import Timer from "./timer"
 
 const baseURL = window.location.origin
 
 var turn = {
 	white: 1,
 	black: 0
+}
+
+function is_possible_promotion(move) {	
+	return move.piece && move.piece.type === "p" && move.to[1] === "1" || move.to[1] === "8"
+}
+
+function get_move(from, to, piece) {
+	let move = {
+		"from": from, 
+		"to": to, 
+		"uci": from + to, 
+		"promotion": false, 
+		"piece": piece
+	}
+	return move
 }
 
 export default class Game extends React.Component {
@@ -42,8 +58,9 @@ export default class Game extends React.Component {
 	
     let board = get_board(this.state.fen)
     let selected_square = this.state.selected_square
-
 	var piece = get_piece(board, square)
+	let move = get_move(selected_square, square, piece)
+	
 	var is_my_color = piece && piece.color === this.props.color
 	var can_move = selected_square && !piece
 	var is_friend = piece && piece.color === this.state.turn
@@ -54,29 +71,35 @@ export default class Game extends React.Component {
     } else if ((this.props.vs === "human") && is_friend) {
       this.setState({"selected_square": square})
     } else if (can_attack || can_move) {
-      let move = {"from": selected_square, "to": square, "uci": selected_square + square, "promotion": false}
       this.make_moves(move)
     }
   }
 
   async make_moves(move) {
-    let board = get_board(this.state.fen)
-	let piece = get_piece(board, move.from)
-
-	let possible_promotion = piece && piece.type === "p" && move.to[1] === "1" || move.to[1] === "8"
+	let is_promotion = await this.check_promotion(move)	
 	
-    if (possible_promotion && !this.state.promotion) {
-	  let uci_promotion = move.uci + "q"
-      let check_promotion = await fetch(`${baseURL}/api/check_promotion_valid/${this.props.gameId}/${uci_promotion}`)
-      let data = await check_promotion.json()
-      if (data["valid"] === "true") {
-        this.setState({"promotion": move.to, "display": "promotion"})
-        return
-      }
-    }
-	
-	let is_valid_move = await this.make_move(this.props.gameId, move.uci)
+	if (!is_promotion) {
+		this.make_move(this.props.gameId, move.uci)
+	}   
   }
+  
+    check_promotion(move) {
+	  let possible_promotion = is_possible_promotion(move)
+	  if (!possible_promotion || this.state.promotion) {
+	    return false
+	  }
+	  
+	  let uci_promotion = move.uci + "q"
+      fetch(`${baseURL}/api/check_promotion_valid/${this.props.gameId}/${uci_promotion}`)
+		.then(res => res.json())
+		.then(data => {
+		  if (data["valid"] === "true") {
+			this.setState({"promotion": move.to})
+		  }	
+		  var is_promotion = data["valid"]
+		  return is_promotion
+		}) 
+    }
   
   make_move(gameId, uci) {
     var is_valid = fetch(`${baseURL}/api/make_move/${gameId}/${uci}`)	
@@ -136,6 +159,7 @@ export default class Game extends React.Component {
 	  if (this.props.vs === "pc") {
         this.setState((state) => ({"result": this.props.username + " resigned", "is_finished": true}))
       } else if (this.props.vs === "online") {
+		  console.log("resign")
         socket.emit("resign", {"username": this.props.username, "room": this.props.gameId})
       }
   }
@@ -185,6 +209,7 @@ export default class Game extends React.Component {
     })
 
     socket.on("announce resign", data => {
+		console.log("resign announced")
       this.setState({"result": data["username"] + " resigned", "is_finished": true, "draw_offered": null, "selected_square": null, "uci": null})
     })
 
@@ -245,13 +270,12 @@ export default class Game extends React.Component {
 			  onClick3={() => this.handleOfferDrawButtonPressed()}
               />
 			  
-	const board = <BoardContainer 
-              pieces={get_board(this.state.fen)} 
-              mirrored={this.props.color === 0}
-              selected_square={this.state.selected_square}
-              uci={this.state.uci} 
-              onClick={(square) => this.handleClickBoard(square)} 
-              />
+	const board = <Board 
+				  pieces={get_board(this.state.fen)} 
+				  selected_square={this.state.selected_square} 
+				  uci={this.state.uci} 
+				  onClick={(square) => this.handleClickBoard(square)} 
+				  mirrored={this.props.color === 0} />
 			  
     return (
       <div id="main_container">
@@ -269,25 +293,21 @@ export default class Game extends React.Component {
 
           <SplitPane
 		    className="show_on_tablet_and_pc"
-            left={board}
+            left={<BoardContainer> {board} </BoardContainer>}
             right={sidebar}
           />
-
-          <Container_mobile 
-            board={<Board
-              pieces={get_board(this.state.fen)} 
-              mirrored={this.state.mirrored}
-              selected_square={this.state.selected_square} 
-              uci={this.state.uci}
-              onClick={(square) => this.handleClickBoard(square)} 
-              />} 
-            mobile_bar={<Mobile_bar 
-              mirrored={this.state.mirrored}
-              times={this.state.times}
-              username={this.props.username} 
-              username2={this.props.usernameOpponent} 
-              />}
-          />
+					
+          <Container_mobile>
+			<Timer username={this.props.usernameOpponent} time={this.state.times[1]} />
+		    {board}  
+			<Timer username={this.props.username} time={this.state.times[0]} />
+			<GameOptionButtons
+		      is_finished={this.state.is_finished}	
+			  vs={this.props.vs}
+              onClick={() => {this.props.onClick()}} 
+			  onClick2={() => this.handleResignButtonPressed()}
+			  onClick3={() => this.handleOfferDrawButtonPressed()} />
+          </Container_mobile>
       </div>
     );
   }

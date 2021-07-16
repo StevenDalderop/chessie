@@ -23,6 +23,14 @@ var chess_color = {
 	black: 0
 }
 
+function get_previous_page(current_page, vs) {
+	if (current_page === pages.time && vs === vs_options.online) {
+		return pages.online
+	} else if (current_page === pages.time || current_page === pages.pc || current_page === pages.online ) {
+		return pages.vs
+	}
+} 
+
 const baseURL = window.location.origin
 
 export default function GameSettings(props) {
@@ -38,17 +46,13 @@ export default function GameSettings(props) {
 		let is_cancelled = false
 		
 		socket.on("announce new game", (data) => { 
-				console.log(data["game_id"])
 				if (!is_cancelled) {
 					setGameId(data["game_id"])
 				}
 			}
 		)
 				
-		socket.on("announce game starts", data => {
-		  console.log("game starts")
-		  console.log(data)
-		  
+		socket.on("announce game starts", data => {		  
 		  if (!is_cancelled) { 
 				let hasWhitePieces = data["username"] === props.username
 				setGameId(data["game_id"])
@@ -91,18 +95,17 @@ export default function GameSettings(props) {
 		}
 	}
 	
-	const handleClickOnlineGame = (e) => {
-		var name = e.target.name 
-		if (name === "new_game") {
-			setShowPage(pages.time)
-		} else if (name === "join_game") {
-			var game_id = e.target.value
-			socket.emit("join game", {"username": props.username, "game_id": game_id})
-		}
+	const handleClickNewOnlineGame = () => {
+		setShowPage(pages.time)
+	}
+	
+	const handleClickJoinGame = (game_id) => {
+		socket.emit("join game", {"username": props.username, "game_id": game_id})
 	}
 	
 	const handleNewGameClick = () => {
 		setShowPage(pages.vs)
+		setColor(chess_color.white)
 	}
 	
 	const handleChange = (e) => {
@@ -112,15 +115,23 @@ export default function GameSettings(props) {
 	}
 	
 	const handleSubmit = () => {
-		setShowPage("game")
+		setShowPage(pages.game)
+	}
+	
+	const handleClickBack = () => {
+		let prevPage = get_previous_page(showPage, vs)
+		setShowPage(prevPage)
 	}
 	
 	const pageSwitch = (page) => {
 		switch (page) {
 			case pages.vs:
-				return <ChooseGame onClick={(vs) => handleClick(vs)}  />
+				return <ChooseGame 
+							onClick={(vs) => handleClick(vs)} />
 			case pages.time:
-				return <ChooseTime onClick={(time) => handleClickTime(time)} />
+				return <ChooseTime 
+							onClick={(time) => handleClickTime(time)} 
+							onClickBack={() => handleClickBack()} />
 			case pages.game:
 				return <Game 
 							username={props.username} 
@@ -135,11 +146,18 @@ export default function GameSettings(props) {
 				return <PcSkillLevelForm 
 							skill_level_pc={pcSkillLevel} 
 							onChange={(e) => handleChange(e)} 							
-							onSubmit={() => handleSubmit()} />
+							onSubmit={() => handleSubmit()}
+							onClickBack={() => handleClickBack()} />
 			case pages.online:
-				return <OnlineGame username={props.username} onClick={(e) => handleClickOnlineGame(e)}/>
+				return <OnlineGame 
+						username={props.username} 
+						onClickJoin={(e) => handleClickJoinGame(e)} 
+						onClickNew={() => handleClickNewOnlineGame()}
+						onClickBack={() => handleClickBack()} />
 			default:
-				return <ChooseGame onClick={(vs) => handleClick(vs)} />
+				return <ChooseGame 
+							onClick={(vs) => handleClick(vs)} 
+							onClickBack={() => handleClickBack()} />
 		}		
 	} 
 

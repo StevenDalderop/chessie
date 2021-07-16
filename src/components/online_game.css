@@ -1,0 +1,24 @@
+.online_games_container {
+	display: flex;
+	margin: 15px;
+}
+
+.users_container {
+	width: 50%;
+	text-align: left;
+}
+
+.games_container {
+	width: 50%;
+	text-align: left;
+}
+
+@media screen and (max-width: 767px) and (orientation: portrait) { 
+	.users_container {
+		display: none;
+	}
+	
+	.games_container {
+		width: 100%;
+	}
+}

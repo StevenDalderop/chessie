@@ -1,3 +1,7 @@
+body {
+  background-color: rgb(60,60,60);
+}
+
 #title {
   color: white;
 }
@@ -20,26 +24,49 @@
 .sidebar {
   color: white;
   background-color: rgb(60, 60, 60);
-  padding: 16px;
-  width: 300px;
+  width: 250px;
   right: 0px;
 }
 
-
-
-
-
-
-
-
-#footer {
-  position: absolute;
-  bottom: 0px;
-  width: 100%;
-  z-index: 10000;
-  color: white;
-  padding-left: 15px;
+.timer {
+  color: black;
+  background-color: white;
+  text-align: center;
 }
+
+.sidebar_item {
+  width: 100%;
+  background-color: rgb(50,50,50);
+  padding: 0px 15px 15px 15px;
+  margin-bottom: 15px;
+  overflow: hidden;	
+}
+
+.promotion-options-container {
+	display: flex;
+	justify-content: space-around;
+	max-width: 300px;
+	margin: auto;
+	flex-wrap: wrap;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #promotion {
   color: white;
@@ -55,23 +82,6 @@
   padding-bottom: 5px;
 }
 
-.welcomeScreen {
-  z-index: 1000;
-  background-color: rgb(30, 30, 30);
-  color: white;
-  position: fixed;
-  width: 50%;
-  margin:auto;
-  top: 35%;
-  left: 25%;
-  text-align: center;
-  padding-bottom: 15px;
-}
-
-.scrollable_y {
-  overflow-y: auto;
-}
-
 .align-left {
   text-align: left;
 }
@@ -80,9 +90,6 @@
   text-align: center;
 }
 
-body {
-  background-color: rgb(60,60,60);
-}
 
 .color_0 {
   color: rgb(60,60,60)
@@ -104,40 +111,7 @@ body {
   background-color: rgb(30, 30, 30);
 }
 
-#history {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  background-color: rgb(50, 50, 50);
-  margin-top: 15px;
-  padding-bottom: 15px;
-  padding-left: 15px;
-  padding-right: 15px;
-}
 
-#list {
-  position: absolute;
-  color: white;
-  overflow-y: auto;
-  top: 32px;
-  bottom: 0px;
-  right: 0px;
-  left: 0px;
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
-#evaluation {
-  margin-top: 15px;
-  background-color: rgb(50,50,50);
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-bottom: 15px;
-}
-
-#evaluation_figure {
-  width: 100%;
-}
 
 #buttons {
   background-color: rgb(50,50,50);
@@ -247,38 +221,6 @@ body {
   transform: translate(-50%, -50%);
 }
 
-
-#timer {
-  color: black;
-  background-color: white;
-  text-align: center;
-}
-
-#timer2 {
-  color: black;
-  background-color: white;
-  text-align: center;
-}
-
-#timer1_div {
-  width: 100%;
-  background-color: rgb(50,50,50);
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-bottom: 15px;
-  overflow: hidden;
-}
-
-#timer2_div {
-  width: 100%;
-  background-color: rgb(50,50,50);
-  padding-left: 15px;
-  padding-right: 15px;
-  margin-top: 15px;
-  padding-bottom: 15px;
-  overflow: hidden;
-}
-
 .times {
   margin-bottom: 0px;
 }
@@ -351,90 +293,23 @@ svg {
 	display: none;
 }
 
-  #mobile_bar_row {
-    margin-top: -15px;
-  }
+.timer_container {
+	display: flex;
+	width: 95vw;
+	margin: auto;
+	max-width: 500px;
+	color: white;
+	justify-content: space-between;
+	background-color: rgb(30,30,30);
+}
 
-  .mobile { 
-    display: initial;
-  }
+.timer-mobile {
+	margin-right: 15px;
+}
 
-  .display_mobile {
-    display: initial;
-  }
-
-  #title_new_game {
-    text-align: left;
-    padding-left: 15px;
-  }
-
-  #button_resign_mobile {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-  }
-
-  #button_draw_mobile {
-    position: absolute;
-    top: 5px;
-    right: 85px;
-  }
-
-  #button_mobile {
-    display: initial; 
-    position: absolute;
-    right: 5px;
-    top: 5px;
-  }
-
-  .mobile {
-    display: initial;
-  }
-
-  .content_box {
-    max-width: 500px;
-    margin: auto;
-  }
-
-  .board {
-    height: 100vw;
-    max-height: 500px;
-    padding-bottom: 30px;
-  }
-
-  .not_mobile {
-    display: none;
-  }
-
-  .chess_row {
-    height: 12.5%;
-    width: 100%;
-  }
-
-  .square {
-    width: 12.5%;
-  }
-
-  .piece_icon {
-    width: 12.5vw;
-    height: 12.5vw;
-    max-width: 62.5px;
-    max-height: 62.5px;
-  }
-
-  .row_number {
-    display: none;
-  }
-
-  .col_letter {
-    display: none;
-  }
-
-  .welcomeScreen {
-    left: 0px;
-    width: 100%;
-    top: 20%;
-  }
+.username {
+	margin-left: 15px;
+}
 
   #buttons {
     top: 0px;
@@ -458,15 +333,6 @@ svg {
   #button {
     margin-left: 0px;
     margin-top: 0px;
-  }
-
-  h5 {
-    font-size: 0.95rem;  
-  }
-
-  .no_padding_mobile {
-    padding-left: 0px;
-    padding-right: 0px;
   }
 
   #title {
@@ -494,6 +360,7 @@ svg {
 	.show_on_tablet_and_pc {
 		display: none;
 	}
+	
 
   #content {
     height: 70vh;
@@ -512,22 +379,6 @@ svg {
     display: none;
   }
 
-  .chess_row {
-    width: 100%;
-    height: 12.5%;
-  }
-
-  .square {
-    width: 12.5%;
-  }
-
-  .row_number {
-    display: none;
-  }
-
-  .col_letter {
-    display: none;
-  }
 
   #button_resign_mobile {
     position: absolute;
@@ -554,14 +405,6 @@ svg {
     top: 5px;
   }
 
-  .piece_icon {
-    width: 8vh;
-    height: 8vh;
-  }
-
-  #content_row {
-    height: 100%;
-  }
 
   #usersOnline {
     top: 0px;
@@ -586,21 +429,16 @@ svg {
     width: initial;
     margin-bottom: 8px;
   }
-
-  .board { 
-    padding-left: 8px;
-    padding-bottom: 8px;
-  }
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
   /* For tablets: */
+.container-mobile {
+	display: none
+}
+
 .sidebar {
-  color: white;
-  background-color: rgb(60, 60, 60);
-  padding: 16px;
   width: 200px;
-  right: 0px;
 }
   
   #history {
@@ -616,27 +454,13 @@ svg {
     width: 210px;
   }
 
-  .board {
-    height: 480px;
-    width: 480px
-  }
-
   #content_row {
     min-height: 480px;
   }
+}
 
-  .chess_row {
-    height: 12.5%;
-    width: 100%;
-  }
-
-  .square {
-    width: 12.5%;
-  }
-
-  .piece_icon {
-    width: 50px;
-    height: 50px;
-  }
-
+@media screen and (min-width: 768px) {
+	.container-mobile {
+		display: none
+	}
 }

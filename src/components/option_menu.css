@@ -1,6 +1,6 @@
 .option {
-  background-color: rgb(200,200,200);
-  color: black;
+  background-color: dodgerblue;
+  color: white;
   height: 100px;
   width: 100px;
   text-align: center;
@@ -12,6 +12,11 @@
 
 .option:hover {
   background-color: rgb(150,150,150);
+}
+
+.option-menu {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .centered_div {
@@ -27,5 +32,17 @@
   .no_padding_mobile {
     padding-left: 0px;
     padding-right: 0px;
+  }
+  
+  .option {
+	  background-color: dodgerblue;
+	  color: white;
+	  height: 60px;
+	  width: 90vw;
+	  text-align: center;
+	  margin: auto;
+	  position: relative;
+	  border: 3px solid black;
+	  margin-bottom: 15px;	  
   }
 }

@@ -1,0 +1,19 @@
+.scrollable {
+	overflow-y: auto;
+	height: 200px;
+}
+
+.scrollable-small {
+	height: 200px;
+}
+
+.scrollable-large {
+	height: 250px;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
+  /* For tablets: */
+  .scrollable-large {
+	  height: 200px;
+  }
+}

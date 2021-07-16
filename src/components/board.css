@@ -66,11 +66,30 @@ bottom: -25px;
 color: white;
 }
 
+@media screen and (max-width: 767px) and (orientation: portrait) { 
+  .row_number {
+    display: none;
+  }
+
+  .col_letter {
+    display: none;
+  }
+  
+  .board {
+    height: 95vw;
+	width: 95vw;
+	margin: auto;
+    padding-bottom: 15px;
+	padding-top: 15px;
+	max-width: 500px;
+	max-height: 500px;
+  }
+}
+
 @media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
   /* For tablets: */
  .board {
 	width: 480px;
 	height: 480px;
 } 
-  
 }

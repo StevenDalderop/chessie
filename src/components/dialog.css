@@ -5,10 +5,21 @@
   position: fixed;
   width: 50%;
   margin:auto;
-  top: 35%;
+  top: 25%;
   left: 25%;
   text-align: center;
   padding-bottom: 15px;
+}
+
+.dialog-large {
+	width: 70%;
+	left: 15%;
+}
+
+.dialog-promotion {
+  left: 30%;
+  width: 40%;
+  top: 40%;  
 }
 
 @media screen and (max-width: 767px) and (orientation: portrait) { 
@@ -16,6 +27,10 @@
     left: 0px;
     width: 100%;
     top: 20%;
+  }
+  
+  .dialog-promotion {
+	  top: 30%;
   }
 }
 
@@ -32,4 +47,10 @@
     width: 70%;
     left: 15%;
   }
+  
+	.dialog-promotion {
+	  left: 30%;
+	  width: 40%;	
+	  top: 40%;
+	}
 }

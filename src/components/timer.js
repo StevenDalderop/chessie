@@ -1,4 +1,5 @@
 import React from "react"
+import css from "./timer.css"
 
 export function get_time(time) {
   let minutes = Math.floor(time / 60)

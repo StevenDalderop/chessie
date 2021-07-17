@@ -76,7 +76,6 @@ def make_move(game_id, uci):
         "valid": "true",
         "fen": fen,
         "san": san,
-        "turn": turn,
         "evaluation": evaluation,
         "result": result
     }
@@ -125,7 +124,6 @@ def get_pc_move(game_id, skill_level):
         "uci": uci,
         "fen": fen,
         "san": san,
-        "turn": turn,
         "evaluation": evaluation,
         "result": result
     }
@@ -261,9 +259,9 @@ def make_move(data):
         "fen": data["fen"], 
         "uci": data["uci"], 
         "san": data["moves_san"], 
-        "turn": data["turn"] , 
         "evaluation": data["evaluation"], 
-        "times": data["times"], 
+        "time_white": data["time_white"], 
+        "time_black": data["time_black"],
         "result": data["result"]
     }
     socketio.emit("announce move", json, room=data["room"])

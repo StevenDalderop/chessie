@@ -3,7 +3,7 @@ import Board from "./board"
 
 export default function BoardContainer(props) {
   return (
-      <div id="board_container">
+      <div className="centered_container">
 	   {props.children}
       </div>
   )

@@ -8,7 +8,7 @@ function PromotionOption(props) {
 		<button 
 			name="promotion" 
 			value={props.value} 
-			className="btn btn-primary mr-1" 
+			className="btn btn-primary" 
 			onClick={(e) => props.onClick(e)}> 
 			{props.value}		
 		</button>
@@ -118,7 +118,7 @@ export function GetUsername(props) {
           <label> What is your username? </label> <br></br>
           <input id="username" name="username" type="text" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
           <MessageBanner message={props.message} />
-          <button id="submit_username_button" className="btn btn-primary mt-3"> Submit </button>
+          <button className="btn btn-primary mt-3"> Submit </button>
         </form>
 	</Dialog>
   )

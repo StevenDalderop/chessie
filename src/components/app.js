@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { BrowserRouter as Router, Route, Link, Switch, useHistory } from "react-router-dom"
 import Game from "./game"
-import HomePage from "./homepage"
 import Header from "./header"
 import { ChooseGame, GetUsername } from "./windows"
 import GameSettings from "./game_settings"

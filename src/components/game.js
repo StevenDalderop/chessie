@@ -1,7 +1,6 @@
 import React from "react"
 import SplitPane from "./splitpane"
 import Container_mobile from "./container_mobile"
-import Mobile_bar from "./mobile_bar"
 import Sidebar, {GameOptionButtons} from "./sidebar"
 import BoardContainer from "./board_container"
 import GameHeader from "./game_header"
@@ -22,15 +21,12 @@ function is_possible_promotion(move) {
 	return move.piece && move.piece.type === "p" && move.to[1] === "1" || move.to[1] === "8"
 }
 
-function get_move(from, to, piece) {
-	let move = {
-		"from": from, 
-		"to": to, 
-		"uci": from + to, 
-		"promotion": false, 
-		"piece": piece
+function get_turn(fen) {
+	var turn_letter = fen.split(" ")[1]
+	if (turn_letter === "w") {
+		return turn.white
 	}
-	return move
+	return turn.black
 }
 
 export default class Game extends React.Component {
@@ -42,9 +38,9 @@ export default class Game extends React.Component {
       "selected_square": null,
       "uci": null,
       "san": null,
-      "turn": turn.white,
       "promotion": false,
-      "times": [60, 60],
+      "time_white": this.props.time,
+	  "time_black": this.props.time, 
       "evaluation": 0,
       "result": null,
       "draw_offered": null
@@ -55,33 +51,62 @@ export default class Game extends React.Component {
 	if (this.state.is_finished) {
 		return 
 	}
+		
+	let is_square_selected = this.select_square(square) 
 	
-    let board = get_board(this.state.fen)
-    let selected_square = this.state.selected_square
-	var piece = get_piece(board, square)
-	let move = get_move(selected_square, square, piece)
+	if (is_square_selected) {
+		return 
+	}
 	
-	var is_my_color = piece && piece.color === this.props.color
-	var can_move = selected_square && !piece
-	var is_friend = piece && piece.color === this.state.turn
-	var can_attack = selected_square && piece && !is_friend
-
-    if ((this.props.vs === "pc" || this.props.vs === "online") && is_my_color) {
-      this.setState({"selected_square": square})
-    } else if ((this.props.vs === "human") && is_friend) {
-      this.setState({"selected_square": square})
-    } else if (can_attack || can_move) {
-      this.make_moves(move)
-    }
+	let is_possible_move = this.can_make_move(square)
+	
+	if (is_possible_move) {
+		let move = this.get_move(square)
+		this.make_move_or_promotion(move)	
+	}
   }
 
-  async make_moves(move) {
+  async make_move_or_promotion(move) {
 	let is_promotion = await this.check_promotion(move)	
 	
 	if (!is_promotion) {
 		this.make_move(this.props.gameId, move.uci)
 	}   
   }
+  
+    can_make_move(square) {
+		let selected_square = this.state.selected_square
+		let board = get_board(this.state.fen)
+		let piece = get_piece(board, square)
+		let turn = get_turn(this.state.fen)
+				
+		var is_opponents_piece = piece && piece.color !== turn 
+		
+		var can_move = selected_square && !piece
+		var can_attack = selected_square && is_opponents_piece
+		
+		return can_move || can_attack
+	}
+  
+    select_square(square) {
+		let board = get_board(this.state.fen)
+		let piece = get_piece(board, square)
+		let turn = get_turn(this.state.fen)
+		
+		var is_my_color = piece && piece.color === this.props.color
+		var is_pieces_turn = piece && piece.color === turn
+		
+		var select_vs_human = this.props.vs === "human" && is_pieces_turn 
+		var select_vs_pc = this.props.vs === "pc" && is_my_color
+		var select_vs_online = this.props.vs === "online" && is_my_color
+		
+		var can_select_square = select_vs_human || select_vs_pc || select_vs_online
+		
+		if (can_select_square) {
+			this.setState({"selected_square": square})
+		}
+		return can_select_square
+	}
   
     check_promotion(move) {
 	  let possible_promotion = is_possible_promotion(move)
@@ -100,16 +125,31 @@ export default class Game extends React.Component {
 		  return is_promotion
 		}) 
     }
+	
+	get_move(square) {
+		let board = get_board(this.state.fen)
+		let selected_square = this.state.selected_square
+		var piece = get_piece(board, square)
+		let promotion = ""
+		
+		let move = {
+			"from": selected_square, 
+			"to": square, 
+			"uci": selected_square + square + promotion, 
+			"promotion": promotion, 
+			"piece": piece
+		}
+		return move
+	}
   
   make_move(gameId, uci) {
-    var is_valid = fetch(`${baseURL}/api/make_move/${gameId}/${uci}`)	
+    fetch(`${baseURL}/api/make_move/${gameId}/${uci}`)	
 		.then(res => res.json())
 		.then(data => {
 			if (data["valid"] === "true") {
 			  this.setState((state) => ({
 				"fen": data["fen"],
 				"result": data["result"],
-				"turn": data["turn"],
 				"evaluation": data["evaluation"],
 				"selected_square": null,
 				"uci": uci,
@@ -118,9 +158,7 @@ export default class Game extends React.Component {
 			   }))
 			  this.startTimer()
 			}
-			return data["valid"]
 		})
-	return is_valid
   }
   
   get_pc_move() {
@@ -130,7 +168,6 @@ export default class Game extends React.Component {
         this.setState((state) => ({
           "fen": data["fen"],
           "result": data["result"],
-          "turn": data["turn"],
           "evaluation": data["evaluation"],
           "selected_square": null,
           "uci": data["uci"],
@@ -140,26 +177,29 @@ export default class Game extends React.Component {
       })
   }  
   
-  handlePromotionOptionPressed(e) {	  
-      let selected_square = this.state.selected_square
-	  let promotion_square = this.state.promotion
+  handlePromotionOptionPressed(e) {	 
+	  let board = get_board(this.state.fen)  
+     
+	  let from = this.state.selected_square
+	  let to = this.state.promotion
+	  let piece = get_piece(board, from)
+	  
 	  let pieces = {
 		  "rook": "r", 
 		  "queen": "q", 
 		  "knight": "n", 
 		  "bishop": "b"
 	  }
-      let piece = pieces[e.target.value]
-	  let uci = selected_square + promotion_square + piece
-	  let move = {"from": selected_square, "to": promotion_square, "uci": uci, "promotion": piece}
-      this.make_moves(move)	  
+      let promotion = pieces[e.target.value]
+	  
+	  let move = get_move(from, to, piece, promotion)
+      this.make_move(move)	  
   }
   
   handleResignButtonPressed() {
 	  if (this.props.vs === "pc") {
         this.setState((state) => ({"result": this.props.username + " resigned", "is_finished": true}))
       } else if (this.props.vs === "online") {
-		  console.log("resign")
         socket.emit("resign", {"username": this.props.username, "room": this.props.gameId})
       }
   }
@@ -179,12 +219,13 @@ export default class Game extends React.Component {
   startTimer() {
       clearInterval(this.interval)
       this.interval = setInterval(() => {
-      let seconds = this.state.turn ? this.state.times[0] : this.state.times[1]
+	  let turn = get_turn(this.state.fen)
+      let seconds = turn ? this.state.time_white : this.state.time_black
       if (seconds === 0) {
-        this.setState((state)=> ({"result": state.turn ? "0-1" : "1-0", "is_finished": true, "selected_square": null}))
+        this.setState((state)=> ({"result": turn ? "0-1" : "1-0", "is_finished": true, "selected_square": null}))
         clearInterval(this.interval)
       } else if (!this.state.is_finished) {
-        this.setState((state) => ({"times": state.turn ? [state.times[0] - 1, state.times[1]] : [state.times[0], state.times[1] - 1]}))
+        this.setState((state) => ({"time_white": turn ? state.time_white - 1 : state.time_white, "time_black": state.turn ? state.time_black : state.time_black - 1}))
       } else {
         clearInterval(this.interval)
       }
@@ -198,11 +239,11 @@ export default class Game extends React.Component {
         "fen": data["fen"],
         "uci": data["uci"],
         "result": data["result"],
-        "turn": data["turn"],
         "evaluation": data["evaluation"],
         "selected_square": null,
         "san": data["san"],
-        "times": data["times"],
+        "time_white": data["time_white"],
+		"time_black": data["time_black"],
         "promotion": false
       }))
       this.startTimer()
@@ -228,17 +269,17 @@ export default class Game extends React.Component {
   
   componentDidUpdate(prevProps, prevState) {
 	if (prevState.fen !== this.state.fen) {
-		if (this.props.vs === "pc" && prevState.turn === 1) {
+		if (this.props.vs === "pc" && get_turn(prevState.fen) === 1) {
 		  this.get_pc_move()
-		} else if (this.props.vs === "online" && prevState.turn === prevProps.color) {
+		} else if (this.props.vs === "online" && get_turn(prevState.fen) === prevProps.color) {
 			var json = {
 				"fen": this.state.fen, 
 				"uci": this.state.uci, 
 				"moves_san": this.state.san, 
-				"turn": this.state.turn, 
 				"evaluation": this.state.evaluation, 
 				"result": this.state.result, 
-				"times": this.state.times, 
+				"time_white": this.state.time_white, 
+				"time_black": this.state.time_black,
 				"room": this.props.gameId
 			}
 		  socket.emit("make move", json)
@@ -257,9 +298,10 @@ export default class Game extends React.Component {
 
   render () { 
 	const sidebar = <Sidebar 
-              times={this.state.times} 
+              time_white={this.state.time_white} 
+			  time_black={this.state.time_black}
               username={this.props.username} 
-              username2={this.props.usernameOpponent} 
+              usernameOpponent={this.props.usernameOpponent} 
               san={this.state.san} 
               evaluation={this.state.evaluation} 
               mirrored={this.props.color === 0}
@@ -298,9 +340,9 @@ export default class Game extends React.Component {
           />
 					
           <Container_mobile>
-			<Timer username={this.props.usernameOpponent} time={this.state.times[1]} />
+			<Timer username={this.props.usernameOpponent} time={this.state.time_black} />
 		    {board}  
-			<Timer username={this.props.username} time={this.state.times[0]} />
+			<Timer username={this.props.username} time={this.state.time_white} />
 			<GameOptionButtons
 		      is_finished={this.state.is_finished}	
 			  vs={this.props.vs}

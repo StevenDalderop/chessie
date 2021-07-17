@@ -13,7 +13,7 @@ export default function GameHeader(props) {
 
   return (
     <div id="header" className="container-fluid bg-black-main">
-      <h1 id="title" className="center"> Chessie </h1>
+      <h1 id="title"> Chessie </h1>
       {buttons}
   </div>
   )

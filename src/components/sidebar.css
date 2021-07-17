@@ -1,0 +1,53 @@
+.sidebar {
+  color: white;
+  background-color: rgb(60, 60, 60);
+  width: 250px;
+  right: 0px;
+}
+
+.sidebar_item {
+  width: 100%;
+  background-color: rgb(50,50,50);
+  padding: 0px 15px 15px 15px;
+  margin-bottom: 15px;
+  overflow: hidden;	
+}
+
+.game-option-buttons {
+  margin-top: 15px;
+}
+
+.evaluation_bar {
+  height: 24px;
+  width: 100%;
+}
+
+#rect_left {
+  height: 24px;
+  fill: white;
+}
+
+#rect_right {
+  height: 24px;
+  fill: black;
+}
+
+#text {
+  height: 24px;
+  font-size: 16px;
+  fill: grey;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
+  /* For tablets: */
+
+	.sidebar {
+	  width: 200px;
+	}
+}
+
+@media screen and (max-width: 767px) and (orientation: portrait) { 
+	.game-option-buttons {
+		margin-left: 15px;
+	}
+}

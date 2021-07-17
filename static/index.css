@@ -4,6 +4,7 @@ body {
 
 #title {
   color: white;
+  text-align: center;
 }
 
 #app {
@@ -21,27 +22,6 @@ body {
 	height: 100%;
 }
 
-.sidebar {
-  color: white;
-  background-color: rgb(60, 60, 60);
-  width: 250px;
-  right: 0px;
-}
-
-.timer {
-  color: black;
-  background-color: white;
-  text-align: center;
-}
-
-.sidebar_item {
-  width: 100%;
-  background-color: rgb(50,50,50);
-  padding: 0px 15px 15px 15px;
-  margin-bottom: 15px;
-  overflow: hidden;	
-}
-
 .promotion-options-container {
 	display: flex;
 	justify-content: space-around;
@@ -50,158 +30,8 @@ body {
 	flex-wrap: wrap;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#promotion {
-  color: white;
-  text-align: center;
-  top: 35%;
-  left: 0;
-  right: 0;
-  width: 25%;
-  z-index: 1000;
-  position: fixed;
-  margin: auto;
-  background-color: rgb(30, 30, 30);
-  padding-bottom: 5px;
-}
-
-.align-left {
-  text-align: left;
-}
-
-.center {
-  text-align: center;
-}
-
-
-.color_0 {
-  color: rgb(60,60,60)
-}
-
-.color_1 {
-  color: rgb(141, 102, 53);
-}
-
-.bg-color_0 {
-  background-color: rgb(60,60,60);
-}
-
-.bg-color_1 {
-  background-color: rgb(50,50,50);
-}
-
 .bg-black-main {
   background-color: rgb(30, 30, 30);
-}
-
-
-
-#buttons {
-  background-color: rgb(50,50,50);
-  top: 537px;
-  height: 68px;
-  width: 100%;
-  margin-top: 15px;
-}
-
-#button_new_game {
-  margin-left: 15px;
-  margin-top: 15px;
-}
-
-.buttons {
-  margin-left: 15px;
-  margin-top: 15px;
-}
-
-.container_div {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.col_left {
-  position: absolute;
-  left: 0px;
-  right: 50%;
-  top: 0px;
-  bottom: 0px;
-}
-
-.col_right {
-  position: absolute;
-  left: 50%;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-}
-
-.row_container {
-  position: relative;
-  width: 100%;
-  height: 150px;
-  margin-bottom: 15px;
-}
-
-#users_online_div {
-  position: absolute;
-  bottom: 0px;
-  top: 41px;
-  left: 0px;
-  right: 0px;
-}
-
-#games_available_div {
-  position: absolute;
-  bottom: 0px;
-  top: 41px;
-  left: 0px;
-  right: 0px;
-}
-
-.color_blue {
-  color: blue;
-}
-
-.relative {
-  position: relative;
-  height: 100%;
-}
-
-.close_button {
-  position: absolute;
-  right: 5px;
-  top: 5px;
-}
-
-.no-padding {
-  padding: 0px;
-}
-
-#board_container {
-  position: absolute;
-  margin: 0;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
 }
 
 .centered_container {
@@ -213,72 +43,34 @@ body {
   transform: translate(-50%, -50%);
 }
 
-#col_left {
-  margin: 0;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
 
-.times {
-  margin-bottom: 0px;
-}
 
-.square_container {
-  width: 100px;
-  height: 100px;
-}
 
-.time {
-  background-color: rgb(200,200,200);
-  color: black;
-  height: 100px;
-  width: 100px;
-  text-align: center;
-  margin: auto;
-  position: relative;
-  border: 3px solid black;
-  margin-bottom: 15px;
-}
 
-.time:hover {
-  background-color: rgb(150,150,150);
-}
 
-svg {
-  height: 24px;
-  width: 100%;
-}
 
-#rect_left {
-  height: 24px;
-  fill: white;
-}
 
-#rect_right {
-  height: 24px;
-  fill: black;
-}
 
-#text {
-  height: 24px;
-  font-size: 16px;
-  fill: grey;
-}
+
 
 .overflow_hidden {
   overflow: hidden;
 }
 
-.content_box {
-  box-sizing: content-box;
-  width: 100%;
+
+.close_button {
+  position: absolute;
+  right: 5px;
+  top: 5px;
 }
 
-#button_mobile {
-  display: none;
-}
+
+
+
+
+
+
+
 
 .mobile {
   display: none;
@@ -289,174 +81,22 @@ svg {
 }
 
 @media screen and (max-width: 767px) and (orientation: portrait) { 
-.show_on_tablet_and_pc {
-	display: none;
-}
-
-.timer_container {
-	display: flex;
-	width: 95vw;
-	margin: auto;
-	max-width: 500px;
-	color: white;
-	justify-content: space-between;
-	background-color: rgb(30,30,30);
-}
-
-.timer-mobile {
-	margin-right: 15px;
-}
-
-.username {
-	margin-left: 15px;
-}
-
-  #buttons {
-    top: 0px;
-    margin-top: 0px;
-    height: initial;
-    padding-top: 15px;
-    padding-bottom: 15px;
-  }
-
-  #timer2_div {
-    margin-top: 0px;
-    color: white;
-    overflow: hidden;
-  }
-
-  #timer1_div {
-    color: white;
-    overflow: hidden;
-  }
-
-  #button {
-    margin-left: 0px;
-    margin-top: 0px;
-  }
-
-  #title {
-    text-align: left;
-  }
-
-  #users_online_subtitle {
-    display: none;
-  }
-
-  .col_right {
-    left: 0px;
-  }
-
-  .col_left {
-    display: none;
-  }
-
-  #games_available_div {
-    position: initial;
-  }
+	.show_on_tablet_and_pc {
+		display: none;
+	}
 }
 
 @media screen and (max-height: 767px) and (orientation: landscape) {
 	.show_on_tablet_and_pc {
 		display: none;
 	}
-	
-
-  #content {
-    height: 70vh;
-  }
-  
-  .board {
-    width: 70vh;
-    height: 70vh;
-  }
-
-  .display_mobile {
-    display: initial;
-  }
-
-  #history, #evaluation {
-    display: none;
-  }
-
-
-  #button_resign_mobile {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    display: initial;
-  }
-
-  #button_draw_mobile {
-    position: absolute;
-    top: 5px;
-    right: 85px;
-    display: initial;
-  }
-
-  #col_right {
-    width: 200px;
-  }
-
-  #button_mobile {
-    display: initial; 
-    position: absolute;
-    right: 5px;
-    top: 5px;
-  }
-
-
-  #usersOnline {
-    top: 0px;
-  }
-
-  .welcomeScreen {
-    left: 0px;
-    width: 100%;
-    top: 20%;
-  }
-
-  #buttons {
-    display: none;
-  }
-
-  #timer2_div {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    margin-right: 15px;
-    width: initial;
-    margin-bottom: 8px;
-  }
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
   /* For tablets: */
-.container-mobile {
-	display: none
-}
-
-.sidebar {
-  width: 200px;
-}
-  
-  #history {
-    height: 200px;
-  }
-
-  .welcomeScreen {
-    width: 70%;
-    left: 15%;
-  }
-  
-  #col_right {
-    width: 210px;
-  }
-
-  #content_row {
-    min-height: 480px;
-  }
+	.container-mobile {
+		display: none
+	}
 }
 
 @media screen and (min-width: 768px) {

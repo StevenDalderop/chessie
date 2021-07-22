@@ -81,12 +81,12 @@ const GameSettings: React.FC<Props> = (props) =>  {
 	const [gameId, setGameId] = useState(null)
 	const [showPage, setShowPage] = useState(pages.vs)
 	
-	useEffect(() => {			
+	useEffect(() => {		
 		socket.on("announce new game", (data: DataNewGame) => { 
 			setGameId(data["game_id"])		
 		})
 				
-		socket.on("announce game starts", (data: DataGameStarts) => {		  
+		socket.on("announce game starts", (data: DataGameStarts) => {	
 				let hasWhitePieces = data["username"] === props.username
 				setGameId(data["game_id"])
 				setShowPage(pages.game)
@@ -104,7 +104,7 @@ const GameSettings: React.FC<Props> = (props) =>  {
 			socket.off("announce new game") 
 			socket.off("announce game starts")
 		}
-	}, []) 
+	}, [props.username]) 
 
 	const handleClick = (vs : string) => {
 		setVs(vs)

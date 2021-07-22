@@ -17,10 +17,24 @@ export default function App() {
 	const history = useHistory()
 	
 	useEffect(() => {
-		if (!loggedIn) {
+		let usernameStored = localStorage.getItem("username")
+		if (usernameStored) {
+			setLoggedIn(true)
+			setUsername(usernameStored)
+			
+			let json = {
+				"method": "POST",
+				"headers": {
+					'Content-Type': 'application/json'
+				},
+				"body": JSON.stringify({"username": username, "sid": socket.id})
+			}
+			fetch(`{baseURL}/api/user_online`, json)
+			socket.emit("new user")
+		} else {
 			history.push("/login")
 		}
-	})   
+	}, [])   
 			
 	function handleChange(e) {
 		e.preventDefault()
@@ -44,6 +58,7 @@ export default function App() {
 				if (data.valid_username) {
 					setUsernameExists(false)
 					setLoggedIn(true)
+					localStorage.setItem("username", username)
 					socket.emit("new user")
 					history.push("/play")					
 				} else {

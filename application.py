@@ -152,10 +152,20 @@ def create_new_user():
     if result:
         return {"valid_username": False}
 
-    cursor.execute("INSERT INTO users (name, sid) VALUES (?, ?)", (username, sid))
+    cursor.execute("INSERT INTO users (name, sid, is_online) VALUES (?, ?, ?)", (username, sid, True))
     db.commit()    
     return {"valid_username": True}
 
+@app.route("/api/user_online", methods=["POST"])
+def user_online():
+    db = sqlite3.connect(DATABASE)
+    cursor = db.cursor()
+
+    username = request.json["username"]
+    sid = request.json["sid"]
+    
+    cursor.execute("UPDATE users SET sid = ? WHERE name = ?", (sid, username))
+    db.commit()
 
 @app.route("/api/get_users")
 def get_users():
@@ -169,17 +179,13 @@ def get_users():
 def connect():
     print("connect")
     
-@socketio.on("test")
-def test():
-    print("test")
-
 @socketio.on("disconnect")
 def disconnect():
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     
     sid = request.sid
-    cursor.execute("DELETE FROM users WHERE sid = ?", (sid,))
+    cursor.execute("UPDATE users SET is_online = ? WHERE sid = ?", (False, sid))
     db.commit()
     
     users_online = [user[0] for user in cursor.execute("SELECT name FROM users").fetchall()]

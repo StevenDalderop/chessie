@@ -4,7 +4,8 @@ DROP TABLE IF EXISTS games;
 CREATE TABLE users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-	sid TEXT
+	sid TEXT,
+	is_online BOOLEAN
 );
 
 CREATE TABLE games(

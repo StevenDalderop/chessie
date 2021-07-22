@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react"
 import { BrowserRouter as Router, Route, Link, Switch, useHistory } from "react-router-dom"
 import Game from "./game"
 import Header from "./header"
-import { ChooseGame, GetUsername } from "./windows"
+import { GetUsername } from "./windows"
 import GameSettings from "./game_settings"
 
+const baseURL = window.location.origin
 
 export var socket = io()
 
-const baseURL = window.location.origin
 
 export default function App() {
 	const [username, setUsername] = useState("test")
@@ -35,7 +35,7 @@ export default function App() {
 			"headers": {
 				'Content-Type': 'application/json'
 			},
-			"body": JSON.stringify({"username": username})
+			"body": JSON.stringify({"username": username, "sid": socket.id})
 		}
 		
 		fetch(`${baseURL}/api/create_new_user`, json)
@@ -44,6 +44,7 @@ export default function App() {
 				if (data.valid_username) {
 					setUsernameExists(false)
 					setLoggedIn(true)
+					socket.emit("new user")
 					history.push("/play")					
 				} else {
 					setUsernameExists(true)
@@ -54,7 +55,7 @@ export default function App() {
 
 	return (
 		<>
-			<Header />
+			<Header username={username} loggedIn={loggedIn} />
 			<Switch>
 				<Route exact path="/login">
 					<GetUsername 

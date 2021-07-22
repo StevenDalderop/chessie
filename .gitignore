@@ -2,3 +2,4 @@
 chess-venv
 node_modules/
 chess.db
+secret.py

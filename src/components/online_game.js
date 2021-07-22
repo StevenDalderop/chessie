@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react"
-import { socket } from "./app"
 import Dialog from "./dialog"
 import Scrollable from "./scrollable"
+import { BackButton } from "./windows"
+
+import { socket } from "./app"
+
 import css from "./online_game.css"
-import {BackButton} from "./windows"
 
 const baseURL = window.location.origin
 
@@ -56,7 +58,7 @@ export default function OnlineGame(props) {
 					setUsersOnline(data["users_online"])					
 				}
 			})	
-		return () => {is_cancelled = true }
+		return () => { is_cancelled = true }
 	}, [])
 	
 	useEffect(() => {
@@ -68,18 +70,24 @@ export default function OnlineGame(props) {
 					setGamesAvailable(data["games_available"])
 				}
 			})	
-		return () => {is_cancelled = true }			
+		return () => { is_cancelled = true }			
 	}, []) 
 	
- 	useEffect(() => {
-		let is_cancelled = false
+ 	useEffect(() => {		
 		socket.on("announce games available", data => {
-			if (!is_cancelled) {
-				setGamesAvailable(data["games_available"])
-			}
+			setGamesAvailable(data["games_available"])
 		})
-		return () => { is_cancelled = true }
+		
+		return () => { socket.off("announce games available")}
 	}, []) 
+	
+	useEffect(() => {
+		socket.on("announce users", data => {
+			setUsersOnline(data["users_online"])
+		})
+		
+		return () => { socket.off("announce users") }
+	})
 	
   let users = usersOnline.map((user, id) => <li key={id}> {user} </li>)
   

@@ -63,11 +63,11 @@ export default class Board extends React.Component {
     }
     
     if (this.props.selected_square === square) {
-      square_color = "yellow"
+      square_color = "selected"
     }
 
     if (this.props.uci && this.props.uci.slice(2,4) === square) {
-      square_color = "gray"
+      square_color = "moved"
     }	
 	
     return (

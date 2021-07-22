@@ -2,32 +2,10 @@ body {
   background-color: rgb(60,60,60);
 }
 
-#title {
-  color: white;
-  text-align: center;
-}
-
 #app {
 	height: 100vh;
 	width: 100vw;
 	background-color: rgb(60,60,60);	
-}
-
-#header {
-	position: fixed;
-}
-
-#main_container {
-	padding-top: 70px;
-	height: 100%;
-}
-
-.promotion-options-container {
-	display: flex;
-	justify-content: space-around;
-	max-width: 300px;
-	margin: auto;
-	flex-wrap: wrap;
 }
 
 .bg-black-main {
@@ -43,64 +21,12 @@ body {
   transform: translate(-50%, -50%);
 }
 
-
-
-
-
-
-
-
-
-
-
 .overflow_hidden {
   overflow: hidden;
 }
-
 
 .close_button {
   position: absolute;
   right: 5px;
   top: 5px;
-}
-
-
-
-
-
-
-
-
-
-.mobile {
-  display: none;
-}
-
-.display_mobile {
-  display: none;
-}
-
-@media screen and (max-width: 767px) and (orientation: portrait) { 
-	.show_on_tablet_and_pc {
-		display: none;
-	}
-}
-
-@media screen and (max-height: 767px) and (orientation: landscape) {
-	.show_on_tablet_and_pc {
-		display: none;
-	}
-}
-
-@media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
-  /* For tablets: */
-	.container-mobile {
-		display: none
-	}
-}
-
-@media screen and (min-width: 768px) {
-	.container-mobile {
-		display: none
-	}
 }

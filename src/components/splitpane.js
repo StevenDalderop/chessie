@@ -1,9 +1,8 @@
 import React from 'react'
 
 export default function SplitPane(props) {
-	var className = " " + props.className
   return (
-    <div className={"container-fluid" + className}>
+    <div className="container-fluid">
       <div className="row">
         <div className="col">
           {props.left}

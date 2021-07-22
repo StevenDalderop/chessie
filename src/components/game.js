@@ -1,14 +1,12 @@
 import React from "react"
 import SplitPane from "./splitpane"
-import Container_mobile from "./container_mobile"
 import Sidebar, {GameOptionButtons} from "./sidebar"
-import BoardContainer from "./board_container"
-import GameHeader from "./game_header"
 import { get_board, uci_to_row_column, get_uci, get_piece } from "../chess_notation"
 import Board from "./board"
-import { Promotion, Result, Draw_offered, GetUsername, GetUsernameMobile, Online_game } from "./windows"
+import { Promotion, Result, DrawOffered, DrawDecision, GetUsername, GetUsernameMobile, Online_game } from "./windows"
 import { socket } from "./app"
 import Timer from "./timer"
+import css from "./game.css"
 
 const baseURL = window.location.origin
 
@@ -29,7 +27,7 @@ function get_turn(fen) {
 	return turn.black
 }
 
-export default class Game extends React.Component {
+class Game extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -126,17 +124,15 @@ export default class Game extends React.Component {
 		}) 
     }
 	
-	get_move(square) {
+	get_move(square, promotion_type = "") {
 		let board = get_board(this.state.fen)
 		let selected_square = this.state.selected_square
 		var piece = get_piece(board, square)
-		let promotion = ""
 		
 		let move = {
 			"from": selected_square, 
 			"to": square, 
-			"uci": selected_square + square + promotion, 
-			"promotion": promotion, 
+			"uci": selected_square + square + promotion_type, 
 			"piece": piece
 		}
 		return move
@@ -156,7 +152,7 @@ export default class Game extends React.Component {
 				"san": data["san"],
 				"promotion": false
 			   }))
-			  this.startTimer()
+			  this.switchTimer()
 			}
 		})
   }
@@ -174,15 +170,12 @@ export default class Game extends React.Component {
           "san": data["san"],
           "promotion": false
         }))
+		this.switchTimer()
       })
   }  
   
   handlePromotionOptionPressed(e) {	 
-	  let board = get_board(this.state.fen)  
-     
-	  let from = this.state.selected_square
 	  let to = this.state.promotion
-	  let piece = get_piece(board, from)
 	  
 	  let pieces = {
 		  "rook": "r", 
@@ -190,10 +183,10 @@ export default class Game extends React.Component {
 		  "knight": "n", 
 		  "bishop": "b"
 	  }
-      let promotion = pieces[e.target.value]
+      let promotion_type = pieces[e.target.value]
 	  
-	  let move = get_move(from, to, piece, promotion)
-      this.make_move(move)	  
+	  let move = this.get_move(to, promotion_type)
+      this.make_move(this.props.gameId, move.uci)	  
   }
   
   handleResignButtonPressed() {
@@ -216,56 +209,62 @@ export default class Game extends React.Component {
 	  socket.emit("draw", {"accepted": "false", "room": this.props.gameId})
   }
   
-  startTimer() {
+  switchTimer() {
       clearInterval(this.interval)
       this.interval = setInterval(() => {
-	  let turn = get_turn(this.state.fen)
-      let seconds = turn ? this.state.time_white : this.state.time_black
-      if (seconds === 0) {
-        this.setState((state)=> ({"result": turn ? "0-1" : "1-0", "is_finished": true, "selected_square": null}))
-        clearInterval(this.interval)
-      } else if (!this.state.is_finished) {
-        this.setState((state) => ({"time_white": turn ? state.time_white - 1 : state.time_white, "time_black": state.turn ? state.time_black : state.time_black - 1}))
-      } else {
-        clearInterval(this.interval)
-      }
+		  let turn = get_turn(this.state.fen)
+		  let seconds = turn ? this.state.time_white : this.state.time_black
+		  if (seconds === 0) {
+			this.setState((state)=> ({
+				"result": turn ? "0-1" : "1-0", 
+				"is_finished": true, 
+				"selected_square": null
+			}))
+			clearInterval(this.interval)
+		  } else if (!this.state.is_finished) {
+			this.setState((state) => ({
+				"time_white": turn ? state.time_white - 1 : state.time_white, 
+				"time_black": turn ? state.time_black : state.time_black - 1
+			}))
+		  } else {
+			clearInterval(this.interval)
+		  }
     }, 1000)
   }
 
-  componentDidMount() {	  
-    socket.on("announce move", data => {
-		console.log(data)
-      this.setState((state) => ({
-        "fen": data["fen"],
-        "uci": data["uci"],
-        "result": data["result"],
-        "evaluation": data["evaluation"],
-        "selected_square": null,
-        "san": data["san"],
-        "time_white": data["time_white"],
+  componentDidMount() {	
+	socket.on("announce move", data => {
+	  this.setState((state) => ({
+		"fen": data["fen"],
+		"uci": data["uci"],
+		"result": data["result"],
+		"evaluation": data["evaluation"],
+		"selected_square": null,
+		"san": data["san"],
+		"time_white": data["time_white"],
 		"time_black": data["time_black"],
-        "promotion": false
-      }))
-      this.startTimer()
-    })
+		"promotion": false
+	  }))
+	  this.switchTimer()
+	})		
 
     socket.on("announce resign", data => {
-		console.log("resign announced")
-      this.setState({"result": data["username"] + " resigned", "is_finished": true, "draw_offered": null, "selected_square": null, "uci": null})
+		this.setState({"result": data["username"] + " resigned", "is_finished": true, "draw_offered": null, "selected_square": null, "uci": null})	
     })
 
     socket.on("announce draw offered", data => {
-      this.setState({"draw_offered": data["username"]})
+		this.setState({"draw_offered": data["username"]})					
     })
 
     socket.on("announce draw decision", data => {
-      if (data["accepted"] === "true") {
-        this.setState({"result": "Draw", "draw_offered": null, "selected_square": null, "uci": null, "is_finished": true})
-      } else if (data["accepted"] === "false") {
-        this.setState({"draw_offered": null})
-      }
-    })
-  }
+			  if (data["accepted"] === "true") {
+				this.setState({"result": "Draw", "draw_offered": null, "selected_square": null, "uci": null, "is_finished": true})
+			  } else if (data["accepted"] === "false") {
+				this.setState({"draw_offered": null})
+			  }
+			}			
+		)
+   }
   
   componentDidUpdate(prevProps, prevState) {
 	if (prevState.fen !== this.state.fen) {
@@ -293,6 +292,10 @@ export default class Game extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this.interval)
+	socket.off("announce move")
+	socket.off("announce resign")
+	socket.off("announce draw offered")
+	socket.off("announce draw decision")
   }
 
 
@@ -318,28 +321,43 @@ export default class Game extends React.Component {
 				  uci={this.state.uci} 
 				  onClick={(square) => this.handleClickBoard(square)} 
 				  mirrored={this.props.color === 0} />
+				  
+	const centeredBoard = <div className="centered_container">
+							{board}
+						  </div>
 			  
     return (
       <div id="main_container">
-          <Promotion 
-			promotion={this.state.promotion} 
-			onClick={(e) => this.handlePromotionOptionPressed(e)} />
-          <Result 
-			result={this.state.result} 
-			onClick={() => {this.setState({"result": null})}} />
-          <Draw_offered 
-			draw_offered={this.state.draw_offered} 
-			username={this.props.username} 
-			onClickAccept={() => this.handleAcceptDrawButtonPressed()} 
-			onClickDecline={() => this.handleDeclineDrawButtonPressed()} /> 
-
-          <SplitPane
-		    className="show_on_tablet_and_pc"
-            left={<BoardContainer> {board} </BoardContainer>}
-            right={sidebar}
-          />
+			{ this.state.promotion && 
+			<Promotion 
+				promotion={this.state.promotion} 
+				onClick={(e) => this.handlePromotionOptionPressed(e)} /> }
+			
+			{ this.state.result && 
+			<Result 
+				result={this.state.result} 
+				onClick={() => {this.setState({"result": null})}} /> }
+				
+			{ this.state.draw_offered === this.props.username && 
+				<DrawOffered />			
+			}
+			
+			{
+				this.state.draw_offered && this.state.draw_offered !== this.props.username &&
+			    <DrawDecision
+					draw_offered={this.state.draw_offered}  
+					onClickAccept={() => this.handleAcceptDrawButtonPressed()} 
+					onClickDecline={() => this.handleDeclineDrawButtonPressed()} /> 				
+			}		
+		
+		  <div className="container-tablet-pc">
+			  <SplitPane		    
+				left={centeredBoard}
+				right={sidebar}
+			  />
+		  </div>
 					
-          <Container_mobile>
+          <div className="container-mobile">
 			<Timer username={this.props.usernameOpponent} time={this.state.time_black} />
 		    {board}  
 			<Timer username={this.props.username} time={this.state.time_white} />
@@ -349,9 +367,10 @@ export default class Game extends React.Component {
               onClick={() => {this.props.onClick()}} 
 			  onClick2={() => this.handleResignButtonPressed()}
 			  onClick3={() => this.handleOfferDrawButtonPressed()} />
-          </Container_mobile>
+          </div>
       </div>
     );
   }
 }
 
+export default Game

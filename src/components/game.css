@@ -1,0 +1,28 @@
+#main_container {
+	padding-top: 70px;
+	height: 100%;
+}
+
+@media screen and (max-width: 767px) and (orientation: portrait) { 
+	.container-tablet-pc {
+		display: none;
+	}
+}
+
+@media screen and (max-height: 767px) and (orientation: landscape) {
+	.container-tablet-pc {
+		display: none;
+	}
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) and (min-height: 500px) {
+	.container-mobile {
+		display: none
+	}
+}
+
+@media screen and (min-width: 768px) {
+	.container-mobile {
+		display: none
+	}
+}

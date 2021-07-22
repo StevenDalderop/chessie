@@ -2,6 +2,7 @@ import React, {useState} from "react"
 import { useHistory } from "react-router-dom"
 import Dialog from "./dialog"
 import { Option, OptionMenu } from "./option_menu"
+import css from "./windows.css"
 
 function PromotionOption(props) {
 	return (
@@ -16,9 +17,6 @@ function PromotionOption(props) {
 }
 
 export function Promotion(props) {
-  if (!props["promotion"]) {
-    return null
-  } else {
     return (
 	  <Dialog title="Promotion" type="promotion">
 	    <div className="promotion-options-container">
@@ -29,21 +27,36 @@ export function Promotion(props) {
 		</div>
       </Dialog>
     )
-  }
 }
 
 export function Result(props) {
-  if (props.result) {
     return (
 		<Dialog title="Result">
           <p> {props.result} </p>
           <button className="btn btn-primary" onClick={props.onClick}> Close </button>
 	    </Dialog>
     )
-  } else {
-    return null
-  }
 }
+
+export function DrawDecision(props) {
+    return (
+      <Dialog title="Draw offered">
+          <p> {props.draw_offered} offered a draw </p>
+          <button name="accept_draw" className="btn btn-success" onClick={props.onClickAccept}> Accept </button>
+          <button name="decline_draw" className="btn btn-danger ml-3" onClick={props.onClickDecline}> Decline </button>
+      </Dialog>
+    )	
+}
+
+export function DrawOffered(props) {
+    return (
+      <Dialog title="Draw offered">
+          <p> You offered a draw </p>
+          <p> Waiting for decision </p>
+      </Dialog>
+    )	
+}
+
 
 export function Draw_offered(props) {
   if (props.draw_offered && props.draw_offered !== props.username) {
@@ -73,17 +86,6 @@ export function BackButton(props) {
 }
 
 
-export function ChooseGame(props) {
-  return (
-	  <Dialog title="New game">
-		<OptionMenu>
-			<Option text="vs Human Offline" onClick={() => props.onClick("human")} />
-			<Option text="vs Human Online" onClick={() => props.onClick("online")} />
-			<Option text="vs PC" onClick={() => props.onClick("pc")} />
-        </OptionMenu>
-	  </Dialog>
-    )
-}
 
 
 export function ChooseTime(props) { 

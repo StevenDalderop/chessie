@@ -1,7 +1,14 @@
 import React from "react"
-import css from "./dialog.css"
+const css = require('./dialog.css')
 
-export default function Dialog(props) {
+type Props = {
+	size: string;
+	type: string;
+	title: string;
+	children: React.ReactNode
+}
+
+const Dialog : React.FC<Props> = (props) => {
 	return (
 		<div className={"dialog dialog-" + props.size + " dialog-" + props.type}>
 		  <h2> {props.title} </h2>
@@ -11,3 +18,5 @@ export default function Dialog(props) {
 		</div>		
 	) 
 }
+
+export default Dialog

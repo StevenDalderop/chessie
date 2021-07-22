@@ -6,12 +6,11 @@
   text-align: center;
   margin: auto;
   position: relative;
-  border: 3px solid black;
   margin-bottom: 15px;
 }
 
 .option:hover {
-  background-color: rgb(150,150,150);
+  background-color: royalblue;
 }
 
 .option-menu {

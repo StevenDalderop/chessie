@@ -1,0 +1,31 @@
+#title {
+  color: white;
+  text-align: center;
+}
+
+#header {
+	position: fixed;
+}
+
+.username {
+	color: white;
+	position: absolute;
+	right: 15px;
+	top: 10px;
+}
+
+.bg-black-main {
+  background-color: rgb(30, 30, 30);
+}
+
+@media screen and (max-width: 767px) and (orientation: portrait) { 
+	.username {
+		display: none;
+	}
+}
+
+@media screen and (max-height: 767px) and (orientation: landscape) {
+	.username {
+		display: none;
+	}
+}

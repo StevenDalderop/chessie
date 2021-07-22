@@ -19,7 +19,7 @@ function ScoreEvaluationBar(props) {
 export function GameOptionButtons(props) {
   if (props.vs === "online" && !props.is_finished) {
     let button_resign = <button key="resign" name="resign" className="btn btn-danger" onClick={() => props.onClick2()}> Resign </button>
-    let button_draw = <button key="draw" name="offer_draw" className="btn btn-warning" onClick={() => props.onClick3()}> Offer draw </button>
+    let button_draw = <button key="draw" name="offer_draw" className="btn btn-warning ml-3" onClick={() => props.onClick3()}> Offer draw </button>
     var buttons = [button_resign, button_draw]
   } else if (props.vs === "pc" && !props.is_finished) {
     var buttons = <button key="resign" name="resign" className="btn btn-danger" onClick={() => props.onClick2()}> Resign </button>
@@ -73,7 +73,7 @@ function SidebarGameOptions(props) {
 			is_finished={props.is_finished}
 			onClick={() => {props.onClick()}} 
 			onClick2={() => props.onClick2()} 
-			onClick3={() => props.onClick3} />
+			onClick3={() => props.onClick3()} />
       </SidebarItem>	
 	)
 }
@@ -103,7 +103,7 @@ export default function Sidebar(props) {
 		is_finished={props.is_finished} 
 		onClick={() => {props.onClick()}} 
 		onClick2={() => props.onClick2()} 
-		onClick3={() => props.onClick3} />
+		onClick3={() => props.onClick3()} />
 	  <SidebarTimer title={props["username"]} time={time_self} />
     </div>
   )

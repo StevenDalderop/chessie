@@ -1,4 +1,4 @@
-from flask import render_template, Flask, request
+from flask import render_template, Flask, request, session
 from flask_socketio import SocketIO, join_room, leave_room
 import chess
 import sys
@@ -9,9 +9,12 @@ import datetime
 from chessie.constants import *
 import sqlite3
 from chessie.utils import * 
+from chessie.secret import secret_key
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+
+app.secret_key = secret_key
 
 if __name__ == '__main__':
     socketio.run(app, debug = True)
@@ -30,7 +33,7 @@ def index():
 @app.errorhandler(404)
 def not_found(e):
     return render_template("index.html")
-
+    
 @app.route("/api/new_game")
 def create_new_game():
     db = sqlite3.connect(DATABASE)
@@ -143,12 +146,13 @@ def create_new_user():
     cursor = db.cursor()
     
     username = request.json["username"]
+    sid = request.json["sid"]
     
     result = cursor.execute("SELECT * FROM users WHERE name = ?", (username,)).fetchone()
     if result:
         return {"valid_username": False}
 
-    cursor.execute("INSERT INTO users (name) VALUES (?)", (username,))
+    cursor.execute("INSERT INTO users (name, sid) VALUES (?, ?)", (username, sid))
     db.commit()    
     return {"valid_username": True}
 
@@ -161,6 +165,13 @@ def get_users():
     users_online = [user[0] for user in cursor.execute("SELECT name FROM users").fetchall()]
     return {"users_online": users_online}
 
+@socketio.on('connect')
+def connect():
+    print("connect")
+    
+@socketio.on("test")
+def test():
+    print("test")
 
 @socketio.on("disconnect")
 def disconnect():
@@ -172,28 +183,16 @@ def disconnect():
     db.commit()
     
     users_online = [user[0] for user in cursor.execute("SELECT name FROM users").fetchall()]
-    socketio.emit("announce user", {"users_online": users_online}, broadcast=True)
+    socketio.emit("announce users", {"users_online": users_online}, broadcast=True)
+    
 
-
-@socketio.on("add user online")
-def add_user_online(data):
+@socketio.on("new user")
+def new_user():
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     
-    username = data["username"]
-    sid = request.sid
-    
-    result = cursor.execute("SELECT * FROM users WHERE name = ?", (username,)).fetchone() 
-    
-    if result:
-        socketio.emit("user already exist", room=request.sid)
-        return 
-
-    cursor.execute("INSERT INTO users (name, sid) VALUES (?, ?)", (username, sid))
-    db.commit()
-    
     users_online = [user[0] for user in cursor.execute("SELECT name FROM users").fetchall()]
-    socketio.emit("announce users online", {"users_online": users_online}, broadcast=True)
+    socketio.emit("announce users", {"users_online": users_online}, broadcast=True)
     
 
 @socketio.on("new online game")
@@ -214,8 +213,10 @@ def new_online_game(data):
     
     cursor.execute("INSERT INTO games (fen, time1, time2, user_id_1, is_online) VALUES (?,?,?,?,?)", (fen, time, time, user_id_1, True))
     game_id = cursor.execute(f"SELECT MAX(id) FROM GAMES").fetchone()[0]
-
-    join_room(game_id)    
+    
+    print(type(game_id))
+    print(game_id)
+    join_room(str(game_id))    
     
     games_available = get_online_games_available(db)
         
@@ -229,10 +230,11 @@ def new_online_game(data):
 def join_game(data):
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
-       
+    
+    
     game_id = int(data["game_id"])
 
-    join_room(game_id)
+    join_room(str(game_id))
     
     username = data["username"]
     user_id = get_user_id(db, username)
@@ -242,7 +244,11 @@ def join_game(data):
     user_id_1, time = cursor.execute("SELECT user_id_1, time1 FROM games WHERE id = ?", (game_id,)).fetchone()
     username_1 = get_username(db, user_id_1)
        
-    socketio.emit("announce game starts", {"username": username_1, "username2": username, "time": time, "game_id": game_id}, room=game_id)
+       
+    print(username_1, username, time, game_id)
+    
+    
+    socketio.emit("announce game starts", {"username": username_1, "username2": username, "time": time, "game_id": game_id}, to=str(game_id))
 
     cursor.execute("DELETE FROM games WHERE user_id_1 = ?", (user_id,))
     
@@ -264,20 +270,20 @@ def make_move(data):
         "time_black": data["time_black"],
         "result": data["result"]
     }
-    socketio.emit("announce move", json, room=data["room"])
+    socketio.emit("announce move", json, room=str(data["room"]))
 
 
 @socketio.on("resign")
 def resign(data): 
-    socketio.emit("announce resign", {"username": data["username"]}, room=data["room"])
+    socketio.emit("announce resign", {"username": data["username"]}, room=str(data["room"]))
 
 
 @socketio.on("offer draw")
 def offer_draw(data): 
-    socketio.emit("announce draw offered", {"username": data["username"]}, room=data["room"])
+    socketio.emit("announce draw offered", {"username": data["username"]}, room=str(data["room"]))
 
 
 @socketio.on("draw")
 def respond_to_draw_offer(data): 
-    socketio.emit("announce draw decision", {"accepted": data["accepted"]}, room=data["room"])
+    socketio.emit("announce draw decision", {"accepted": data["accepted"]}, room=str(data["room"]))
     

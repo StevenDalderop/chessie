@@ -44,12 +44,12 @@
 	background-color: white
 }
 
-.color-square-yellow {
-	background-color: yellow;
+.color-square-selected {
+	background-color: skyblue;
 }
 
-.color-square-gray {
-	background-color: gray;
+.color-square-moved {
+	background-color: royalblue;
 }
 
 .row_number {

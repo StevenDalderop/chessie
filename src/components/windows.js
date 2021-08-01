@@ -126,15 +126,39 @@ export function GetUsername(props) {
   )
 }
 
+export function Signup(props) {
+	return (
+		<Dialog title = "Signup">
+			<form action="/signup" method="post">
+				<input type="text" name="name" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
+				<input type="password" name="password" placeholder="password" className="mt-1" /> <br></br>
+				<button className="btn btn-primary mt-3"> Submit </button>
+			</form>
+		</Dialog>
+	)
+}
+
+export function Login(props) {
+	return (
+		<Dialog title = "Login">
+			<form action="/login" method="post">
+				<input type="text" name="name" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
+				<input type="password" name="password" placeholder="password" className="mt-1" /> <br></br>
+				<button className="btn btn-primary mt-3"> Submit </button>
+			</form>
+		</Dialog>	
+	)
+}
+
 
 export function PcSkillLevelForm(props) {
     return (
 	  <Dialog title="PC strength">
-		<form name="pcSkillLevel" onSubmit={() => props.onSubmit()}>
+		<form name="pcSkillLevel" onSubmit={(e) => props.onSubmit(e)}>
 		  <label> Skill level (0-20): </label> <br></br>
 		  <input id="elo" className="mb-3" type="number" min="0" max="20" name="pcSkillLevel" value={props.skill_level_pc} onChange={props.onChange} /> <br></br>
 		  <BackButton onClick={() => props.onClickBack()} />
-		  <button className="btn btn-primary ml-3"> Submit </button>		  
+		  <button type="submit" className="btn btn-primary ml-3"> Submit </button>		  
 		</form>					
 	  </Dialog>
 	)

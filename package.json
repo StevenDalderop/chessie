@@ -26,6 +26,7 @@
     "@babel/preset-typescript": "^7.14.5",
     "@types/react": "^17.0.14",
     "@types/react-dom": "^17.0.9",
+    "@types/react-router-dom": "^5.1.8",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.2.6",
     "react": "^17.0.2",
@@ -38,6 +39,7 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
+    "@types/react-router": "^5.1.16",
     "socket.io-client": "^4.1.3"
   }
 }

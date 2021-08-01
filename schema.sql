@@ -3,8 +3,8 @@ DROP TABLE IF EXISTS games;
 
 CREATE TABLE users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-	sid TEXT,
+    name TEXT NOT NULL UNIQUE,
+	password_hash TEXT, 
 	is_online BOOLEAN
 );
 

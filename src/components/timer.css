@@ -4,6 +4,10 @@
   text-align: center;
 }
 
+.username {
+	margin-left: 15px;
+}
+
 @media screen and (max-width: 767px) and (orientation: portrait) { 
 	.timer_container {
 		display: flex;

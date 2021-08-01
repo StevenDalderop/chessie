@@ -1,4 +1,5 @@
 import React from "react"
+import { useHistory } from "react-router-dom"
 import SplitPane from "./splitpane"
 import Sidebar, {GameOptionButtons} from "./sidebar"
 import { get_board, uci_to_row_column, get_uci, get_piece } from "../chess_notation"
@@ -232,7 +233,7 @@ class Game extends React.Component {
     }, 1000)
   }
 
-  componentDidMount() {	
+  componentDidMount() {	 
 	socket.on("announce move", data => {
 	  this.setState((state) => ({
 		"fen": data["fen"],
@@ -274,7 +275,7 @@ class Game extends React.Component {
 			var json = {
 				"fen": this.state.fen, 
 				"uci": this.state.uci, 
-				"moves_san": this.state.san, 
+				"san": this.state.san, 
 				"evaluation": this.state.evaluation, 
 				"result": this.state.result, 
 				"time_white": this.state.time_white, 
@@ -327,7 +328,7 @@ class Game extends React.Component {
 						  </div>
 			  
     return (
-      <div id="main_container">
+      <>
 			{ this.state.promotion && 
 			<Promotion 
 				promotion={this.state.promotion} 
@@ -368,7 +369,7 @@ class Game extends React.Component {
 			  onClick2={() => this.handleResignButtonPressed()}
 			  onClick3={() => this.handleOfferDrawButtonPressed()} />
           </div>
-      </div>
+      </>
     );
   }
 }

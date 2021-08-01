@@ -7,7 +7,7 @@
 	position: fixed;
 }
 
-.username {
+.username-header {
 	color: white;
 	position: absolute;
 	right: 15px;
@@ -19,13 +19,13 @@
 }
 
 @media screen and (max-width: 767px) and (orientation: portrait) { 
-	.username {
+	.username-header {
 		display: none;
 	}
 }
 
 @media screen and (max-height: 767px) and (orientation: landscape) {
-	.username {
+	.username-header {
 		display: none;
 	}
 }

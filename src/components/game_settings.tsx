@@ -36,43 +36,43 @@ function get_previous_page(current_page : string, vs : string) {
 	}
 } 
 
-const fetchApiCreateGame = (vs : string, username : string, time : number) => {
-	let is_online = vs === vs_options.online
+const fetchApiCreateGame = (vs : string, username : string, time : number, color: string, skill_level : number = null) => {	
+	let data : {
+		[key: string]: string | number | undefined
+	}
+	
+	data = {"username": username, "time": time, "game_type": vs, "color": color}
+	
+
+	data["skill_level"] = skill_level 
+	
 	
 	let json = {
 		"method": "POST",
 		"headers": {
 			'Content-Type': 'application/json'
 		},
-		"body": JSON.stringify({"username_white": username, "time": time, "is_online": is_online})
+		"body": JSON.stringify(data)
 	}
 	
-	return fetch(`${baseURL}/api/new_game`, json)
+	return fetch(`${baseURL}/api/me/game`, json)
 				.then(response => response.json())		
 }
 
-const fetchApiLeaveGames = (username : string) => {
+const fetchApiLeaveGames = () => {
+	return fetch(`${baseURL}/api/me/leave-games`)
+}	
+
+const fetchApiJoinGame = (game_id : number) => {
 	let json = {
 		"method": "POST",
 		"headers": {
 			'Content-Type': 'application/json'
 		},
-		"body": JSON.stringify({"username": username})			
+		"body": JSON.stringify({"game_id": game_id})			
 	}
 	
-	return fetch(`${baseURL}/api/leave-games`, json)
-}	
-
-const fetchApiUpdateGame = (game_id : number, username_black : string) => {
-	let json = {
-		"method": "PATCH",
-		"headers": {
-			'Content-Type': 'application/json'
-		},
-		"body": JSON.stringify({"game_id": game_id, "username_black": username_black})			
-	}
-	
-	return fetch(`${baseURL}/api/game`, json) 		
+	return fetch(`${baseURL}/api/join-game`, json) 		
 }
 	
 const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
@@ -117,28 +117,28 @@ const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
 		}
 	}
 	
-	async function onTimeSelected() {
+	async function onTimeSelected(time_chosen : number) {
+		let chess_color = "white"
 		if (vs === vs_options.human) {
-			let game = await fetchApiCreateGame(vs, props.username, time)
-			console.log(game)
+			let res = await fetchApiLeaveGames()
+			let game = await fetchApiCreateGame(vs, props.username, time_chosen, chess_color)
 			setGameId(game.id)
 			history.push("/play")
 		} else if (vs === vs_options.pc) {
 			setShowPage(pages.pc)
 		} else if (vs === vs_options.online) {
-			let res = await fetchApiLeaveGames(props.username)
-			let game = await fetchApiCreateGame(vs, props.username, time)
-			console.log(game)
+			let res = await fetchApiLeaveGames()
+			let game = await fetchApiCreateGame(vs, props.username, time_chosen, chess_color)
 			setGameId(game.id)
-			socket.emit("new online game", {"game_id": game.id})
+			socket.emit("new online game")
 			socket.emit("join room", {"room": game.id})
 			setShowPage(pages.online)
 		}			
 	}
 	
-	function handleClickTime(time : number) {
-		setTime(time)
-		onTimeSelected()
+	function handleClickTime(time_chosen : number) {
+		setTime(time_chosen)
+		onTimeSelected(time_chosen)
 	}
 	
 	const handleClickNewOnlineGame = () => {
@@ -148,7 +148,7 @@ const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
 	const handleClickJoinGame = (game_id: number) => {
 		socket.emit("join room", {"room": game_id})
 		
-		fetchApiUpdateGame(game_id, props.username)
+		fetchApiJoinGame(game_id)
 			.then(res => {
 				socket.emit("start game", {"game_id": game_id})	
 			})	
@@ -169,7 +169,8 @@ const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
 	
 	async function handleSubmit(e : React.ChangeEvent<HTMLInputElement>) {
 		e.preventDefault()
-		let game = await fetchApiCreateGame(vs, props.username, time)
+		let res = await fetchApiLeaveGames()
+		let game = await fetchApiCreateGame(vs, props.username, time, "white", pcSkillLevel)
 		console.log(game)
 		setGameId(game.id)	
 		history.push("/play")

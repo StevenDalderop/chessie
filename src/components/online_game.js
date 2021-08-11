@@ -51,7 +51,7 @@ export default function OnlineGame(props) {
 	
     useEffect(() => {
 		let is_cancelled = false
-		fetch(`${baseURL}/api/get_users`)
+		fetch(`${baseURL}/api/users`)
 			.then(res => res.json())
 			.then(data => {
 				if (!is_cancelled) {
@@ -63,7 +63,7 @@ export default function OnlineGame(props) {
 	
 	useEffect(() => {
 		let is_cancelled = false
-		fetch(`${baseURL}/api/get_games`)
+		fetch(`${baseURL}/api/games`)
 			.then(response => response.json())
 			.then(data => {
 				if (!is_cancelled) {
@@ -78,16 +78,27 @@ export default function OnlineGame(props) {
 			setGamesAvailable(data["games_available"])
 		})
 		
-		return () => { socket.off("announce games available")}
-	}, []) 
-	
-	useEffect(() => {
-		socket.on("announce users", data => {
-			setUsersOnline(data["users_online"])
+		socket.on("status change", data => {
+			if (data["is_online"]) {
+				setUsersOnline(prevUsers => [...prevUsers, data["username"]])
+			} else {
+				setUsersOnline(prevUsers => {
+					var array = [...prevUsers]
+					var index = array.indexOf(data["username"])
+					if (index !== -1) {
+						array.splice(index, 1)
+						return array
+					}					
+				})
+			}
 		})
 		
-		return () => { socket.off("announce users") }
-	})
+		return () => { 
+			socket.off("announce games available")
+			socket.off("status change")
+		}
+	}, []) 
+	
 	
   let users = usersOnline.map((user, id) => <li key={id}> {user} </li>)
   

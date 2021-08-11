@@ -113,19 +113,6 @@ function MessageBanner(props) {
 }
 
 
-export function GetUsername(props) {
-  return (
-    <Dialog title="Username">
-        <form name="username" onSubmit={(e) => props.onSubmit(e)}>
-          <label> What is your username? </label> <br></br>
-          <input id="username" name="username" type="text" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
-          <MessageBanner message={props.message} />
-          <button className="btn btn-primary mt-3"> Submit </button>
-        </form>
-	</Dialog>
-  )
-}
-
 export function Signup(props) {
 	return (
 		<Dialog title = "Signup">
@@ -141,7 +128,7 @@ export function Signup(props) {
 export function Login(props) {
 	return (
 		<Dialog title = "Login">
-			<form action="/login" method="post">
+			<form onSubmit={props.onSubmit}>
 				<input type="text" name="name" maxLength="15" placeholder="username" value={props.username} onChange={props.onChange} /> <br></br>
 				<input type="password" name="password" placeholder="password" className="mt-1" /> <br></br>
 				<button className="btn btn-primary mt-3"> Submit </button>

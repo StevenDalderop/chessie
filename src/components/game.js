@@ -196,6 +196,10 @@ class Game extends React.Component {
       } else if (this.props.vs === "online") {
         socket.emit("resign", {"username": this.props.username, "room": this.props.gameId})
       }
+	  fetch(`${baseURL}/api/me/game/resign`)
+		.then(res => res.json())
+		.then(data => console.log(data))
+		.catch(err => console.log(err))
   }
   
   handleOfferDrawButtonPressed() {

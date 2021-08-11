@@ -5,27 +5,36 @@
 
 #header {
 	position: fixed;
+	z-index: 2;
 }
 
-.username-header {
+#username {
 	color: white;
-	position: absolute;
-	right: 15px;
-	top: 10px;
 }
 
 .bg-black-main {
   background-color: rgb(30, 30, 30);
 }
 
+.auth-buttons-list {
+	display: inline;
+	position: fixed;
+	right: 0px;
+	top: 0px;
+	margin: 0px;
+}
+
+.auth-buttons-list > li {
+	display: inline;
+	line-height: 56px;
+	height: 56px;
+	padding: 0 12px 0 0;
+	font-size: 20px;
+}
+
 @media screen and (max-width: 767px) and (orientation: portrait) { 
-	.username-header {
-		display: none;
+	#title {
+		text-align: left;
 	}
 }
 
-@media screen and (max-height: 767px) and (orientation: landscape) {
-	.username-header {
-		display: none;
-	}
-}

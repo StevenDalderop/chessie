@@ -5,7 +5,6 @@ export interface Pages {
 	online: string;	
 }
 
-
 export interface Vs_options {
 	human: string;
 	pc: string;
@@ -17,14 +16,27 @@ export interface Chess_color {
 	black: number;
 }
 
-export interface DataGameStarts {
-	username_white: string;
-	username_black: string;
-	time_white: number;
-	time_black: number;
-	game_id: number;
+export interface Game {
+	id: number;
+	fen: string;
+	is_finished: boolean;
+	is_started: boolean;
+	moves: string;
+	result: string;
+	time: number;
+	type: string;
+	timestamp: string;
+	users: User[];
+	skill_level?: number;
+	pc_name?: string;
+	room?: string;
 }
 
-export type GameSettingsProps = {
-	username: string;
+export interface User {
+	id: number;
+	color: string;
+	name: string;
+	is_online: boolean;
+	time: number;
 }
+

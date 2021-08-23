@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import * as types from "./types"
 
 
 const baseURL = window.location.origin
@@ -55,6 +56,7 @@ const Results : React.FC<{username: string}> = (props) => {
 		fetch(`${baseURL}/api/me/results`)
 			.then(res => res.json())
 			.then(data => {
+				console.log(data)
 				setResults(data["results"])
 			})
 	}, [])
@@ -72,13 +74,23 @@ const Results : React.FC<{username: string}> = (props) => {
 			<table className="table table-dark table-striped">
 				<TableHead colnames={["Players", "Result", "Time"]} />
 				<tbody>
-					{ results && results.filter(x => x.type === filterType).map((result, key) => { 
+					{ results && results.filter(x => x.type === filterType).map((result : types.Game, key) => { 					
+						if (result.type === "pc") {
+							var opponent_name = result.pc_name
+							var color = result.users[0].color
+						} else {
+							let opponent = result.users.filter(user => user.name !== props.username)[0] 
+							var opponent_name = opponent.name
+							var color = opponent.color === "white" ? "black" : "white"
+						}
+						
+					
 						return <TableRowResults key={key}
 												username={props.username}
-												opponent={result.opponent} 
+												opponent={opponent_name} 
 												result={result.result}
 												time={result.time}
-												color={result.color} />})
+												color={color} />})
 					}
 				</tbody>
 			</table>

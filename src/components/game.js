@@ -86,8 +86,8 @@ class Game extends React.Component {
 		
 		return can_move || can_attack
 	}
-  
-    select_square(square) {
+	
+	can_select_square(square) {
 		let board = get_board(this.state.fen)
 		let piece = get_piece(board, square)
 		let turn = get_turn(this.state.fen)
@@ -100,7 +100,11 @@ class Game extends React.Component {
 		var select_vs_online = this.props.vs === "online" && is_my_color
 		
 		var can_select_square = select_vs_human || select_vs_pc || select_vs_online
-		
+		return can_select_square
+	}
+  
+    select_square(square) {	
+		let can_select_square = this.can_select_square(square)
 		if (can_select_square) {
 			this.setState({"selected_square": square})
 		}
@@ -110,7 +114,8 @@ class Game extends React.Component {
     check_promotion(move) {
 	  let possible_promotion = is_possible_promotion(move)
 	  if (!possible_promotion || this.state.promotion) {
-	    return false
+		let is_valid_promotion = false
+	    return is_valid_promotion
 	  }
 	  
 	  let uci_promotion = move.uci + "q"
@@ -120,8 +125,8 @@ class Game extends React.Component {
 		  if (data["valid"] === "true") {
 			this.setState({"promotion": move.to})
 		  }	
-		  var is_promotion = data["valid"]
-		  return is_promotion
+		  var is_valid_promotion = data["valid"]
+		  return is_valid_promotion
 		}) 
     }
 	
@@ -194,24 +199,21 @@ class Game extends React.Component {
 	  if (this.props.vs === "pc") {
         this.setState((state) => ({"result": this.props.username + " resigned", "is_finished": true}))
       } else if (this.props.vs === "online") {
-        socket.emit("resign", {"username": this.props.username, "room": this.props.gameId})
+        socket.emit("resign", {"username": this.props.username, "room": this.props.room})
       }
 	  fetch(`${baseURL}/api/me/game/resign`)
-		.then(res => res.json())
-		.then(data => console.log(data))
-		.catch(err => console.log(err))
   }
   
   handleOfferDrawButtonPressed() {
-	  socket.emit("offer draw", {"username": this.props.username, "room": this.props.gameId})
+	  socket.emit("offer draw", {"username": this.props.username, "room": this.props.room})
   }
   
   handleAcceptDrawButtonPressed() {
-	  socket.emit("draw", {"accepted": "true", "room": this.props.gameId})
+	  socket.emit("draw", {"accepted": "true", "room": this.props.room})
   }
   
   handleDeclineDrawButtonPressed() {
-	  socket.emit("draw", {"accepted": "false", "room": this.props.gameId})
+	  socket.emit("draw", {"accepted": "false", "room": this.props.room})
   }
   
   switchTimer() {
@@ -237,7 +239,11 @@ class Game extends React.Component {
     }, 1000)
   }
 
-  componentDidMount() {	 
+  componentDidMount() {	
+	if (this.props.color === 0 && this.props.vs === "pc") {
+		this.get_pc_move()
+	}
+  
 	socket.on("announce move", data => {
 	  this.setState((state) => ({
 		"fen": data["fen"],
@@ -273,7 +279,7 @@ class Game extends React.Component {
   
   componentDidUpdate(prevProps, prevState) {
 	if (prevState.fen !== this.state.fen) {
-		if (this.props.vs === "pc" && get_turn(prevState.fen) === 1) {
+		if (this.props.vs === "pc" && get_turn(prevState.fen) === this.props.color) {
 		  this.get_pc_move()
 		} else if (this.props.vs === "online" && get_turn(prevState.fen) === prevProps.color) {
 			var json = {
@@ -284,7 +290,7 @@ class Game extends React.Component {
 				"result": this.state.result, 
 				"time_white": this.state.time_white, 
 				"time_black": this.state.time_black,
-				"room": this.props.gameId
+				"room": this.props.room
 			}
 		  socket.emit("make move", json)
 		}

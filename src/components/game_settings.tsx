@@ -36,12 +36,12 @@ function get_previous_page(current_page : string, vs : string) {
 	}
 } 
 
-const fetchApiCreateGame = (vs : string, username : string, time : number, color: string, skill_level : number = null) => {	
+const fetchApiCreateGame = (vs : string, time : number, skill_level : number = null) => {	
 	let data : {
 		[key: string]: string | number | undefined
 	}
 	
-	data = {"username": username, "time": time, "game_type": vs, "color": color}
+	data = {"time": time, "game_type": vs}
 	
 
 	data["skill_level"] = skill_level 
@@ -75,30 +75,31 @@ const fetchApiJoinGame = (game_id : number) => {
 	return fetch(`${baseURL}/api/join-game`, json) 		
 }
 	
-const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
+const GameSettings: React.FC<{username: string}> = (props) =>  {
 	const [vs, setVs] = useState(null)
 	const [time, setTime] = useState(0)
 	const [pcSkillLevel, setPcSkillLevel] = useState(10)
 	const [usernameOpponent, setUsernameOpponent] = useState("Opponent")
 	const [color, setColor] = useState(chess_color.white)
 	const [gameId, setGameId] = useState(null)
+	const [room, setRoom] = useState(null)
 	const [showPage, setShowPage] = useState(pages.vs)
 	const history = useHistory()
 	let { path, url } = useRouteMatch();
 	
 	useEffect(() => {							
-		socket.on("announce game starts", (data: types.DataGameStarts) => {	
-				let hasWhitePieces = data["username_white"] === props.username
-				setGameId(data["game_id"])
-							
-			  if (hasWhitePieces) {
-				  setUsernameOpponent(data["username_black"])
-				  setColor(chess_color.white)
-			  } else {
-				  setUsernameOpponent(data["username_white"])
-				  setColor(chess_color.black)				  
-			  }										
-				setTime(data["time_white"])	
+		socket.on("announce game starts", (data: types.Game) => {	
+				console.log(data)
+				let user = data["users"].filter(user => user.name === props.username)[0]
+				let opponent = data["users"].filter(user => user.name !== props.username)[0]
+
+				setGameId(data["id"])
+				setRoom(data["room"])
+				setTime(data["time"])							
+
+				setUsernameOpponent(opponent.name)
+				setColor(user.color === "white" ? chess_color.white : chess_color.black)
+			  					
 				history.push("/play")
 		  }
 		)
@@ -121,17 +122,19 @@ const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
 		let chess_color = "white"
 		if (vs === vs_options.human) {
 			let res = await fetchApiLeaveGames()
-			let game = await fetchApiCreateGame(vs, props.username, time_chosen, chess_color)
+			let game = await fetchApiCreateGame(vs, time_chosen)
 			setGameId(game.id)
+			setColor(game.users[0].color === "white" ? 1 : 0)
 			history.push("/play")
 		} else if (vs === vs_options.pc) {
 			setShowPage(pages.pc)
 		} else if (vs === vs_options.online) {
 			let res = await fetchApiLeaveGames()
-			let game = await fetchApiCreateGame(vs, props.username, time_chosen, chess_color)
+			let game = await fetchApiCreateGame(vs, time_chosen)
 			setGameId(game.id)
-			socket.emit("new online game")
-			socket.emit("join room", {"room": game.id})
+			setColor(game.users[0].color === "white" ? 1 : 0)
+			socket.emit("online game added")
+			socket.emit("join room", {"room": game.room})
 			setShowPage(pages.online)
 		}			
 	}
@@ -145,12 +148,13 @@ const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
 		setShowPage(pages.time)
 	}
 	
-	const handleClickJoinGame = (game_id: number) => {
-		socket.emit("join room", {"room": game_id})
+	const handleClickJoinGame = (game: types.Game) => {
+		socket.emit("join room", {"room": game.room})
+		console.log(`join room ${game.id}`)
 		
-		fetchApiJoinGame(game_id)
+		fetchApiJoinGame(game.id)
 			.then(res => {
-				socket.emit("start game", {"game_id": game_id})	
+				socket.emit("start game", {"game_id": game.id})	
 			})	
 	}
 	
@@ -170,9 +174,10 @@ const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
 	async function handleSubmit(e : React.ChangeEvent<HTMLInputElement>) {
 		e.preventDefault()
 		let res = await fetchApiLeaveGames()
-		let game = await fetchApiCreateGame(vs, props.username, time, "white", pcSkillLevel)
+		let game = await fetchApiCreateGame(vs, time, pcSkillLevel)
 		console.log(game)
 		setGameId(game.id)	
+		setColor(game.users[0].color === "white" ? 1 : 0)
 		history.push("/play")
 	}
 	
@@ -198,7 +203,7 @@ const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
 			case pages.online:
 				return <OnlineGame 
 							username={props.username} 
-							onClickJoin={(game_id : number) => handleClickJoinGame(game_id)} 
+							onClickJoin={(game : types.Game) => handleClickJoinGame(game)} 
 							onClickNew={() => handleClickNewOnlineGame()}
 							onClickBack={() => handleClickBack()} />
 			default:
@@ -219,6 +224,7 @@ const GameSettings: React.FC<types.GameSettingsProps> = (props) =>  {
 						gameId={gameId}							
 						time={time} 
 						color={color}
+						room={room}
 						onClick={() => handleNewGameClick()} />				
 				</Route>
 				<Route exact path="/settings">

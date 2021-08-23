@@ -73,44 +73,54 @@ export default function OnlineGame(props) {
 		return () => { is_cancelled = true }			
 	}, []) 
 	
- 	useEffect(() => {		
-		socket.on("announce games available", data => {
-			setGamesAvailable(data["games_available"])
+ 	useEffect(() => {				
+		socket.on("game added", data => {
+			console.log(data)
+			setGamesAvailable(prevGames => {
+				var array = [...prevGames]
+				array = array.filter(game => game.users[0].name !== data["game"].users[0].name)
+				array.push(data["game"])
+				return array
+			})
 		})
 		
 		socket.on("status change", data => {
+			console.log(data)  
 			if (data["is_online"]) {
-				setUsersOnline(prevUsers => [...prevUsers, data["username"]])
+				console.log("status change online")
+				setUsersOnline(prevUsers => [...prevUsers, data["user"]])
 			} else {
+				console.log("status change offline")
 				setUsersOnline(prevUsers => {
 					var array = [...prevUsers]
-					var index = array.indexOf(data["username"])
+					var index = array.findIndex(user => user.id === data["user"].id)
 					if (index !== -1) {
 						array.splice(index, 1)
 						return array
-					}					
+					}
+					return array
 				})
 			}
 		})
 		
 		return () => { 
-			socket.off("announce games available")
+			socket.off("game added")
 			socket.off("status change")
 		}
 	}, []) 
 	
 	
-  let users = usersOnline.map((user, id) => <li key={id}> {user} </li>)
+  let users = usersOnline.map((user, id) => <li key={id}> {user.name} </li>)
   
   let games = gamesAvailable.map((game, id) => 
 	  <OnlineGameItem 
 	    key={id}
 		id={id} 
 		username={props.username} 
-		username_game={game["username"]} 
-		game_id={game["game_id"]} 
+		username_game={game["users"][0]["name"]} 
+		game_id={game["id"]} 
 		time={game["time"]}
-		onClick={() => props.onClickJoin(game["game_id"])}/>
+		onClick={() => props.onClickJoin(game)}/>
   )
 
 

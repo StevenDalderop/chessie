@@ -44,8 +44,8 @@ export default function App(props) {
 				setUsername(data["name"])
 				setLoggedIn(data["is_authenticated"])
 				if (data["is_authenticated"]) {
-					socket.emit("user online")
-					history.push("/settings")					
+					history.push("/settings")
+					socket.emit("user online", {"username": data["name"]})					
 				} else {
 					history.push("/login")
 				}
@@ -60,7 +60,7 @@ export default function App(props) {
 				setLoggedIn(data["logged_in"])
 				setUsername(data["username"])
 			})
-	}, [])
+	}, [loggedIn])
 	
 
 	

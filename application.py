@@ -1,10 +1,9 @@
 import functools
-from flask import render_template, Flask, request, session, Response, redirect
-from flask_socketio import SocketIO, join_room, leave_room
+from flask import render_template, Flask, request, session, Response, redirect, url_for
+from flask_socketio import SocketIO, join_room, leave_room, disconnect
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-import json
 import chess
 import sys
 import os
@@ -12,19 +11,16 @@ import stat
 from stockfish import Stockfish
 import datetime
 import sqlite3
-
+from .config import Config
 from .constants import *
-from .secret import secret_key
 
 app = Flask(__name__)
+app.config.from_object(Config)
 socketio = SocketIO(app)
-
-app.secret_key = secret_key
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
 
 from .models import *
@@ -44,7 +40,8 @@ def authenticated_only(f):
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
         if not current_user.is_authenticated:
-            socketio.disconnect()
+            print("not authenticated")
+            disconnect()
         else:
             return f(*args, **kwargs)
     return wrapped
@@ -77,12 +74,12 @@ def signup():
     user = User.query.filter_by(name=name).first()
     
     if user:
-        return redirect("/signup")
+        return redirect(url_for("signup"))
     
-    new_user = User(name=name, password_hash=generate_password_hash(password), is_authenticated=True, is_active=True, is_anonymous=False, is_online = True)
+    new_user = User(name=name, password_hash=generate_password_hash(password), is_online = True)
     db.session.add(new_user)
     db.session.commit()
-    return redirect("/")        
+    return redirect(url_for("not_found"))        
     
 
 @app.route("/login", methods = ["GET", "POST"])
@@ -106,11 +103,11 @@ def login():
 
 @app.route("/logout", methods = ["GET"])
 @login_required
-def logout():    
+def logout():
     current_user.is_online = False
-    db.session.commit()
+    db.session.commit()   
     logout_user()
-    return redirect("/login")
+    return redirect(url_for("login"))
 
 
 @app.route("/is_authenticated")
@@ -222,52 +219,38 @@ def get_pc_move(game_id, skill_level):
 @app.route("/api/games") 
 @login_required   
 def get_games_available():   
-    online_games = get_online_games_available()   
-    return {"games_available": online_games}, 200
+    games = Game.query.filter_by(is_started = False, type_pk = "online").all()
+    data = [game.to_dict() for game in games]  
+    return {"games_available": data}, 200
 
 
 @app.route("/api/users")
 @login_required
 def get_users():
     users = User.query.filter_by(is_online = True).all()
-    names = [user.name for user in users]
-    return {"users_online": names}, 200
+    data = [user.to_dict() for user in users]
+    return {"users_online": data}, 200
     
 
 @app.route("/api/me/game")
 @login_required
-def get_current_game():
-    user_id = current_user.get_id()
-    user_details = UserDetails.query.filter_by(user_id = user_id).all()
-    
-    games = [Game.query.get(user_detail.game_id) for user_detail in user_details]
-    filtered_games = [game for game in games if not game.is_finished and game.type_pk != "human" and game.is_started]  
-
-    if len(filtered_games) > 1:
-        return {"error": "multiple current games"}, 400
-        
-    if len(filtered_games) == 0:
-        return {"current_game": None}, 200
-    
-    current_game = filtered_games[0]
-    
-    return current_game.get_json(), 200
+def get_current_game():    
+    current_game = current_user.get_current_game()
+    return {"current_game": current_game.to_dict()}, 200
     
     
 @app.route("/api/me/game", methods=["POST"])
 @login_required
-def create_new_game():   
-    fen = chess.STARTING_FEN
+def create_new_game(): 
+    user_id = current_user.get_id()  
+    
     time = int(request.json["time"])
     vs = request.json["game_type"]
-    username = request.json["username"]
-    color = request.json.get("color")
     skill_level = request.json.get("skill_level")
     
-    user = User.query.filter_by(name = username).first()
     game_type = GameType.query.get(vs)
     is_started = vs != "online"
-    game = Game(time = time, fen = fen, type = game_type, is_started = is_started, is_finished = False)
+    game = Game(time = time, type = game_type, is_started = is_started, is_finished = False)
     db.session.add(game)
     db.session.commit()
     
@@ -275,39 +258,28 @@ def create_new_game():
         pc_game = PCGame(game_id = game.id, skill_level = skill_level)
         db.session.add(pc_game)
         db.session.commit()
+        
+    if game_type.type == "online":
+        online_game = OnlineGame(game_id = game.id, game = game)
+        db.session.add(online_game)
+        db.session.commit()
     
-    user_details = UserDetails(time = time, color = color, game_id = game.id, user_id = user.id)
-
+    user_details = UserDetails(time = time, game_id = game.id, user_id = user_id)
     db.session.add(user_details)
     db.session.commit()
+    user_details.set_color()
+    db.session.commit()
     
-    return game.get_json(), 201
+    return game.to_dict(), 201
 
 
 @app.route("/api/me/game/resign")
 @login_required
-def resign():           
-    user_id = current_user.get_id()
-    user_details = UserDetails.query.filter_by(user_id = user_id)
-    
-    games = [Game.query.get(user_detail.game_id) for user_detail in user_details.all()]
-    filtered_games = [game for game in games if not game.is_finished and game.type_pk != "human" and game.is_started]
-
-    if len(filtered_games) > 1:
-        return {"error": "multiple current games"}, 400
-        
-    if len(filtered_games) == 0:
-        return {"error": "no current game"}, 400
-    
-    current_game = filtered_games[0]
-    
-    color = user_details.filter_by(game_id = current_game.id).first().color
-    
-    current_game.is_finished = True
-    current_game.result_pk = "1-0" if color == "black" else "0-1"
+def resign():               
+    current_user.resign_current_games()
     db.session.commit()
     
-    return current_game.get_json(), 200 
+    return "", 200 
     
 
 @app.route("/api/join-game", methods=["POST"])
@@ -320,19 +292,21 @@ def join_game():
         return {"error": "game does not exist"}, 400
     
     game.is_started = True
-    user_details = UserDetails(color = "black", time = game.time, user_id = current_user.get_id(), game_id = game.id)
-    
+    user_details = UserDetails(time = game.time, user_id = current_user.get_id(), game_id = game.id)    
     db.session.add(user_details)
     db.session.commit()
-    return "", 200
+    
+    user_details.set_color()
+    db.session.commit()
+    return game.to_dict(), 200
    
 
 @app.route("/api/me/leave-games")
 @login_required
 def leave_games():       
-    user_id = current_user.get_id()  
-    delete_games(db, user_id)
-    resign_games(db, user_id)    
+    current_user.delete_unstarted_games()
+    current_user.resign_current_games()    
+    db.session.commit()
     return "", 200  
 
 
@@ -345,122 +319,106 @@ def get_results():
     games = []
     for user_detail in user_details:
         game = Game.query.get(user_detail.game_id)
-        if not game.is_finished:
+        if not game.is_finished or game.type_pk == "human":
             continue
         
-        if game.type_pk == "online":
-            opponent_details = UserDetails.query.filter(UserDetails.user_id != current_user_id, UserDetails.game_id == game.id).first()
-            opponent = User.query.get(opponent_details.user_id)
-            opponent_username = opponent.name
-        elif game.type_pk == "pc":
-            pc_game = PCGame.query.filter_by(game_id = game.id).first()
-            opponent_username = pc_game.get_username()
-        else:
-            opponent_username = "-"
-            
-        json = {
-            "color": user_detail.color,
-            "time": game.time,
-            "moves": game.moves,
-            "type": game.type_pk,
-            "result": game.result_pk,
-            "opponent": opponent_username
-        }
-        games.append(json)
+        games.append(game.to_dict())
     return {"results": games}       
 
 
-    
-    
-
 @socketio.on("connect")
-@authenticated_only
 def connect():
-    username = current_user.name
-    socketio.emit("status change", {"username": username, "is_online": True}, broadcast = True)
-
+    pass
 
 @socketio.on("disconnect")
-@authenticated_only
-def disconnect():  
-    username = current_user.name
-    socketio.emit("status change", {"username": username, "is_online": False}, broadcast = True)
-    user_id = current_user.get_id()
-    delete_games(db, user_id)
-    resign_games(db, user_id)
-    announce_online_games(socketio)
+def disconnect():
+    pass
+
+#@socketio.on("disconnect")
+#@authenticated_only
+#def disconnect():
+#    print("disconnect")
+
+ #   current_game = current_user.get_current_game()
+  #  if current_game and not current_game.is_started and current_game.type_pk == "online":
+   #     socketio.emit("game change", {"game": current_game.to_dict(), "added": False}, broadcast = True)
+   # current_user.delete_unstarted_games()
+   # current_user.resign_current_game()    
+   # db.session.commit()
 
 
 @socketio.on("user online")
-@authenticated_only
-def user_online():   
-    username = current_user.name
-    socketio.emit("status change", {"username": username, "is_online": True}, broadcast = True)
-
-
-@socketio.on("user offline")
-@authenticated_only
-def user_offline(data):
-    socketio.emit("status change", {"username": data["username"], "is_online": False}, broadcast = True)
-
-
-@socketio.on("new online game")
-@authenticated_only
-def new_online_game():  
-    announce_online_games(socketio)
+def user_online(data):
+    username = data["username"]
+    print(f"user {username} online")
+    user = User.query.filter_by(name = username).first()
     
+    if user:
+        socketio.emit("status change", {"user": user.to_dict(), "is_online": True}, broadcast = True)
+    
+    
+@socketio.on("user offline")
+def user_offline(data):
+    username = data["username"]
+    print(f"user {username} offline")
+    user = User.query.filter_by(name = username).first()
+    
+    if user:
+        socketio.emit("status change", {"user": user.to_dict(), "is_online": False}, broadcast = True)
+
+
+@socketio.on("online game added")
+@authenticated_only
+def new_online_game():
+    print("game added")
+    unstarted_game = current_user.get_unstarted_game()
+    if unstarted_game:
+        socketio.emit("game added", {"game": unstarted_game.to_dict()}, broadcast = True)
+
     
 @socketio.on("join room")
 @authenticated_only
 def on_join_room(data):
-    room = str(data["room"])
+    room = data["room"]
     join_room(room) 
 
+
+@socketio.on("leave room")
+@authenticated_only
+def on_leave_room(data):
+    room = data["room"]
+    leave_room(room)
+    
 
 @socketio.on("start game")
 @authenticated_only
 def start_game(data):    
-    game_id = data["game_id"]
-            
+    game_id = data["game_id"]           
     game = Game.query.get(game_id)
-    user_details_white = UserDetails.query.filter_by(game_id = game_id, color = "white").first()
-    user_details_black = UserDetails.query.filter_by(game_id = game_id, color = "black").first()
-    user_white = User.query.get(user_details_white.user_id)
-    user_black = User.query.get(user_details_black.user_id)
-    
-    data = {
-        "game_id": game_id,
-        "fen": game.fen, 
-        "username_white": user_white.name, 
-        "username_black": user_black.name,
-        "time_white": user_details_white.time, 
-        "time_black": user_details_black.time
-    }
-    
-    socketio.emit("announce game starts", data, to = str(game_id))
+    online_game = game.online[0]
+    socketio.emit("announce game starts", game.to_dict(), room=online_game.room)
     
 
 @socketio.on("make move")
 @authenticated_only
-def make_move(data):
-    room = data.pop("room")
-    socketio.emit("announce move", data, room = str(room))
+def make_move(data):   
+    socketio.emit("announce move", data, room = data["room"])
 
 
 @socketio.on("resign")
 @authenticated_only
 def resign(data): 
-    socketio.emit("announce resign", {"username": data["username"]}, room=str(data["room"]))
+    socketio.emit("announce resign", {"username": data["username"]}, room=data["room"])
 
 
 @socketio.on("offer draw")
 @authenticated_only
 def offer_draw(data): 
-    socketio.emit("announce draw offered", {"username": data["username"]}, room=str(data["room"]))
+    socketio.emit("announce draw offered", {"username": data["username"]}, room=data["room"])
 
 
 @socketio.on("draw")
 @authenticated_only
 def respond_to_draw_offer(data): 
-    socketio.emit("announce draw decision", {"accepted": data["accepted"]}, room=str(data["room"]))
+    socketio.emit("announce draw decision", {"accepted": data["accepted"]}, room=data["room"])
     

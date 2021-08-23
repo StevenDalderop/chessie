@@ -24,7 +24,7 @@ export default function Header(props) {
 						<LinkItem name="New game" link="/settings" />
 						<LinkItem name="Results" link="/results" />
 						<li className="nav-item">
-							<a className="nav-link" href="/logout" onClick = {() => {socket.emit("user offline", {"username": props.username})}}> Logout </a>
+							<a className="nav-link" href="/logout" onClick={() => {socket.emit("user offline", {"username": props.username})}}> Logout </a>
 						</li>
 						
 					</>

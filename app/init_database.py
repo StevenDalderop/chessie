@@ -2,9 +2,6 @@ from app import db
 from app.models import Color, GameResult, GameType 
 
 def init_database():
-    db.drop_all()
-    db.create_all()
-
     color_white = Color(color = "white")
     color_black = Color(color = "black")
     db.session.add(color_white)

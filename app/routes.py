@@ -231,13 +231,17 @@ def get_current_game():
 def create_new_game(): 
     user_id = current_user.get_id()  
     
-    time = int(request.json["time"])
-    vs = request.json["game_type"]
+    print(request.json)
+    
+    time = request.json.get("time")
+    vs = request.json.get("game_type")
     skill_level = request.json.get("skill_level")
+    print(time, vs, skill_level)
+    
     
     game_type = GameType.query.get(vs)
     is_started = vs != "online"
-    game = Game(time = time, type = game_type, is_started = is_started, is_finished = False)
+    game = Game(time = time, type = game_type, type_pk = vs, is_started = is_started, is_finished = False)
     db.session.add(game)
     db.session.commit()
     

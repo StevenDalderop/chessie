@@ -36,10 +36,8 @@ class User(UserMixin, db.Model):
         }
         return data
         
-    def get_current_game(self):
-        user_details = UserDetails.query.filter_by(user_id = self.id).all()
-    
-        games = [Game.query.get(user_detail.game_id) for user_detail in user_details]
+    def get_current_game(self):    
+        games = [Game.query.get(user_detail.game_id) for user_detail in self.details]
         current_games = [game for game in games if not game.is_finished and game.is_started]  
             
         if len(current_games) == 0:
@@ -47,10 +45,8 @@ class User(UserMixin, db.Model):
             
         return current_games[0]
         
-    def resign_current_games(self):       
-        user_details = UserDetails.query.filter_by(user_id = self.id).all()
-              
-        for user_detail in user_details:
+    def resign_current_games(self):                    
+        for user_detail in self.details:
             color = user_detail.color
             game = Game.query.get(user_detail.game_id)
             
@@ -58,10 +54,8 @@ class User(UserMixin, db.Model):
                 game.is_finished = True
                 game.result_pk = "1-0" if color == "black" else "0-1"                 
         
-    def get_unstarted_game(self):
-        user_details = UserDetails.query.filter_by(user_id = self.id).all()
-    
-        games = [Game.query.get(user_detail.game_id) for user_detail in user_details]
+    def get_unstarted_game(self):   
+        games = [Game.query.get(user_detail.game_id) for user_detail in self.details]
         unstarted_games = [game for game in games if not game.is_started]
         
         if len(unstarted_games) == 0:
@@ -69,16 +63,12 @@ class User(UserMixin, db.Model):
         
         return unstarted_games[0]
         
-    def delete_unstarted_games(self):
-        user_details = UserDetails.query.filter_by(user_id = self.id).all()
-    
-        for user_detail in user_details:
+    def delete_unstarted_games(self):    
+        for user_detail in self.details:
             game = Game.query.get(user_detail.game_id)
             if game and not game.is_started:
                 db.session.delete(game)
                 
-
-
 
 class UserDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,6 +77,7 @@ class UserDetails(db.Model):
     game_id = db.Column(db.Integer, db.ForeignKey('game.id', ondelete="CASCADE"))
     game = db.relationship("Game", backref = db.backref("details", cascade = "all,delete"))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"))
+    user = db.relationship("User", backref = db.backref("details", cascade = "all,delete"))
     
     def set_color(self):
         user_count = len(UserDetails.query.filter_by(game_id = self.game_id).all())
@@ -119,7 +110,7 @@ class Game(db.Model):
     fen = db.Column(db.String(100), default=chess.STARTING_FEN)
     moves = db.Column(db.String(100))
     type_pk = db.Column(db.String(100), db.ForeignKey('game_type.type'), nullable=False)
-    type = db.relationship("GameType")  
+    type = db.relationship("GameType")
     is_started = db.Column(db.Boolean)
     is_finished = db.Column(db.Boolean, default=False)    
     result_pk = db.Column(db.String, db.ForeignKey('game_result.result'))

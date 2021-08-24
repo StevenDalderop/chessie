@@ -1,5 +1,5 @@
-from .application import db
-from .models import Color, GameResult, GameType 
+from app import db
+from app.models import Color, GameResult, GameType 
 
 def init_database():
     db.drop_all()

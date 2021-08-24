@@ -1,39 +1,15 @@
+from app import app, socketio, db, login_manager
+from app.models import *
+from app.utils import * 
+from app.constants import *
+from app.stockfish import stockfish
+
 import functools
-from flask import render_template, Flask, request, session, Response, redirect, url_for
-from flask_socketio import SocketIO, join_room, leave_room, disconnect
-from flask_login import LoginManager, login_required, login_user, logout_user, current_user
-from flask_sqlalchemy import SQLAlchemy
+from flask import render_template, request, session, Response, redirect, url_for
+from flask_socketio import join_room, leave_room, disconnect
+from flask_login import login_required, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import chess
-import sys
-import os
-import stat
-from stockfish import Stockfish
-import datetime
-import sqlite3
-from .config import Config
-from .constants import *
-
-app = Flask(__name__)
-app.config.from_object(Config)
-socketio = SocketIO(app)
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-db = SQLAlchemy(app)
-
-from .models import *
-from .utils import * 
-
-if __name__ == '__main__':
-    socketio.run(app, debug = True)
-
-if sys.platform == "linux":
-    os.chmod(STOCKFISH_LINUX, stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-    stockfish = Stockfish(STOCKFISH_LINUX)
-else:
-    stockfish = Stockfish(STOCKFISH_WINDOWS)
 
 
 def authenticated_only(f):
@@ -45,23 +21,31 @@ def authenticated_only(f):
         else:
             return f(*args, **kwargs)
     return wrapped
-    
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
  
 
 @login_manager.unauthorized_handler
 def unauthorized():
     print("Unauthorized")
-    return redirect("/login")
+    return redirect(url_for("login"))
+
 
 @app.errorhandler(404)
 @login_required
 def not_found(e):
     return render_template("index.html")
 
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('index.html'), 500
+    
+    
+@app.route("/")
+@login_required
+def index():
+    return render_template("index.html")
+    
 
 @app.route("/signup", methods = ["GET", "POST"])
 def signup():
@@ -79,11 +63,14 @@ def signup():
     new_user = User(name=name, password_hash=generate_password_hash(password), is_online = True)
     db.session.add(new_user)
     db.session.commit()
-    return redirect(url_for("not_found"))        
+    return redirect(url_for("index"))        
     
 
 @app.route("/login", methods = ["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+        
     if request.method == "GET":
         return render_template("index.html")
     
@@ -92,7 +79,7 @@ def login():
 
     user = User.query.filter_by(name=name).first()
     
-    if not user or not check_password_hash(user.password_hash, password):
+    if user is None or not check_password_hash(user.password_hash, password):
         return {"name": name, "is_authenticated": False}
     
     login_user(user)

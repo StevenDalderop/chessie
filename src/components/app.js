@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { BrowserRouter as Router, Route, Link, Switch, useHistory, Redirect } from "react-router-dom"
 import Game from "./game"
 import Header from "./header"
-import { GetUsername, Signup, Login } from "./windows"
+import { GetUsername, Signup, Login, ResetPassword, SetPassword } from "./windows"
 import Results from "./results"
 import GameSettings from "./game_settings"
 import css from "./app.css"
@@ -63,8 +63,6 @@ export default function App(props) {
 	}, [loggedIn])
 	
 
-	
-
 	return (
 		<>
 			<Header username={username} loggedIn={loggedIn} />
@@ -76,6 +74,12 @@ export default function App(props) {
 					<Route exact path="/signup">
 						<Signup onChange={(e) => handleChange(e)} />
 					</Route>
+					<Route path="/reset-password">
+						<ResetPassword />
+					</Route>
+					<Route path="/set-password">
+						<SetPassword />
+					</Route>					
 					<Route exact path="/results">
 						<Results username={username} />
 					</Route>

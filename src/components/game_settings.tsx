@@ -72,7 +72,7 @@ const fetchApiJoinGame = (game_id : number) => {
 		"body": JSON.stringify({"game_id": game_id})			
 	}
 	
-	return fetch(`${baseURL}/api/join-game`, json) 		
+	return fetch(`${baseURL}/api/join-game`, json)
 }
 	
 const GameSettings: React.FC<{username: string}> = (props) =>  {
@@ -153,9 +153,12 @@ const GameSettings: React.FC<{username: string}> = (props) =>  {
 		console.log(`join room ${game.id}`)
 		
 		fetchApiJoinGame(game.id)
-			.then(res => {
+			.then(res => { if (res.status >= 400) {
+				return res.json()
+					.then(err => console.log(err))
+			} else {
 				socket.emit("start game", {"game_id": game.id})	
-			})	
+			}})
 	}
 	
 	const handleNewGameClick = () => {

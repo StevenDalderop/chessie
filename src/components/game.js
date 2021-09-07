@@ -161,6 +161,7 @@ class Game extends React.Component {
 			  this.switchTimer()
 			}
 		})
+		.catch(err => console.log(err))
   }
   
   get_pc_move() {

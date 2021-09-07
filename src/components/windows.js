@@ -133,8 +133,31 @@ export function Login(props) {
 				<input type="password" name="password" placeholder="password" className="mt-1" /> <br></br>
 				<button className="btn btn-primary mt-3"> Submit </button>
 			</form>
+			<a href="/reset-password"> Forgot password? </a>
 		</Dialog>	
 	)
+}
+
+export function ResetPassword(props) {
+	return (
+		<Dialog title = "Reset password">
+			<form action="/reset-password" method="post">
+				<input type="email" name="email" maxLength="100" placeholder="email" /> <br></br>
+				<button className="btn btn-primary mt-3"> Submit </button>
+			</form>
+		</Dialog>	
+	)	
+}
+
+export function SetPassword(props) {
+	return (
+		<Dialog title = "Reset password">
+			<form action="" method="post">
+				<input type="password" name="password" maxLength="100" placeholder="password" /> <br></br>
+				<button className="btn btn-primary mt-3"> Submit </button>
+			</form>
+		</Dialog>	
+	)	
 }
 
 

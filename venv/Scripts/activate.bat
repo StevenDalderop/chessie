@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\Steve\Downloads\wetransfer_overzetten_2021-11-28_1708\overzetten\chessie\venv
+set VIRTUAL_ENV=C:\Users\Steve\Documents\Programmeren\chessie\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

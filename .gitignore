@@ -3,3 +3,4 @@ chess-venv
 node_modules/
 *.db
 flask_session/
+venv/

@@ -8,10 +8,10 @@ from flask_login import login_required, login_user, logout_user, current_user
 from app.auth.email import send_password_reset_email
 
 
-@login_manager.unauthorized_handler
-def unauthorized():
-    print("Unauthorized")
-    return redirect(url_for("auth.login"))
+#@login_manager.unauthorized_handler
+#def unauthorized():
+#    print("Unauthorized..")
+#    return redirect(url_for("auth.login"))
 
 
 @bp.route("/signup", methods = ["GET", "POST"])
@@ -30,13 +30,13 @@ def signup():
     new_user = User(name=name, password_hash=generate_password_hash(password), is_online = True)
     db.session.add(new_user)
     db.session.commit()
-    return redirect(url_for("index"))        
+    return redirect(url_for("main.index"))        
     
 
 @bp.route("/login", methods = ["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("index"))
+        return redirect(url_for("main.index"))
         
     if request.method == "GET":
         return render_template("index.html")
@@ -46,7 +46,7 @@ def login():
 
     user = User.query.filter_by(name=name).first()
     
-    if user is None or not check_password_hash(user.password_hash, password):
+    if user is None or not user.verify_password(password):
         return {"name": name, "is_authenticated": False}
     
     login_user(user)
@@ -67,7 +67,7 @@ def logout():
 @bp.route("/reset-password", methods = ["GET", "POST"])
 def reset_password():
     if current_user.is_authenticated:
-        return redirect(url_for("index"))
+        return redirect(url_for("main.index"))
         
     if request.method == "GET":
         return render_template("index.html")
@@ -82,7 +82,7 @@ def reset_password():
 @bp.route("/set-password/<string:token>", methods = ["GET", "POST"])
 def set_password(token):
     if current_user.is_authenticated:
-        return redirect(url_for("index"))
+        return redirect(url_for("main.index"))
     
     if request.method == "GET":
         return render_template("index.html")
@@ -94,12 +94,3 @@ def set_password(token):
         db.session.commit() 
 
     return redirect(url_for("auth.login"))   
-    
-
-@bp.route("/is_authenticated")
-def is_authenticated():
-    logged_in = current_user.is_authenticated
-    username = "" 
-    if logged_in: 
-        username = current_user.name
-    return {"logged_in": logged_in, "username": username}

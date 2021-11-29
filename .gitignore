@@ -2,4 +2,4 @@
 chess-venv
 node_modules/
 *.db
-secret.py
+flask_session/

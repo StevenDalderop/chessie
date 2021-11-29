@@ -5,7 +5,7 @@ from flask import template_rendered
 from flask_socketio import SocketIO
 from contextlib import contextmanager
 import chess
-from  unittest.mock import patch
+from unittest.mock import patch
 import application
 
 @contextmanager

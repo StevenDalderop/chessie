@@ -1,8 +1,11 @@
+from flask import request
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from app.api.errors import error_response
+from app.api.email import send_password_reset_email
 from app.models import User
 
 from app import db 
+from app.api import bp
 
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth(scheme='Bearer')
@@ -32,3 +35,19 @@ def token_auth_error(status):
         message = "User not authenticated"        
         return error_response(status, message)
     return error_response(status)
+
+@bp.route("/reset-password")
+def reset_password():
+    user = token_auth.current_user()
+    if user:
+        return error_response(400, "user already authenticated")
+
+    data = request.get_json()
+    if 'email' not in data:
+        return error_response(400, "no email provided")
+
+    email = data.email
+    user = User.query.filter_by(email = email).first()
+    if user:
+        send_password_reset_email(user)
+    return "", 201

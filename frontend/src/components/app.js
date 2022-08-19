@@ -105,6 +105,35 @@ export default function App(props) {
 			})
 			.catch(err => console.log(err))		
 	}	
+
+	function handlePasswordReset(e) {
+		e.preventDefault()
+		var email = e.target.email.value
+
+		var data = {
+			"email": email
+		}
+
+		let json = {
+			"method": "post", 
+			"body": JSON.stringify(data)
+		}
+
+		fetch(`${baseURL}/api/reset-password`, json)
+			.then(data => {
+				console.log(data)
+				if ('error' in data) {
+					setAlert({"message": data["message"], "type": "danger"})
+					let err = new Error(data.message)
+					err.status = data.code
+					throw err					
+				} else {
+					setAlert({"message": "Password reset email send", "type": "success", "timeout": 3000})
+					history.push("/set-password")				
+				}
+			})
+			.catch(err => console.log(err))
+	}
 	
 	function handleError(data) {
 		if (data["code"] === 401) {
@@ -120,11 +149,13 @@ export default function App(props) {
 			history.push("/login")
 		}
 		
+		console.log("test")
 		let encodedToken = encodeURIComponent(token)
 		
 		fetch(`${baseURL}/api/is_token_valid?token=${encodedToken}`)
 			.then(res => res.json())
 			.then(data => {
+				console.log(data)
 				if (data["user"]) {
 					setLoggedIn(true)
 					setUsername(data["user"]["name"])
@@ -164,7 +195,7 @@ export default function App(props) {
 						<Signup onChange={(e) => handleChange(e)} onSubmit={(e) => handleSignup(e)} />
 					</Route>
 					<Route exact path="/reset-password">
-						<ResetPassword />
+						<ResetPassword onSubmit={(e) => handlePasswordReset(e)}/>
 					</Route>
 					<Route exact path="/set-password">
 						<SetPassword />

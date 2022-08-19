@@ -5,6 +5,7 @@ from flask import render_template
 
 @bp.app_errorhandler(404)
 def not_found(e):
+    print("not found")
     return render_template("index.html")
 
 @bp.app_errorhandler(500)

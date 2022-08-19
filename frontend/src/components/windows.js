@@ -1,5 +1,5 @@
 import React, {useState} from "react"
-import { useHistory } from "react-router-dom"
+import { useHistory, Link } from "react-router-dom"
 import Dialog from "./dialog"
 import { Option, OptionMenu } from "./option_menu"
 import css from "./windows.css"
@@ -133,7 +133,7 @@ export function Login(props) {
 				<input type="password" name="password" placeholder="password" className="mt-1" /> <br></br>
 				<button className="btn btn-primary mt-3"> Submit </button>
 			</form>
-			<a href="/reset-password"> Forgot password? </a>
+			<Link to="/reset-password"> Forgot password? </Link>
 		</Dialog>	
 	)
 }
@@ -141,7 +141,7 @@ export function Login(props) {
 export function ResetPassword(props) {
 	return (
 		<Dialog title = "Reset password">
-			<form action="/reset-password" method="post">
+			<form name="reset-password" onSubmit={(e) => props.onSubmit(e)}>
 				<input type="email" name="email" maxLength="100" placeholder="email" /> <br></br>
 				<button className="btn btn-primary mt-3"> Submit </button>
 			</form>

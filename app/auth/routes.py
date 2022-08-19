@@ -5,7 +5,7 @@ from app import login_manager, db
 from flask import render_template, request, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, login_user, logout_user, current_user
-from app.auth.email import send_password_reset_email
+#from app.auth.email import send_password_reset_email
 
 
 #@login_manager.unauthorized_handler
@@ -63,7 +63,7 @@ def logout():
     logout_user()
     return redirect(url_for("auth.login"))
 
-
+'''
 @bp.route("/reset-password", methods = ["GET", "POST"])
 def reset_password():
     if current_user.is_authenticated:
@@ -76,7 +76,7 @@ def reset_password():
     user = User.query.filter_by(email = email).first()
     if user:
         send_password_reset_email(user)
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login"))'''
 
 
 @bp.route("/set-password/<string:token>", methods = ["GET", "POST"])
